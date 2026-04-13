@@ -224,7 +224,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const Spacer(),
             PopupMenuButton<String>(
               initialValue: _selectedSort,
               onSelected: (value) {
