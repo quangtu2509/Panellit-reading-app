@@ -212,15 +212,19 @@ class _LibraryPageState extends State<LibraryPage> {
       children: [
         Row(
           children: [
-            const Text(
-              '12 Titles',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF31363A),
+            const Flexible(
+              child: Text(
+                '12 Titles',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF31363A),
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 12),
             PopupMenuButton<String>(
               initialValue: _selectedSort,
               onSelected: (value) {
@@ -263,8 +267,8 @@ class _LibraryPageState extends State<LibraryPage> {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 14,
+                  horizontal: 14,
+                  vertical: 12,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -282,7 +286,7 @@ class _LibraryPageState extends State<LibraryPage> {
                     Text(
                       'Sort',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         color: Colors.grey.shade700,
                         fontWeight: FontWeight.w500,
                       ),
@@ -290,6 +294,7 @@ class _LibraryPageState extends State<LibraryPage> {
                     const SizedBox(width: 6),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
+                      size: 18,
                       color: Colors.grey.shade700,
                     ),
                   ],
@@ -345,14 +350,14 @@ class _LibraryPageState extends State<LibraryPage> {
                 'Explore 500+ New\nSeries This Weekend',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.w800,
                   height: 1.15,
                 ),
               ),
               const SizedBox(height: 20),
               SizedBox(
-                width: 220,
+                width: double.infinity,
                 height: 52,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
@@ -365,7 +370,7 @@ class _LibraryPageState extends State<LibraryPage> {
                       'Browse Now',
                       style: TextStyle(
                         color: Color(0xFF0B6B8A),
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -423,99 +428,107 @@ class _LibraryCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              width: 165,
-              height: 220,
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x22000000),
-                    blurRadius: 14,
-                    offset: Offset(0, 8),
-                  ),
-                ],
+        SizedBox(
+          width: 145,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 145,
+                height: 190,
+                decoration: BoxDecoration(
+                  color: item.color,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x22000000),
+                      blurRadius: 14,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.image_outlined,
+                  color: Colors.white24,
+                  size: 38,
+                ),
               ),
-              child: const Icon(
-                Icons.image_outlined,
-                color: Colors.white24,
-                size: 42,
-              ),
-            ),
-            if (item.badge != null)
-              Positioned(
-                top: 10,
-                left: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F7AA5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    item.badge!,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
+              if (item.badge != null)
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F7AA5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      item.badge!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
-        const SizedBox(width: 18),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 22,
                   height: 1.05,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF31363A),
                 ),
               ),
-              const SizedBox(height: 12),
-              Row(
+              const SizedBox(height: 10),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     item.genre,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF5C7499),
                     ),
                   ),
                   const Text(
                     ' • ',
-                    style: TextStyle(fontSize: 18, color: Color(0xFF9AA3AE)),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF9AA3AE)),
                   ),
                   Text(
                     item.updatedText,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       color: Color(0xFF7D848C),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Row(
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 10,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFD6ECFB),
@@ -524,17 +537,16 @@ class _LibraryCard extends StatelessWidget {
                     child: Text(
                       item.chapter,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         color: Color(0xFF1D6D93),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
                   Text(
                     item.actionLabel,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 15,
                       color: Color(0xFF0F7AA5),
                       fontWeight: FontWeight.w800,
                     ),
