@@ -39,3 +39,17 @@ class HomeNovelItem {
     required this.reads,
   });
 }
+
+enum HomeNotificationType { savedWorkChapterUpdate, general }
+
+class HomeNotificationItem {
+  final HomeNotificationType type;
+  final bool isUnread;
+  final String title;
+
+  const HomeNotificationItem({
+    required this.type,
+    required this.isUnread,
+    required this.title,
+  });
+}

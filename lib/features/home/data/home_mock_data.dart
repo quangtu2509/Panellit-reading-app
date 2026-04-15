@@ -78,3 +78,16 @@ const List<HomeNovelItem> kHomeTopWebnovels = [
     reads: '720k Reads',
   ),
 ];
+
+const List<HomeNotificationItem> kHomeNotifications = [
+  HomeNotificationItem(
+    type: HomeNotificationType.savedWorkChapterUpdate,
+    isUnread: true,
+    title: 'Shadow Realm Chronicles has a new chapter',
+  ),
+  HomeNotificationItem(
+    type: HomeNotificationType.general,
+    isUnread: false,
+    title: 'Weekly reading digest is ready',
+  ),
+];
