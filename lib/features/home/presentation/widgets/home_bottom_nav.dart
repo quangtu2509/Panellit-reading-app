@@ -27,19 +27,16 @@ class HomeBottomNav extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           const _BottomNavItem(
-            icon: Icons.explore_rounded,
-            label: 'EXPLORE',
+            icon: Icons.home_rounded,
+            label: 'HOME',
             active: true,
           ),
           _BottomNavItem(
-            icon: Icons.library_books_outlined,
+            icon: Icons.library_books_rounded,
             label: 'LIBRARY',
             onTap: onLibraryTap,
           ),
-          const _BottomNavItem(
-            icon: Icons.menu_book_outlined,
-            label: 'READING',
-          ),
+          const _BottomNavItem(icon: Icons.search_rounded, label: 'SEARCH'),
           const _BottomNavItem(
             icon: Icons.person_outline_rounded,
             label: 'PROFILE',
@@ -66,20 +63,33 @@ class _BottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active ? HomeColors.primary : HomeColors.bottomInactive;
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
+
+    final content = AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      padding: EdgeInsets.symmetric(
+        horizontal: active ? 18 : 8,
+        vertical: active ? 10 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: active ? const Color(0xFFD9ECF8) : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
 
     if (onTap == null) {
@@ -88,11 +98,8 @@ class _BottomNavItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: content,
-      ),
+      borderRadius: BorderRadius.circular(16),
+      child: content,
     );
   }
 }
