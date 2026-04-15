@@ -41,7 +41,7 @@ class HomeFeaturedBanner extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Colors.white.withOpacity(0.95),
+                    Colors.white.withValues(alpha: 0.95),
                     const Color(0xFFB8D9FF),
                   ],
                 ),
@@ -57,7 +57,7 @@ class HomeFeaturedBanner extends StatelessWidget {
                   const SizedBox(width: 8),
                   _Chip(
                     label: 'ACTION',
-                    backgroundColor: Colors.white.withOpacity(0.14),
+                    backgroundColor: Colors.white.withValues(alpha: 0.14),
                   ),
                 ],
               ),
