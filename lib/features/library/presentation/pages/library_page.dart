@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/router/smooth_page_route.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../data/library_mock_data.dart';
+import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
+import '../../data/models/library_reading_item.dart';
 import '../theme/library_colors.dart';
 import '../widgets/library_bottom_nav.dart';
 import '../widgets/library_card.dart';
+import '../widgets/library_completed_card.dart';
 import '../widgets/library_recommend_banner.dart';
-import '../widgets/library_sort_button.dart';
+import '../widgets/library_reading_card.dart';
+import '../widgets/library_tab_section.dart';
 import '../widgets/library_top_bar.dart';
 
 class LibraryPage extends StatefulWidget {
@@ -18,7 +23,9 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
-  LibrarySortOption _selectedSort = LibrarySortOption.newestToOldest;
+  LibrarySortOption _followingSort = LibrarySortOption.newestToOldest;
+  LibrarySortOption _readingSort = LibrarySortOption.newestToOldest;
+  LibrarySortOption _completedSort = LibrarySortOption.newestToOldest;
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +73,8 @@ class _LibraryPageState extends State<LibraryPage> {
                 child: TabBarView(
                   children: [
                     _buildFollowingTab(),
-                    _buildPlaceholderTab('Reading list will appear here.'),
-                    _buildPlaceholderTab('Completed books will appear here.'),
+                    _buildReadingTab(),
+                    _buildCompletedTab(),
                   ],
                 ),
               ),
@@ -76,9 +83,9 @@ class _LibraryPageState extends State<LibraryPage> {
         ),
         bottomNavigationBar: LibraryBottomNav(
           onHomeTap: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
+            Navigator.of(
+              context,
+            ).pushReplacement(buildSmoothPageRoute(const HomePage()));
           },
         ),
       ),
@@ -86,33 +93,18 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildFollowingTab() {
-    final sortedItems = _sortedItems(kFollowingLibraryItems);
+    final sortedItems = _sortedFollowingItems(kFollowingLibraryItems);
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 96),
+    return LibraryTabSection(
+      topPadding: 18,
+      title: '$kLibraryTotalTitles Titles',
+      selectedSort: _followingSort,
+      onSortSelected: (value) {
+        setState(() {
+          _followingSort = value;
+        });
+      },
       children: [
-        Row(
-          children: [
-            Text(
-              '$kLibraryTotalTitles Titles',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: LibraryColors.title,
-              ),
-            ),
-            const Spacer(),
-            LibrarySortButton(
-              selectedSort: _selectedSort,
-              onSelected: (value) {
-                setState(() {
-                  _selectedSort = value;
-                });
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 18),
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 28),
@@ -124,23 +116,54 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Widget _buildPlaceholderTab(String text) {
-    return Center(
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          color: LibraryColors.subtitle,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+  Widget _buildReadingTab() {
+    final sortedItems = _sortedReadingItems(kReadingLibraryItems);
+
+    return LibraryTabSection(
+      topPadding: 16,
+      selectedSort: _readingSort,
+      onSortSelected: (value) {
+        setState(() {
+          _readingSort = value;
+        });
+      },
+      children: [
+        ...sortedItems.map((item) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 22),
+            child: LibraryReadingCard(item: item),
+          );
+        }),
+      ],
     );
   }
 
-  List<LibraryItem> _sortedItems(List<LibraryItem> items) {
+  Widget _buildCompletedTab() {
+    final sortedItems = _sortedCompletedItems(kCompletedLibraryItems);
+
+    return LibraryTabSection(
+      topPadding: 16,
+      selectedSort: _completedSort,
+      onSortSelected: (value) {
+        setState(() {
+          _completedSort = value;
+        });
+      },
+      children: [
+        ...sortedItems.map((item) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: LibraryCompletedCard(item: item),
+          );
+        }),
+      ],
+    );
+  }
+
+  List<LibraryItem> _sortedFollowingItems(List<LibraryItem> items) {
     final result = List<LibraryItem>.from(items);
 
-    switch (_selectedSort) {
+    switch (_followingSort) {
       case LibrarySortOption.az:
         result.sort((a, b) => a.title.compareTo(b.title));
         break;
@@ -152,6 +175,54 @@ class _LibraryPageState extends State<LibraryPage> {
         break;
       case LibrarySortOption.oldestToNewest:
         result.sort((a, b) => b.updatedHoursAgo.compareTo(a.updatedHoursAgo));
+        break;
+    }
+
+    return result;
+  }
+
+  List<LibraryReadingItem> _sortedReadingItems(List<LibraryReadingItem> items) {
+    final result = List<LibraryReadingItem>.from(items);
+
+    switch (_readingSort) {
+      case LibrarySortOption.az:
+        result.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case LibrarySortOption.za:
+        result.sort((a, b) => b.title.compareTo(a.title));
+        break;
+      case LibrarySortOption.newestToOldest:
+        result.sort((a, b) => a.lastReadHoursAgo.compareTo(b.lastReadHoursAgo));
+        break;
+      case LibrarySortOption.oldestToNewest:
+        result.sort((a, b) => b.lastReadHoursAgo.compareTo(a.lastReadHoursAgo));
+        break;
+    }
+
+    return result;
+  }
+
+  List<LibraryCompletedItem> _sortedCompletedItems(
+    List<LibraryCompletedItem> items,
+  ) {
+    final result = List<LibraryCompletedItem>.from(items);
+
+    switch (_completedSort) {
+      case LibrarySortOption.az:
+        result.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case LibrarySortOption.za:
+        result.sort((a, b) => b.title.compareTo(a.title));
+        break;
+      case LibrarySortOption.newestToOldest:
+        result.sort(
+          (a, b) => a.completedHoursAgo.compareTo(b.completedHoursAgo),
+        );
+        break;
+      case LibrarySortOption.oldestToNewest:
+        result.sort(
+          (a, b) => b.completedHoursAgo.compareTo(a.completedHoursAgo),
+        );
         break;
     }
 
