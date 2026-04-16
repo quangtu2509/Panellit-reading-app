@@ -4,8 +4,13 @@ import '../theme/library_colors.dart';
 
 class LibraryBottomNav extends StatelessWidget {
   final VoidCallback onHomeTap;
+  final VoidCallback onSearchTap;
 
-  const LibraryBottomNav({super.key, required this.onHomeTap});
+  const LibraryBottomNav({
+    super.key,
+    required this.onHomeTap,
+    required this.onSearchTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +44,7 @@ class LibraryBottomNav extends StatelessWidget {
           _BottomNavItem(
             icon: Icons.search_rounded,
             label: 'SEARCH',
-            onTap: () {},
+            onTap: onSearchTap,
           ),
           _BottomNavItem(
             icon: Icons.person_outline_rounded,

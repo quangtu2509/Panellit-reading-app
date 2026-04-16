@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../theme/library_colors.dart';
 
 class LibraryTopBar extends StatelessWidget {
-  const LibraryTopBar({super.key});
+  final VoidCallback onNotificationTap;
+
+  const LibraryTopBar({super.key, required this.onNotificationTap});
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +31,22 @@ class LibraryTopBar extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none_rounded, size: 30),
-                color: LibraryColors.mutedIcon,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onNotificationTap,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.notifications_none_rounded,
+                      size: 30,
+                      color: LibraryColors.mutedIcon,
+                    ),
+                  ),
+                ),
               ),
               Positioned(
                 right: 12,

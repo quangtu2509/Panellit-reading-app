@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/router/smooth_page_route.dart';
 import '../../../home/presentation/pages/home_page.dart';
+import '../../../discover/presentation/pages/search_page.dart';
+import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../data/library_mock_data.dart';
 import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
@@ -36,7 +38,44 @@ class _LibraryPageState extends State<LibraryPage> {
         body: SafeArea(
           child: Column(
             children: [
-              const LibraryTopBar(),
+              LibraryTopBar(
+                onNotificationTap: () {
+                  Navigator.of(context).push(
+                    buildSmoothPageRoute(
+                      NotificationsPage(
+                        onHomeTap: () {
+                          Navigator.of(context).pushReplacement(
+                            buildSmoothPageRoute(const HomePage()),
+                          );
+                        },
+                        onLibraryTap: () {
+                          Navigator.of(context).pushReplacement(
+                            buildSmoothPageRoute(const LibraryPage()),
+                          );
+                        },
+                        onSearchTap: () {
+                          Navigator.of(context).pushReplacement(
+                            buildSmoothPageRoute(
+                              SearchPage(
+                                onHomeTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    buildSmoothPageRoute(const HomePage()),
+                                  );
+                                },
+                                onLibraryTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    buildSmoothPageRoute(const LibraryPage()),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
               Container(
                 decoration: const BoxDecoration(
                   color: LibraryColors.surface,
@@ -86,6 +125,24 @@ class _LibraryPageState extends State<LibraryPage> {
             Navigator.of(
               context,
             ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+          },
+          onSearchTap: () {
+            Navigator.of(context).push(
+              buildSmoothPageRoute(
+                SearchPage(
+                  onHomeTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+                  },
+                  onLibraryTap: () {
+                    Navigator.of(context).pushReplacement(
+                      buildSmoothPageRoute(const LibraryPage()),
+                    );
+                  },
+                ),
+              ),
+            );
           },
         ),
       ),
