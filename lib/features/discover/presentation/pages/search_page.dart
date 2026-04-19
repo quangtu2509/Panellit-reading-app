@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/router/smooth_page_route.dart';
+import 'title_detail_page.dart';
+
 class SearchPage extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
@@ -111,12 +114,37 @@ class SearchPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ..._kTrendingItems.map(
-                    (item) => Padding(
+                  ..._kTrendingItems.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
-                      child: _TrendingCard(item: item),
-                    ),
-                  ),
+                      child: _TrendingCard(
+                        item: item,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            buildSmoothPageRoute(
+                              TitleDetailPage(
+                                isGuest: index == 1,
+                                onHomeTap: onHomeTap,
+                                onLibraryTap: onLibraryTap,
+                                onSearchTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    buildSmoothPageRoute(
+                                      SearchPage(
+                                        onHomeTap: onHomeTap,
+                                        onLibraryTap: onLibraryTap,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 16),
                   const Text(
                     'Popular Genres',
@@ -291,132 +319,140 @@ const List<_TrendingItem> _kTrendingItems = [
 
 class _TrendingCard extends StatelessWidget {
   final _TrendingItem item;
+  final VoidCallback onTap;
 
-  const _TrendingCard({required this.item});
+  const _TrendingCard({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 20,
-            offset: Offset(0, 8),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0D000000),
+                blurRadius: 20,
+                offset: Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 118,
-            height: 130,
-            decoration: BoxDecoration(
-              color: item.coverColor,
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          child: Row(
+            children: [
+              Container(
+                width: 118,
+                height: 130,
+                decoration: BoxDecoration(
+                  color: item.coverColor,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'RANK ${item.rank}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F6F9B),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Divider(height: 1, color: Color(0xFFE4E7EA)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF31363A),
-                    height: 1.0,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item.author,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    color: Color(0xFF647596),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDAECF9),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        item.genre,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF2C6A8E),
+                    Row(
+                      children: [
+                        Text(
+                          'RANK ${item.rank}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F6F9B),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Divider(height: 1, color: Color(0xFFE4E7EA)),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Color(0xFFF1B400),
-                      size: 26,
-                    ),
-                    const SizedBox(width: 4),
+                    const SizedBox(height: 12),
                     Text(
-                      item.rating.toStringAsFixed(1),
+                      item.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF42484D),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF31363A),
+                        height: 1.0,
                       ),
                     ),
-                    const Spacer(),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0F2F3),
-                        borderRadius: BorderRadius.circular(16),
+                    const SizedBox(height: 8),
+                    Text(
+                      item.author,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        color: Color(0xFF647596),
                       ),
-                      child: const Icon(
-                        Icons.chevron_right_rounded,
-                        color: Color(0xFF0F6F9B),
-                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDAECF9),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            item.genre,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF2C6A8E),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Color(0xFFF1B400),
+                          size: 26,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          item.rating.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF42484D),
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0F2F3),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_right_rounded,
+                            color: Color(0xFF0F6F9B),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -435,7 +471,7 @@ class _GenreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLight = backgroundColor.red > 180;
+    final isLight = (backgroundColor.r * 255).round() > 180;
     final titleColor = isLight ? const Color(0xFF2E405E) : Colors.white;
     final subtitleColor = isLight ? const Color(0xFF5A6C8D) : Colors.white70;
 
