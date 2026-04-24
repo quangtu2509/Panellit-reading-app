@@ -3,72 +3,113 @@ import 'package:flutter/material.dart';
 import '../../../data/models/title_detail_model.dart';
 import '../../theme/title_detail_colors.dart';
 
-class DetailChaptersSection extends StatelessWidget {
+class DetailChaptersSection extends StatefulWidget {
   final List<ChapterUpdateModel> chapters;
 
   const DetailChaptersSection({super.key, required this.chapters});
 
   @override
+  State<DetailChaptersSection> createState() => _DetailChaptersSectionState();
+}
+
+class _DetailChaptersSectionState extends State<DetailChaptersSection> {
+  ChapterSortOption _sortOption = ChapterSortOption.newest;
+
+  List<ChapterUpdateModel> get _sortedChapters {
+    final result = List<ChapterUpdateModel>.from(widget.chapters);
+    result.sort((a, b) {
+      switch (_sortOption) {
+        case ChapterSortOption.newest:
+          return b.chapterNumber.compareTo(a.chapterNumber);
+        case ChapterSortOption.oldest:
+          return a.chapterNumber.compareTo(b.chapterNumber);
+      }
+    });
+    return result;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final chapters = _sortedChapters;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Center(
-          child: Text(
-            'Chapters',
-            style: TextStyle(
-              color: TitleDetailColors.brand,
-              fontSize: 21,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Divider(height: 1, color: TitleDetailColors.brand, thickness: 2),
-        const SizedBox(height: 14),
         Row(
-          children: const [
-            Text(
-              'Latest Updates',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w800,
-                color: TitleDetailColors.textPrimary,
+          children: [
+            const Expanded(
+              child: Text(
+                'Chapters',
+                style: TextStyle(
+                  color: TitleDetailColors.textPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            Spacer(),
-            Text(
-              'SORT: NEWEST',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: TitleDetailColors.brand,
+            PopupMenuButton<ChapterSortOption>(
+              initialValue: _sortOption,
+              onSelected: (value) {
+                setState(() {
+                  _sortOption = value;
+                });
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
+              child: Row(
+                children: [
+                  Text(
+                    _sortOption == ChapterSortOption.newest
+                        ? 'Newest'
+                        : 'Oldest',
+                    style: const TextStyle(
+                      color: TitleDetailColors.brand,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.sort_rounded,
+                    size: 18,
+                    color: TitleDetailColors.brand,
+                  ),
+                ],
+              ),
+              itemBuilder: (context) {
+                return ChapterSortOption.values.map((option) {
+                  return PopupMenuItem<ChapterSortOption>(
+                    value: option,
+                    child: Text(
+                      option == ChapterSortOption.newest ? 'Newest' : 'Oldest',
+                    ),
+                  );
+                }).toList();
+              },
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        ...chapters.map((item) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: _ChapterTile(item: item),
-          );
-        }),
-        const SizedBox(height: 4),
+        const SizedBox(height: 10),
         Container(
-          height: 48,
-          alignment: Alignment.center,
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: const Color(0xFFEAEAF7),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFD7D9E7)),
+            color: TitleDetailColors.card,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: TitleDetailColors.divider),
           ),
-          child: const Text(
-            'See All Chapters',
-            style: TextStyle(
-              color: TitleDetailColors.brand,
-              fontSize: 21,
-              fontWeight: FontWeight.w800,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 260),
+            child: ListView.separated(
+              shrinkWrap: true,
+              primary: false,
+              scrollDirection: Axis.vertical,
+              padding: EdgeInsets.zero,
+              itemCount: chapters.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                return _ChapterTile(item: chapters[index]);
+              },
             ),
           ),
         ),
@@ -85,21 +126,22 @@ class _ChapterTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: TitleDetailColors.card,
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF9FBFD),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: TitleDetailColors.divider),
       ),
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: const Color(0xFFF0F2F6),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '${item.chapterNumber}',
@@ -109,56 +151,69 @@ class _ChapterTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: TitleDetailColors.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          height: 1.1,
+                          fontWeight: FontWeight.w700,
+                          color: TitleDetailColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (item.isNew)
+                      Container(
+                        margin: const EdgeInsets.only(left: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: TitleDetailColors.brand,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'NEW',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 10,
+                          ),
+                        ),
+                      )
+                    else if (item.isRead)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Icon(
+                          Icons.check_circle_outline_rounded,
+                          color: TitleDetailColors.brand,
+                          size: 18,
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   item.timeLabel,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: TitleDetailColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          if (item.isNew)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: TitleDetailColors.brand,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'NEW',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 11,
-                ),
-              ),
-            )
-          else if (item.isRead)
-            const Icon(
-              Icons.check_circle_outline_rounded,
-              color: TitleDetailColors.brand,
-            )
-          else
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: TitleDetailColors.muted,
-            ),
         ],
       ),
     );

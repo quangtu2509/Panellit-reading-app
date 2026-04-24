@@ -20,32 +20,31 @@ class DetailReviewsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: const [
-            Text(
-              'Community Reviews',
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w800,
-                color: TitleDetailColors.textPrimary,
-              ),
+        const Text(
+          'Community Reviews',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: TitleDetailColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            'See All',
+            style: TextStyle(
+              color: TitleDetailColors.brand,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
             ),
-            Spacer(),
-            Text(
-              'See All',
-              style: TextStyle(
-                color: TitleDetailColors.brand,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-              ),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: 12),
         _ReviewSummaryCard(summary: summary),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         isGuest ? const _GuestReviewPrompt() : const _ReviewComposer(),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         ...reviews.map((review) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -68,8 +67,15 @@ class _ReviewSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: TitleDetailColors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: TitleDetailColors.divider),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0B000000),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -85,7 +91,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                     color: TitleDetailColors.textPrimary,
                   ),
                 ),
-                const Text('☆☆☆☆☆', style: TextStyle(color: Color(0xFFF0B511))),
+                const Text('★★★★★', style: TextStyle(color: Color(0xFFF0B511))),
                 Text(
                   summary.ratingsCountLabel,
                   style: const TextStyle(
@@ -147,14 +153,12 @@ class _GuestReviewPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FB),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFDADEE6),
-          style: BorderStyle.solid,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFDADEE6)),
       ),
       child: Column(
         children: [
@@ -166,12 +170,12 @@ class _GuestReviewPrompt extends StatelessWidget {
               color: TitleDetailColors.chipText,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               color: TitleDetailColors.brand,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x334F46E5),
@@ -184,7 +188,7 @@ class _GuestReviewPrompt extends StatelessWidget {
               'Login to Review',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -201,31 +205,39 @@ class _ReviewComposer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: TitleDetailColors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: TitleDetailColors.divider),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0B000000),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CircleAvatar(
-            radius: 14,
+            radius: 18,
             backgroundColor: Color(0xFFE5D4B2),
-            child: Icon(Icons.person_outline, size: 16, color: Colors.white),
+            child: Icon(Icons.person_outline, size: 18, color: Colors.white),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               children: [
                 Container(
-                  height: 64,
-                  padding: const EdgeInsets.all(10),
+                  height: 90,
+                  padding: const EdgeInsets.all(12),
                   alignment: Alignment.topLeft,
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F3F7),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFFDCE2EA)),
                   ),
                   child: const Text(
@@ -233,23 +245,26 @@ class _ReviewComposer extends StatelessWidget {
                     style: TextStyle(color: TitleDetailColors.muted),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     const Expanded(
                       child: Text(
                         '☆☆☆☆☆',
-                        style: TextStyle(color: Color(0xFFBAC2CF)),
+                        style: TextStyle(
+                          color: Color(0xFFBAC2CF),
+                          fontSize: 18,
+                        ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                        horizontal: 14,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         color: TitleDetailColors.brand,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
                         'Post',
@@ -281,7 +296,7 @@ class _ReviewCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: TitleDetailColors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: TitleDetailColors.divider),
       ),
       child: Column(
@@ -318,14 +333,7 @@ class _ReviewCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 2),
-          Text(
-            '☆☆☆☆☆',
-            style: TextStyle(
-              color: review.rating >= 4
-                  ? const Color(0xFFF1C40F)
-                  : const Color(0xFFCAD2DE),
-            ),
-          ),
+          const Text('★★★★★', style: TextStyle(color: Color(0xFFF1C40F))),
           const SizedBox(height: 8),
           Text(
             review.content,
@@ -368,6 +376,28 @@ class _ReviewCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DetailReviewsBlock extends StatelessWidget {
+  final bool isGuest;
+  final ReviewSummaryModel summary;
+  final List<CommunityReviewModel> reviews;
+
+  const DetailReviewsBlock({
+    super.key,
+    required this.isGuest,
+    required this.summary,
+    required this.reviews,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DetailReviewsSection(
+      isGuest: isGuest,
+      summary: summary,
+      reviews: reviews,
     );
   }
 }

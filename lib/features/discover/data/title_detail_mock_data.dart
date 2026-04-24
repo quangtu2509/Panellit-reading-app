@@ -21,6 +21,12 @@ const TitleDetailModel kTitleDetail = TitleDetailModel(
   ],
   chapterUpdates: [
     ChapterUpdateModel(
+      chapterNumber: 176,
+      title: 'After the Rift',
+      timeLabel: '30 minutes ago',
+      isNew: true,
+    ),
+    ChapterUpdateModel(
       chapterNumber: 175,
       title: 'Reunion and Revelation',
       timeLabel: '2 hours ago',
@@ -41,6 +47,11 @@ const TitleDetailModel kTitleDetail = TitleDetailModel(
       title: 'Diverging Paths',
       timeLabel: 'Read · 2 weeks ago',
       isRead: true,
+    ),
+    ChapterUpdateModel(
+      chapterNumber: 171,
+      title: 'A Quiet Resolve',
+      timeLabel: '3 weeks ago',
     ),
   ],
   reviewSummary: ReviewSummaryModel(

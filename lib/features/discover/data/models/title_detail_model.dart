@@ -32,6 +32,8 @@ class TitleDetailModel {
   });
 }
 
+enum ChapterSortOption { newest, oldest }
+
 class ChapterUpdateModel {
   final int chapterNumber;
   final String title;

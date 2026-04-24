@@ -16,9 +16,9 @@ class DetailRelatedSection extends StatelessWidget {
         Row(
           children: const [
             Text(
-              'Related Stories',
+              'Related comics',
               style: TextStyle(
-                fontSize: 33,
+                fontSize: 24,
                 fontWeight: FontWeight.w800,
                 color: TitleDetailColors.textPrimary,
               ),
@@ -29,28 +29,31 @@ class DetailRelatedSection extends StatelessWidget {
               style: TextStyle(
                 color: TitleDetailColors.brand,
                 fontWeight: FontWeight.w800,
-                fontSize: 18,
+                fontSize: 16,
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 180,
+          height: 210,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             itemBuilder: (context, index) {
               final story = stories[index];
               return SizedBox(
-                width: 110,
+                width: 128,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Container(
+                        width: 128,
                         decoration: BoxDecoration(
                           color: story.coverColor,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: Align(
                           alignment: Alignment.bottomRight,
@@ -76,9 +79,10 @@ class DetailRelatedSection extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
                       story.title,
+                      textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -90,7 +94,7 @@ class DetailRelatedSection extends StatelessWidget {
                 ),
               );
             },
-            separatorBuilder: (context, index) => const SizedBox(width: 10),
+            separatorBuilder: (context, index) => const SizedBox(width: 14),
             itemCount: stories.length,
           ),
         ),
