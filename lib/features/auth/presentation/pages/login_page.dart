@@ -135,7 +135,8 @@ class LoginPage extends StatelessWidget {
                             onPressed: () {
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => const HomePage(),
+                                  builder: (context) =>
+                                      const HomePage(isGuest: false),
                                 ),
                               );
                             },
@@ -153,7 +154,8 @@ class LoginPage extends StatelessWidget {
                                   onPressed: () {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                        builder: (context) => const HomePage(),
+                                        builder: (context) =>
+                                            const HomePage(isGuest: true),
                                       ),
                                     );
                                   },

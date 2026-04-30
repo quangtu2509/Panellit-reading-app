@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class SearchBottomNav extends StatelessWidget {
+import '../theme/profile_colors.dart';
+
+class ProfileBottomNav extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
-  final VoidCallback onProfileTap;
+  final VoidCallback onSearchTap;
 
-  const SearchBottomNav({
+  const ProfileBottomNav({
     super.key,
     required this.onHomeTap,
     required this.onLibraryTap,
-    required this.onProfileTap,
+    required this.onSearchTap,
   });
 
   @override
@@ -31,25 +33,25 @@ class SearchBottomNav extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _SearchNavItem(
+          _ProfileNavItem(
             icon: Icons.home_outlined,
-            label: 'Home',
+            label: 'HOME',
             onTap: onHomeTap,
           ),
-          _SearchNavItem(
-            icon: Icons.book_outlined,
-            label: 'Library',
+          _ProfileNavItem(
+            icon: Icons.library_books_rounded,
+            label: 'LIBRARY',
             onTap: onLibraryTap,
           ),
-          const _SearchNavItem(
+          _ProfileNavItem(
             icon: Icons.search_rounded,
-            label: 'Search',
-            active: true,
+            label: 'SEARCH',
+            onTap: onSearchTap,
           ),
-          _SearchNavItem(
-            icon: Icons.person_outline_rounded,
-            label: 'Profile',
-            onTap: onProfileTap,
+          const _ProfileNavItem(
+            icon: Icons.person_rounded,
+            label: 'PROFILE',
+            active: true,
           ),
         ],
       ),
@@ -57,13 +59,13 @@ class SearchBottomNav extends StatelessWidget {
   }
 }
 
-class _SearchNavItem extends StatelessWidget {
+class _ProfileNavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool active;
   final VoidCallback? onTap;
 
-  const _SearchNavItem({
+  const _ProfileNavItem({
     required this.icon,
     required this.label,
     this.active = false,
@@ -72,8 +74,7 @@ class _SearchNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF0F6F9B) : const Color(0xFFA2A9B2);
-
+    final color = active ? ProfileColors.primary : const Color(0xFFA2A9B2);
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOutCubic,

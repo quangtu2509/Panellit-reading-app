@@ -17,6 +17,7 @@ class TitleDetailPage extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
   final VoidCallback onSearchTap;
+  final VoidCallback onProfileTap;
 
   const TitleDetailPage({
     super.key,
@@ -25,6 +26,7 @@ class TitleDetailPage extends StatelessWidget {
     required this.onHomeTap,
     required this.onLibraryTap,
     required this.onSearchTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -63,6 +65,7 @@ class TitleDetailPage extends StatelessWidget {
         onHomeTap: onHomeTap,
         onLibraryTap: onLibraryTap,
         onSearchTap: onSearchTap,
+        onProfileTap: onProfileTap,
       ),
     );
   }

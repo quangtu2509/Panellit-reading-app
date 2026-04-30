@@ -4,12 +4,14 @@ class DetailBottomNav extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
   final VoidCallback onSearchTap;
+  final VoidCallback onProfileTap;
 
   const DetailBottomNav({
     super.key,
     required this.onHomeTap,
     required this.onLibraryTap,
     required this.onSearchTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -47,9 +49,10 @@ class DetailBottomNav extends StatelessWidget {
             label: 'SEARCH',
             onTap: onSearchTap,
           ),
-          const _DetailNavItem(
+          _DetailNavItem(
             icon: Icons.person_outline_rounded,
             label: 'PROFILE',
+            onTap: onProfileTap,
           ),
         ],
       ),

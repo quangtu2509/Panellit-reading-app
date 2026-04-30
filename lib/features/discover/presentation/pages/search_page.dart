@@ -13,13 +13,17 @@ import '../widgets/search/search_top_bar.dart';
 import 'title_detail_page.dart';
 
 class SearchPage extends StatefulWidget {
+  final bool isGuest;
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onProfileTap;
 
   const SearchPage({
     super.key,
+    required this.isGuest,
     required this.onHomeTap,
     required this.onLibraryTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -131,22 +135,26 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _onResultTap(SearchResultModel result) {
+    final detailIsGuest = widget.isGuest || result.openAsGuest;
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
-          isGuest: result.openAsGuest,
+          isGuest: detailIsGuest,
           onHomeTap: widget.onHomeTap,
           onLibraryTap: widget.onLibraryTap,
           onSearchTap: () {
             Navigator.of(context).pushReplacement(
               buildSmoothPageRoute(
                 SearchPage(
+                  isGuest: widget.isGuest,
                   onHomeTap: widget.onHomeTap,
                   onLibraryTap: widget.onLibraryTap,
+                  onProfileTap: widget.onProfileTap,
                 ),
               ),
             );
           },
+          onProfileTap: widget.onProfileTap,
         ),
       ),
     );
@@ -201,6 +209,7 @@ class _SearchPageState extends State<SearchPage> {
       bottomNavigationBar: SearchBottomNav(
         onHomeTap: widget.onHomeTap,
         onLibraryTap: widget.onLibraryTap,
+        onProfileTap: widget.onProfileTap,
       ),
     );
   }

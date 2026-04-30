@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 class NotificationsPage extends StatelessWidget {
+  final bool isGuest;
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
   final VoidCallback onSearchTap;
+  final VoidCallback onProfileTap;
 
   const NotificationsPage({
     super.key,
+    required this.isGuest,
     required this.onHomeTap,
     required this.onLibraryTap,
     required this.onSearchTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -149,6 +153,7 @@ class NotificationsPage extends StatelessWidget {
         onHomeTap: onHomeTap,
         onLibraryTap: onLibraryTap,
         onSearchTap: onSearchTap,
+        onProfileTap: onProfileTap,
       ),
     );
   }
@@ -476,11 +481,13 @@ class _NotificationBottomNav extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onLibraryTap;
   final VoidCallback onSearchTap;
+  final VoidCallback onProfileTap;
 
   const _NotificationBottomNav({
     required this.onHomeTap,
     required this.onLibraryTap,
     required this.onSearchTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -517,9 +524,10 @@ class _NotificationBottomNav extends StatelessWidget {
             label: 'SEARCH',
             onTap: onSearchTap,
           ),
-          const _NotificationNavItem(
+          _NotificationNavItem(
             icon: Icons.person_outline_rounded,
             label: 'PROFILE',
+            onTap: onProfileTap,
           ),
         ],
       ),

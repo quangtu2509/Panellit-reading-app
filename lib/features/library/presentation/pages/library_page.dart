@@ -4,6 +4,7 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 import '../../data/library_mock_data.dart';
 import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
@@ -20,7 +21,9 @@ import '../widgets/library_tab_section.dart';
 import '../widgets/library_top_bar.dart';
 
 class LibraryPage extends StatefulWidget {
-  const LibraryPage({super.key});
+  final bool isGuest;
+
+  const LibraryPage({super.key, this.isGuest = false});
 
   @override
   State<LibraryPage> createState() => _LibraryPageState();
@@ -34,18 +37,23 @@ class _LibraryPageState extends State<LibraryPage> {
   void _openHome() {
     Navigator.of(
       context,
-    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+    ).pushReplacement(buildSmoothPageRoute(HomePage(isGuest: widget.isGuest)));
   }
 
   void _openLibrary() {
-    Navigator.of(
-      context,
-    ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+    Navigator.of(context).pushReplacement(
+      buildSmoothPageRoute(LibraryPage(isGuest: widget.isGuest)),
+    );
   }
 
   void _openSearch({bool replace = false}) {
     final route = buildSmoothPageRoute(
-      SearchPage(onHomeTap: _openHome, onLibraryTap: _openLibrary),
+      SearchPage(
+        isGuest: widget.isGuest,
+        onHomeTap: _openHome,
+        onLibraryTap: _openLibrary,
+        onProfileTap: _openProfile,
+      ),
     );
 
     if (replace) {
@@ -59,9 +67,24 @@ class _LibraryPageState extends State<LibraryPage> {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         NotificationsPage(
+          isGuest: widget.isGuest,
           onHomeTap: _openHome,
           onLibraryTap: _openLibrary,
           onSearchTap: () => _openSearch(replace: true),
+          onProfileTap: _openProfile,
+        ),
+      ),
+    );
+  }
+
+  void _openProfile() {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        ProfilePage(
+          isGuest: widget.isGuest,
+          onHomeTap: _openHome,
+          onLibraryTap: _openLibrary,
+          onSearchTap: _openSearch,
         ),
       ),
     );
@@ -72,9 +95,11 @@ class _LibraryPageState extends State<LibraryPage> {
       buildSmoothPageRoute(
         TitleDetailPage(
           detail: detail,
+          isGuest: widget.isGuest,
           onHomeTap: _openHome,
           onLibraryTap: _openLibrary,
           onSearchTap: () => _openSearch(replace: true),
+          onProfileTap: _openProfile,
         ),
       ),
     );
@@ -137,6 +162,7 @@ class _LibraryPageState extends State<LibraryPage> {
         bottomNavigationBar: LibraryBottomNav(
           onHomeTap: _openHome,
           onSearchTap: _openSearch,
+          onProfileTap: _openProfile,
         ),
       ),
     );

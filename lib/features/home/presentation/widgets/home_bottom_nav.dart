@@ -5,11 +5,13 @@ import '../theme/home_colors.dart';
 class HomeBottomNav extends StatelessWidget {
   final VoidCallback onLibraryTap;
   final VoidCallback onSearchTap;
+  final VoidCallback onProfileTap;
 
   const HomeBottomNav({
     super.key,
     required this.onLibraryTap,
     required this.onSearchTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -46,9 +48,10 @@ class HomeBottomNav extends StatelessWidget {
             label: 'SEARCH',
             onTap: onSearchTap,
           ),
-          const _BottomNavItem(
+          _BottomNavItem(
             icon: Icons.person_outline_rounded,
             label: 'PROFILE',
+            onTap: onProfileTap,
           ),
         ],
       ),

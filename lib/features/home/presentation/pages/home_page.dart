@@ -6,6 +6,7 @@ import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../../discover/data/models/title_detail_model.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
@@ -14,25 +15,29 @@ import '../widgets/home_page_content.dart';
 import '../widgets/home_top_bar.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final bool isGuest;
+
+  const HomePage({super.key, this.isGuest = false});
 
   void _openHome(BuildContext context) {
     Navigator.of(
       context,
-    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+    ).pushReplacement(buildSmoothPageRoute(HomePage(isGuest: isGuest)));
   }
 
   void _openLibrary(BuildContext context) {
     Navigator.of(
       context,
-    ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+    ).pushReplacement(buildSmoothPageRoute(LibraryPage(isGuest: isGuest)));
   }
 
   void _openSearch(BuildContext context, {bool replace = false}) {
     final route = buildSmoothPageRoute(
       SearchPage(
+        isGuest: isGuest,
         onHomeTap: () => _openHome(context),
         onLibraryTap: () => _openLibrary(context),
+        onProfileTap: () => _openProfile(context),
       ),
     );
 
@@ -47,9 +52,24 @@ class HomePage extends StatelessWidget {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         NotificationsPage(
+          isGuest: isGuest,
           onHomeTap: () => _openHome(context),
           onLibraryTap: () => _openLibrary(context),
           onSearchTap: () => _openSearch(context, replace: true),
+          onProfileTap: () => _openProfile(context),
+        ),
+      ),
+    );
+  }
+
+  void _openProfile(BuildContext context) {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        ProfilePage(
+          isGuest: isGuest,
+          onHomeTap: () => _openHome(context),
+          onLibraryTap: () => _openLibrary(context),
+          onSearchTap: () => _openSearch(context),
         ),
       ),
     );
@@ -60,9 +80,11 @@ class HomePage extends StatelessWidget {
       buildSmoothPageRoute(
         TitleDetailPage(
           detail: detail,
+          isGuest: isGuest,
           onHomeTap: () => _openHome(context),
           onLibraryTap: () => _openLibrary(context),
           onSearchTap: () => _openSearch(context, replace: true),
+          onProfileTap: () => _openProfile(context),
         ),
       ),
     );
@@ -99,6 +121,7 @@ class HomePage extends StatelessWidget {
       bottomNavigationBar: HomeBottomNav(
         onLibraryTap: () => _openLibrary(context),
         onSearchTap: () => _openSearch(context),
+        onProfileTap: () => _openProfile(context),
       ),
     );
   }
