@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../discover/data/models/title_detail_model.dart';
+
 class LibraryReadingItem {
   final String title;
   final String typeLabel;
@@ -8,6 +10,7 @@ class LibraryReadingItem {
   final int totalUnit;
   final int lastReadHoursAgo;
   final Color coverColor;
+  final TitleDetailModel detail;
 
   const LibraryReadingItem({
     required this.title,
@@ -17,6 +20,7 @@ class LibraryReadingItem {
     required this.totalUnit,
     required this.lastReadHoursAgo,
     required this.coverColor,
+    required this.detail,
   });
 
   double get progressValue {

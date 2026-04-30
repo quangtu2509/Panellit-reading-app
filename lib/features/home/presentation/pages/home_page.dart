@@ -5,6 +5,7 @@ import '../../../library/presentation/pages/library_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
+import '../../../discover/data/models/title_detail_model.dart';
 import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
@@ -54,10 +55,11 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _openDetail(BuildContext context) {
+  void _openDetail(BuildContext context, TitleDetailModel detail) {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
+          detail: detail,
           onHomeTap: () => _openHome(context),
           onLibraryTap: () => _openLibrary(context),
           onSearchTap: () => _openSearch(context, replace: true),
@@ -87,7 +89,8 @@ class HomePage extends StatelessWidget {
               child: HomePageContent(
                 featuredTitle: kHomeFeaturedTitle,
                 featuredSubtitle: kHomeFeaturedSubtitle,
-                onOpenDetail: () => _openDetail(context),
+                featuredDetail: kHomeFeaturedDetail,
+                onOpenDetail: (detail) => _openDetail(context, detail),
               ),
             ),
           ],

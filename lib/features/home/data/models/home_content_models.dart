@@ -1,9 +1,12 @@
+import '../../../discover/data/models/title_detail_model.dart';
+
 class HomeUpdateItem {
   final String title;
   final String genre;
   final String timeAgo;
   final String episode;
   final String coverTone;
+  final TitleDetailModel detail;
 
   const HomeUpdateItem({
     required this.title,
@@ -11,6 +14,7 @@ class HomeUpdateItem {
     required this.timeAgo,
     required this.episode,
     required this.coverTone,
+    required this.detail,
   });
 }
 
@@ -18,11 +22,13 @@ class HomeRankItem {
   final String rank;
   final String title;
   final String description;
+  final TitleDetailModel detail;
 
   const HomeRankItem({
     required this.rank,
     required this.title,
     required this.description,
+    required this.detail,
   });
 }
 
@@ -31,12 +37,14 @@ class HomeNovelItem {
   final String title;
   final String tag;
   final String reads;
+  final TitleDetailModel detail;
 
   const HomeNovelItem({
     required this.number,
     required this.title,
     required this.tag,
     required this.reads,
+    required this.detail,
   });
 }
 

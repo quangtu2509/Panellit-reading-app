@@ -9,6 +9,7 @@ import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
 import '../../data/models/library_reading_item.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
+import '../../../discover/data/models/title_detail_model.dart';
 import '../theme/library_colors.dart';
 import '../widgets/library_bottom_nav.dart';
 import '../widgets/library_card.dart';
@@ -66,10 +67,11 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  void _openDetail() {
+  void _openDetail(TitleDetailModel detail) {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
+          detail: detail,
           onHomeTap: _openHome,
           onLibraryTap: _openLibrary,
           onSearchTap: () => _openSearch(replace: true),
@@ -156,7 +158,10 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 28),
-            child: LibraryCard(item: item, onTap: _openDetail),
+            child: LibraryCard(
+              item: item,
+              onTap: () => _openDetail(item.detail),
+            ),
           );
         }),
         const LibraryRecommendBanner(),
@@ -179,7 +184,10 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 22),
-            child: LibraryReadingCard(item: item, onTap: _openDetail),
+            child: LibraryReadingCard(
+              item: item,
+              onTap: () => _openDetail(item.detail),
+            ),
           );
         }),
       ],
@@ -201,7 +209,10 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24),
-            child: LibraryCompletedCard(item: item, onTap: _openDetail),
+            child: LibraryCompletedCard(
+              item: item,
+              onTap: () => _openDetail(item.detail),
+            ),
           );
         }),
       ],

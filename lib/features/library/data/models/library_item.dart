@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../discover/data/models/title_detail_model.dart';
+
 enum LibrarySortOption { az, za, newestToOldest, oldestToNewest }
 
 extension LibrarySortOptionLabel on LibrarySortOption {
@@ -25,6 +27,7 @@ class LibraryItem {
   final String actionLabel;
   final String? badge;
   final Color coverColor;
+  final TitleDetailModel detail;
 
   const LibraryItem({
     required this.title,
@@ -33,6 +36,7 @@ class LibraryItem {
     required this.chapter,
     required this.actionLabel,
     required this.coverColor,
+    required this.detail,
     this.badge,
   });
 

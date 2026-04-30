@@ -1,17 +1,21 @@
+import '../../discover/data/models/title_detail_model.dart';
+import '../../discover/data/title_detail_mock_data.dart';
 import 'models/home_content_models.dart';
 
 const String kHomeAppName = 'Panellit';
 const String kHomeFeaturedTitle = 'The Azure\nSentinel:\nRebirth';
 const String kHomeFeaturedSubtitle =
     'In a world where the stars have\nforgotten their names, one...';
+final TitleDetailModel kHomeFeaturedDetail = kDetailAzureSentinel;
 
-const List<HomeUpdateItem> kHomeUpdates = [
+final List<HomeUpdateItem> kHomeUpdates = [
   HomeUpdateItem(
     title: 'Star-Crossed...',
     genre: 'Romance',
     timeAgo: '2h ago',
     episode: 'EP. 142',
     coverTone: 'light',
+    detail: kDetailStarCrossed,
   ),
   HomeUpdateItem(
     title: 'Void Walker',
@@ -19,6 +23,7 @@ const List<HomeUpdateItem> kHomeUpdates = [
     timeAgo: '5h ago',
     episode: 'EP. 89',
     coverTone: 'dark',
+    detail: kDetailVoidWalker,
   ),
   HomeUpdateItem(
     title: 'Final Quarter',
@@ -26,56 +31,65 @@ const List<HomeUpdateItem> kHomeUpdates = [
     timeAgo: '8h ago',
     episode: 'EP. 24',
     coverTone: 'neutral',
+    detail: kDetailFinalQuarter,
   ),
 ];
 
-const List<HomeRankItem> kHomePopularManga = [
+final List<HomeRankItem> kHomePopularManga = [
   HomeRankItem(
     rank: '#1',
     title: 'Eternal Horizon',
     description: 'A journey beyond the edge of the known universe.',
+    detail: kDetailEternalHorizon,
   ),
   HomeRankItem(
     rank: '#2',
-    title: 'Shadow Architect',
-    description: 'Building worlds in darkness of the mind.',
+    title: 'The Azure Sentinel: Rebirth',
+    description: 'A sentinel returns to rebuild a fallen order.',
+    detail: kDetailAzureSentinel,
   ),
   HomeRankItem(
     rank: '#3',
-    title: 'Cursed Legacy',
-    description: 'The sins of the father shall be the power of the son.',
+    title: 'Star-Crossed...',
+    description: 'A forbidden bond sparked by a passing comet.',
+    detail: kDetailStarCrossed,
   ),
   HomeRankItem(
     rank: '#4',
-    title: 'Wind Whisperer',
-    description: 'Listen to the breeze, it tells the tales of old.',
+    title: 'Void Walker',
+    description: 'A ranger maps the void between realms.',
+    detail: kDetailVoidWalker,
   ),
 ];
 
-const List<HomeNovelItem> kHomeTopWebnovels = [
+final List<HomeNovelItem> kHomeTopWebnovels = [
   HomeNovelItem(
     number: '01',
-    title: 'Solo Ascension: The Infinite Library',
-    tag: 'PROGRESSION',
-    reads: '1.2M Reads',
+    title: 'The Azure Sentinel: Rebirth',
+    tag: 'SCI-FI',
+    reads: '1.8M Reads',
+    detail: kDetailAzureSentinel,
   ),
   HomeNovelItem(
     number: '02',
-    title: 'My System is a Gacha Machine',
-    tag: 'COMEDY',
-    reads: '980k Reads',
+    title: 'Eternal Horizon',
+    tag: 'ADVENTURE',
+    reads: '2.2M Reads',
+    detail: kDetailEternalHorizon,
   ),
   HomeNovelItem(
     number: '03',
-    title: 'Reincarnated as a Spirit Forge',
-    tag: 'CRAFTING',
-    reads: '850k Reads',
+    title: 'Void Walker',
+    tag: 'DARK FANTASY',
+    reads: '1.2M Reads',
+    detail: kDetailVoidWalker,
   ),
   HomeNovelItem(
     number: '04',
-    title: 'The Alchemist of Silent Hill',
-    tag: 'MYSTERY',
-    reads: '720k Reads',
+    title: 'Final Quarter',
+    tag: 'SPORTS',
+    reads: '640k Reads',
+    detail: kDetailFinalQuarter,
   ),
 ];
 
