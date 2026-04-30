@@ -5,8 +5,9 @@ import '../theme/home_colors.dart';
 
 class HomeUpdateCard extends StatelessWidget {
   final HomeUpdateItem item;
+  final VoidCallback? onTap;
 
-  const HomeUpdateCard({super.key, required this.item});
+  const HomeUpdateCard({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -16,60 +17,67 @@ class HomeUpdateCard extends StatelessWidget {
       _ => const Color(0xFFD7E9F1),
     };
 
-    return Container(
-      decoration: BoxDecoration(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        color: HomeColors.surface,
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0C000000),
-            blurRadius: 12,
-            offset: Offset(0, 6),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: HomeColors.surface,
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0C000000),
+                blurRadius: 12,
+                offset: Offset(0, 6),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: coverColor,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: coverColor,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: _MiniTag(label: item.episode),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: _MiniTag(label: item.episode),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF33363A),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.genre} · ${item.timeAgo}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: HomeColors.updateGenre,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              item.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF33363A),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${item.genre} · ${item.timeAgo}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: HomeColors.updateGenre,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

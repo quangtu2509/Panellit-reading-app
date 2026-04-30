@@ -8,6 +8,7 @@ import '../../data/library_mock_data.dart';
 import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
 import '../../data/models/library_reading_item.dart';
+import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../theme/library_colors.dart';
 import '../widgets/library_bottom_nav.dart';
 import '../widgets/library_card.dart';
@@ -28,6 +29,43 @@ class _LibraryPageState extends State<LibraryPage> {
   LibrarySortOption _followingSort = LibrarySortOption.newestToOldest;
   LibrarySortOption _readingSort = LibrarySortOption.newestToOldest;
   LibrarySortOption _completedSort = LibrarySortOption.newestToOldest;
+
+  void _openDetail() {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        TitleDetailPage(
+          onHomeTap: () {
+            Navigator.of(
+              context,
+            ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+          },
+          onLibraryTap: () {
+            Navigator.of(
+              context,
+            ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+          },
+          onSearchTap: () {
+            Navigator.of(context).pushReplacement(
+              buildSmoothPageRoute(
+                SearchPage(
+                  onHomeTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+                  },
+                  onLibraryTap: () {
+                    Navigator.of(context).pushReplacement(
+                      buildSmoothPageRoute(const LibraryPage()),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +203,7 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 28),
-            child: LibraryCard(item: item),
+            child: LibraryCard(item: item, onTap: _openDetail),
           );
         }),
         const LibraryRecommendBanner(),
@@ -188,7 +226,7 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 22),
-            child: LibraryReadingCard(item: item),
+            child: LibraryReadingCard(item: item, onTap: _openDetail),
           );
         }),
       ],
@@ -210,7 +248,7 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24),
-            child: LibraryCompletedCard(item: item),
+            child: LibraryCompletedCard(item: item, onTap: _openDetail),
           );
         }),
       ],

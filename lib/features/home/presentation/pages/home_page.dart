@@ -4,6 +4,7 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../../library/presentation/pages/library_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
+import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
@@ -16,6 +17,43 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void openDetail() {
+      Navigator.of(context).push(
+        buildSmoothPageRoute(
+          TitleDetailPage(
+            onHomeTap: () {
+              Navigator.of(
+                context,
+              ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+            },
+            onLibraryTap: () {
+              Navigator.of(
+                context,
+              ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+            },
+            onSearchTap: () {
+              Navigator.of(context).pushReplacement(
+                buildSmoothPageRoute(
+                  SearchPage(
+                    onHomeTap: () {
+                      Navigator.of(
+                        context,
+                      ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+                    },
+                    onLibraryTap: () {
+                      Navigator.of(context).pushReplacement(
+                        buildSmoothPageRoute(const LibraryPage()),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: HomeColors.background,
       body: SafeArea(
@@ -70,6 +108,7 @@ class HomePage extends StatelessWidget {
               child: HomePageContent(
                 featuredTitle: kHomeFeaturedTitle,
                 featuredSubtitle: kHomeFeaturedSubtitle,
+                onOpenDetail: openDetail,
               ),
             ),
           ],

@@ -8,11 +8,13 @@ import 'home_updates_section.dart';
 class HomePageContent extends StatelessWidget {
   final String featuredTitle;
   final String featuredSubtitle;
+  final VoidCallback onOpenDetail;
 
   const HomePageContent({
     super.key,
     required this.featuredTitle,
     required this.featuredSubtitle,
+    required this.onOpenDetail,
   });
 
   @override
@@ -20,13 +22,17 @@ class HomePageContent extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
       children: [
-        HomeFeaturedBanner(title: featuredTitle, subtitle: featuredSubtitle),
+        HomeFeaturedBanner(
+          title: featuredTitle,
+          subtitle: featuredSubtitle,
+          onTap: onOpenDetail,
+        ),
         const SizedBox(height: 28),
-        const HomeUpdatesSection(),
+        HomeUpdatesSection(onItemTap: (_) => onOpenDetail()),
         const SizedBox(height: 24),
-        const HomePopularMangaSection(),
+        HomePopularMangaSection(onItemTap: (_) => onOpenDetail()),
         const SizedBox(height: 24),
-        const HomeTopWebnovelsSection(),
+        HomeTopWebnovelsSection(onItemTap: (_) => onOpenDetail()),
       ],
     );
   }

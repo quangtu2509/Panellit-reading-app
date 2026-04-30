@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../data/home_mock_data.dart';
+import '../../data/models/home_content_models.dart';
 import 'home_section_header.dart';
 import 'home_update_card.dart';
 
 class HomeUpdatesSection extends StatelessWidget {
-  const HomeUpdatesSection({super.key});
+  final ValueChanged<HomeUpdateItem> onItemTap;
+
+  const HomeUpdatesSection({super.key, required this.onItemTap});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +30,18 @@ class HomeUpdatesSection extends StatelessWidget {
             mainAxisSpacing: 14,
             childAspectRatio: 0.73,
             children: [
-              HomeUpdateCard(item: kHomeUpdates[0]),
-              HomeUpdateCard(item: kHomeUpdates[1]),
-              HomeUpdateCard(item: kHomeUpdates[2]),
+              HomeUpdateCard(
+                item: kHomeUpdates[0],
+                onTap: () => onItemTap(kHomeUpdates[0]),
+              ),
+              HomeUpdateCard(
+                item: kHomeUpdates[1],
+                onTap: () => onItemTap(kHomeUpdates[1]),
+              ),
+              HomeUpdateCard(
+                item: kHomeUpdates[2],
+                onTap: () => onItemTap(kHomeUpdates[2]),
+              ),
               const SizedBox.shrink(),
             ],
           ),

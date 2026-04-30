@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../data/home_mock_data.dart';
+import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
 import 'home_novel_row.dart';
 import 'home_section_header.dart';
 
 class HomeTopWebnovelsSection extends StatelessWidget {
-  const HomeTopWebnovelsSection({super.key});
+  final ValueChanged<HomeNovelItem> onItemTap;
+
+  const HomeTopWebnovelsSection({super.key, required this.onItemTap});
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +37,23 @@ class HomeTopWebnovelsSection extends StatelessWidget {
           ),
           child: Column(
             children: [
-              HomeNovelRow(item: kHomeTopWebnovels[0]),
-              HomeNovelRow(item: kHomeTopWebnovels[1]),
-              HomeNovelRow(item: kHomeTopWebnovels[2]),
-              HomeNovelRow(item: kHomeTopWebnovels[3], isLast: true),
+              HomeNovelRow(
+                item: kHomeTopWebnovels[0],
+                onTap: () => onItemTap(kHomeTopWebnovels[0]),
+              ),
+              HomeNovelRow(
+                item: kHomeTopWebnovels[1],
+                onTap: () => onItemTap(kHomeTopWebnovels[1]),
+              ),
+              HomeNovelRow(
+                item: kHomeTopWebnovels[2],
+                onTap: () => onItemTap(kHomeTopWebnovels[2]),
+              ),
+              HomeNovelRow(
+                item: kHomeTopWebnovels[3],
+                isLast: true,
+                onTap: () => onItemTap(kHomeTopWebnovels[3]),
+              ),
             ],
           ),
         ),
