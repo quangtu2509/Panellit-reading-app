@@ -36,25 +36,15 @@ class HomeTopWebnovelsSection extends StatelessWidget {
             ],
           ),
           child: Column(
-            children: [
-              HomeNovelRow(
-                item: kHomeTopWebnovels[0],
-                onTap: () => onItemTap(kHomeTopWebnovels[0]),
-              ),
-              HomeNovelRow(
-                item: kHomeTopWebnovels[1],
-                onTap: () => onItemTap(kHomeTopWebnovels[1]),
-              ),
-              HomeNovelRow(
-                item: kHomeTopWebnovels[2],
-                onTap: () => onItemTap(kHomeTopWebnovels[2]),
-              ),
-              HomeNovelRow(
-                item: kHomeTopWebnovels[3],
-                isLast: true,
-                onTap: () => onItemTap(kHomeTopWebnovels[3]),
-              ),
-            ],
+            children: kHomeTopWebnovels.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              return HomeNovelRow(
+                item: item,
+                isLast: index == kHomeTopWebnovels.length - 1,
+                onTap: () => onItemTap(item),
+              );
+            }).toList(),
           ),
         ),
       ],

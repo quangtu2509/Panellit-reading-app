@@ -30,38 +30,49 @@ class _LibraryPageState extends State<LibraryPage> {
   LibrarySortOption _readingSort = LibrarySortOption.newestToOldest;
   LibrarySortOption _completedSort = LibrarySortOption.newestToOldest;
 
+  void _openHome() {
+    Navigator.of(
+      context,
+    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+  }
+
+  void _openLibrary() {
+    Navigator.of(
+      context,
+    ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+  }
+
+  void _openSearch({bool replace = false}) {
+    final route = buildSmoothPageRoute(
+      SearchPage(onHomeTap: _openHome, onLibraryTap: _openLibrary),
+    );
+
+    if (replace) {
+      Navigator.of(context).pushReplacement(route);
+    } else {
+      Navigator.of(context).push(route);
+    }
+  }
+
+  void _openNotifications() {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        NotificationsPage(
+          onHomeTap: _openHome,
+          onLibraryTap: _openLibrary,
+          onSearchTap: () => _openSearch(replace: true),
+        ),
+      ),
+    );
+  }
+
   void _openDetail() {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
-          onHomeTap: () {
-            Navigator.of(
-              context,
-            ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-          },
-          onLibraryTap: () {
-            Navigator.of(
-              context,
-            ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
-          },
-          onSearchTap: () {
-            Navigator.of(context).pushReplacement(
-              buildSmoothPageRoute(
-                SearchPage(
-                  onHomeTap: () {
-                    Navigator.of(
-                      context,
-                    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-                  },
-                  onLibraryTap: () {
-                    Navigator.of(context).pushReplacement(
-                      buildSmoothPageRoute(const LibraryPage()),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
+          onHomeTap: _openHome,
+          onLibraryTap: _openLibrary,
+          onSearchTap: () => _openSearch(replace: true),
         ),
       ),
     );
@@ -76,44 +87,7 @@ class _LibraryPageState extends State<LibraryPage> {
         body: SafeArea(
           child: Column(
             children: [
-              LibraryTopBar(
-                onNotificationTap: () {
-                  Navigator.of(context).push(
-                    buildSmoothPageRoute(
-                      NotificationsPage(
-                        onHomeTap: () {
-                          Navigator.of(context).pushReplacement(
-                            buildSmoothPageRoute(const HomePage()),
-                          );
-                        },
-                        onLibraryTap: () {
-                          Navigator.of(context).pushReplacement(
-                            buildSmoothPageRoute(const LibraryPage()),
-                          );
-                        },
-                        onSearchTap: () {
-                          Navigator.of(context).pushReplacement(
-                            buildSmoothPageRoute(
-                              SearchPage(
-                                onHomeTap: () {
-                                  Navigator.of(context).pushReplacement(
-                                    buildSmoothPageRoute(const HomePage()),
-                                  );
-                                },
-                                onLibraryTap: () {
-                                  Navigator.of(context).pushReplacement(
-                                    buildSmoothPageRoute(const LibraryPage()),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
+              LibraryTopBar(onNotificationTap: _openNotifications),
               Container(
                 decoration: const BoxDecoration(
                   color: LibraryColors.surface,
@@ -159,29 +133,8 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
         ),
         bottomNavigationBar: LibraryBottomNav(
-          onHomeTap: () {
-            Navigator.of(
-              context,
-            ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-          },
-          onSearchTap: () {
-            Navigator.of(context).push(
-              buildSmoothPageRoute(
-                SearchPage(
-                  onHomeTap: () {
-                    Navigator.of(
-                      context,
-                    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-                  },
-                  onLibraryTap: () {
-                    Navigator.of(context).pushReplacement(
-                      buildSmoothPageRoute(const LibraryPage()),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
+          onHomeTap: _openHome,
+          onSearchTap: _openSearch,
         ),
       ),
     );

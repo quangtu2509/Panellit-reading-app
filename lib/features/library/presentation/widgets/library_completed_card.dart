@@ -15,6 +15,8 @@ class LibraryCompletedCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        splashColor: onTap == null ? Colors.transparent : null,
+        highlightColor: onTap == null ? Colors.transparent : null,
         borderRadius: BorderRadius.circular(16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

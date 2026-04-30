@@ -15,45 +15,59 @@ import '../widgets/home_top_bar.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  void _openHome(BuildContext context) {
+    Navigator.of(
+      context,
+    ).pushReplacement(buildSmoothPageRoute(const HomePage()));
+  }
+
+  void _openLibrary(BuildContext context) {
+    Navigator.of(
+      context,
+    ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
+  }
+
+  void _openSearch(BuildContext context, {bool replace = false}) {
+    final route = buildSmoothPageRoute(
+      SearchPage(
+        onHomeTap: () => _openHome(context),
+        onLibraryTap: () => _openLibrary(context),
+      ),
+    );
+
+    if (replace) {
+      Navigator.of(context).pushReplacement(route);
+    } else {
+      Navigator.of(context).push(route);
+    }
+  }
+
+  void _openNotifications(BuildContext context) {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        NotificationsPage(
+          onHomeTap: () => _openHome(context),
+          onLibraryTap: () => _openLibrary(context),
+          onSearchTap: () => _openSearch(context, replace: true),
+        ),
+      ),
+    );
+  }
+
+  void _openDetail(BuildContext context) {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        TitleDetailPage(
+          onHomeTap: () => _openHome(context),
+          onLibraryTap: () => _openLibrary(context),
+          onSearchTap: () => _openSearch(context, replace: true),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    void openDetail() {
-      Navigator.of(context).push(
-        buildSmoothPageRoute(
-          TitleDetailPage(
-            onHomeTap: () {
-              Navigator.of(
-                context,
-              ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-            },
-            onLibraryTap: () {
-              Navigator.of(
-                context,
-              ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
-            },
-            onSearchTap: () {
-              Navigator.of(context).pushReplacement(
-                buildSmoothPageRoute(
-                  SearchPage(
-                    onHomeTap: () {
-                      Navigator.of(
-                        context,
-                      ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-                    },
-                    onLibraryTap: () {
-                      Navigator.of(context).pushReplacement(
-                        buildSmoothPageRoute(const LibraryPage()),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: HomeColors.background,
       body: SafeArea(
@@ -67,77 +81,21 @@ class HomePage extends StatelessWidget {
                         HomeNotificationType.savedWorkChapterUpdate &&
                     notification.isUnread,
               ),
-              onNotificationTap: () {
-                Navigator.of(context).push(
-                  buildSmoothPageRoute(
-                    NotificationsPage(
-                      onHomeTap: () {
-                        Navigator.of(context).pushReplacement(
-                          buildSmoothPageRoute(const HomePage()),
-                        );
-                      },
-                      onLibraryTap: () {
-                        Navigator.of(context).pushReplacement(
-                          buildSmoothPageRoute(const LibraryPage()),
-                        );
-                      },
-                      onSearchTap: () {
-                        Navigator.of(context).pushReplacement(
-                          buildSmoothPageRoute(
-                            SearchPage(
-                              onHomeTap: () {
-                                Navigator.of(context).pushReplacement(
-                                  buildSmoothPageRoute(const HomePage()),
-                                );
-                              },
-                              onLibraryTap: () {
-                                Navigator.of(context).pushReplacement(
-                                  buildSmoothPageRoute(const LibraryPage()),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
+              onNotificationTap: () => _openNotifications(context),
             ),
             Expanded(
               child: HomePageContent(
                 featuredTitle: kHomeFeaturedTitle,
                 featuredSubtitle: kHomeFeaturedSubtitle,
-                onOpenDetail: openDetail,
+                onOpenDetail: () => _openDetail(context),
               ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: HomeBottomNav(
-        onLibraryTap: () {
-          Navigator.of(
-            context,
-          ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
-        },
-        onSearchTap: () {
-          Navigator.of(context).push(
-            buildSmoothPageRoute(
-              SearchPage(
-                onHomeTap: () {
-                  Navigator.of(
-                    context,
-                  ).pushReplacement(buildSmoothPageRoute(const HomePage()));
-                },
-                onLibraryTap: () {
-                  Navigator.of(
-                    context,
-                  ).pushReplacement(buildSmoothPageRoute(const LibraryPage()));
-                },
-              ),
-            ),
-          );
-        },
+        onLibraryTap: () => _openLibrary(context),
+        onSearchTap: () => _openSearch(context),
       ),
     );
   }

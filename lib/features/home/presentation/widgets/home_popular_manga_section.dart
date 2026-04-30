@@ -21,8 +21,9 @@ class HomePopularMangaSection extends StatelessWidget {
           actionLabel: '',
         ),
         const SizedBox(height: 14),
-        ...kHomePopularManga.map((item) {
-          final index = kHomePopularManga.indexOf(item);
+        ...kHomePopularManga.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
           return Padding(
             padding: EdgeInsets.only(
               bottom: index == kHomePopularManga.length - 1 ? 0 : 12,
