@@ -1,162 +1,68 @@
-import 'package:flutter/material.dart';
 
+
+import '../../../../core/data/mock_database.dart';
 import 'models/title_detail_model.dart';
 
-const List<ChapterUpdateModel> kDefaultChapterUpdates = [
-  ChapterUpdateModel(
-    chapterNumber: 176,
-    title: 'After the Rift',
-    timeLabel: '30 minutes ago',
-    isNew: true,
-  ),
-  ChapterUpdateModel(
-    chapterNumber: 175,
-    title: 'Reunion and Revelation',
-    timeLabel: '2 hours ago',
-    isNew: true,
-  ),
-  ChapterUpdateModel(
-    chapterNumber: 174,
-    title: 'The Calm Before',
-    timeLabel: '3 days ago',
-  ),
-  ChapterUpdateModel(
-    chapterNumber: 173,
-    title: 'Echoes of the Past',
-    timeLabel: '1 week ago',
-  ),
-  ChapterUpdateModel(
-    chapterNumber: 172,
-    title: 'Diverging Paths',
-    timeLabel: 'Read · 2 weeks ago',
-    isRead: true,
-  ),
-  ChapterUpdateModel(
-    chapterNumber: 171,
-    title: 'A Quiet Resolve',
-    timeLabel: '3 weeks ago',
-  ),
-];
+// Helper to convert MockTitle to TitleDetailModel
+TitleDetailModel _mapToDetailModel(MockTitle mock) {
+  return TitleDetailModel(
+    title: mock.title,
+    author: mock.author,
+    status: mock.status,
+    rating: mock.rating,
+    chapters: mock.chapters.length,
+    readsLabel: mock.readsLabel,
+    synopsis: mock.synopsis,
+    genres: mock.genres,
+    chapterUpdates: mock.chapters.map((c) => ChapterUpdateModel(
+      chapterNumber: c.number,
+      title: c.title,
+      timeLabel: c.timeLabel,
+      isNew: c.isNew,
+      isRead: c.isRead,
+    )).toList(),
+    reviewSummary: ReviewSummaryModel(
+      average: mock.reviewSummary.average,
+      ratingsCountLabel: mock.reviewSummary.ratingsCountLabel,
+      bars: mock.reviewSummary.bars,
+    ),
+    reviews: mock.reviews.map((r) => CommunityReviewModel(
+      author: r.author,
+      timeLabel: r.timeLabel,
+      rating: r.rating,
+      content: r.content,
+      likes: r.likes,
+      comments: r.comments,
+    )).toList(),
+    relatedStories: mock.relatedStories.map((rs) => RelatedStoryModel(
+      title: rs.title,
+      rating: rs.rating,
+      coverColor: rs.coverColor,
+    )).toList(),
+    coverColor: mock.coverColor,
+  );
+}
 
-const ReviewSummaryModel kDefaultReviewSummary = ReviewSummaryModel(
-  average: 4.8,
-  ratingsCountLabel: '12.5k ratings',
-  bars: {5: 0.92, 4: 0.16, 3: 0.04, 2: 0.01, 1: 0.02},
-);
+// Convert all titles from MockDatabase into a map for easy lookup
+final Map<String, TitleDetailModel> _detailModels = {
+  for (var title in MockDatabase.titles) title.title: _mapToDetailModel(title),
+};
 
-const List<CommunityReviewModel> kDefaultReviews = [
-  CommunityReviewModel(
-    author: 'Sarah Jenkins',
-    timeLabel: '2d ago',
-    rating: 5,
-    content:
-        'This series just keeps getting better! The character development in the latest arc is phenomenal. Can\'t wait for the next update.',
-    likes: 245,
-    comments: 12,
-  ),
-];
+// Fallback logic to get detail model
+TitleDetailModel getDetailModelForTitle(String title) {
+  if (_detailModels.containsKey(title)) {
+    return _detailModels[title]!;
+  }
+  // Return a safe fallback if title is not found
+  return _detailModels.values.first;
+}
 
-const List<RelatedStoryModel> kDefaultRelatedStories = [
-  RelatedStoryModel(
-    title: 'Omniscient Reader\'s Viewpoint',
-    rating: 4.9,
-    coverColor: Color(0xFF8BA1C2),
-  ),
-  RelatedStoryModel(
-    title: 'Solo Leveling',
-    rating: 4.8,
-    coverColor: Color(0xFF70839F),
-  ),
-  RelatedStoryModel(
-    title: 'Tower of God',
-    rating: 4.7,
-    coverColor: Color(0xFF8A98AF),
-  ),
-];
+// We expose kTitleDetail as the featured one (e.g., Azure Sentinel or Final Quarter)
+final TitleDetailModel kTitleDetail = getDetailModelForTitle('The Azure Sentinel: Rebirth');
 
-const TitleDetailModel kDetailAzureSentinel = TitleDetailModel(
-  title: 'The Azure Sentinel: Rebirth',
-  author: 'Iris Vale',
-  status: 'ONGOING',
-  rating: 4.9,
-  chapters: 68,
-  readsLabel: '1.8M',
-  synopsis:
-      'A sentinel returns to a shattered sky to rebuild a fallen order and defend the last city of light.',
-  genres: ['Action', 'Sci-Fi', 'Fantasy'],
-  chapterUpdates: kDefaultChapterUpdates,
-  reviewSummary: kDefaultReviewSummary,
-  reviews: kDefaultReviews,
-  relatedStories: kDefaultRelatedStories,
-  coverColor: Color(0xFF6FAED6),
-);
-
-const TitleDetailModel kDetailStarCrossed = TitleDetailModel(
-  title: 'Star-Crossed...',
-  author: 'Mina Cho',
-  status: 'ONGOING',
-  rating: 4.6,
-  chapters: 142,
-  readsLabel: '980k',
-  synopsis:
-      'Two worlds collide when a comet awakens a forbidden bond between rival families.',
-  genres: ['Romance', 'Drama', 'Fantasy'],
-  chapterUpdates: kDefaultChapterUpdates,
-  reviewSummary: kDefaultReviewSummary,
-  reviews: kDefaultReviews,
-  relatedStories: kDefaultRelatedStories,
-  coverColor: Color(0xFFD7E9F1),
-);
-
-const TitleDetailModel kDetailVoidWalker = TitleDetailModel(
-  title: 'Void Walker',
-  author: 'Aiden Roe',
-  status: 'ONGOING',
-  rating: 4.7,
-  chapters: 89,
-  readsLabel: '1.2M',
-  synopsis:
-      'A lone ranger maps the void between realms to prevent a war that could erase time itself.',
-  genres: ['Dark Fantasy', 'Action', 'Adventure'],
-  chapterUpdates: kDefaultChapterUpdates,
-  reviewSummary: kDefaultReviewSummary,
-  reviews: kDefaultReviews,
-  relatedStories: kDefaultRelatedStories,
-  coverColor: Color(0xFF111827),
-);
-
-const TitleDetailModel kDetailFinalQuarter = TitleDetailModel(
-  title: 'Final Quarter',
-  author: 'Jasper Hall',
-  status: 'ONGOING',
-  rating: 4.3,
-  chapters: 24,
-  readsLabel: '640k',
-  synopsis:
-      'A last season comeback puts a fractured team against impossible odds.',
-  genres: ['Sports', 'Drama'],
-  chapterUpdates: kDefaultChapterUpdates,
-  reviewSummary: kDefaultReviewSummary,
-  reviews: kDefaultReviews,
-  relatedStories: kDefaultRelatedStories,
-  coverColor: Color(0xFFE7E7E7),
-);
-
-const TitleDetailModel kDetailEternalHorizon = TitleDetailModel(
-  title: 'Eternal Horizon',
-  author: 'Rhea Wolfe',
-  status: 'ONGOING',
-  rating: 4.9,
-  chapters: 112,
-  readsLabel: '2.2M',
-  synopsis:
-      'Beyond the edge of the known universe, an expedition uncovers a hidden empire.',
-  genres: ['Sci-Fi', 'Adventure'],
-  chapterUpdates: kDefaultChapterUpdates,
-  reviewSummary: kDefaultReviewSummary,
-  reviews: kDefaultReviews,
-  relatedStories: kDefaultRelatedStories,
-  coverColor: Color(0xFFD8EAF4),
-);
-
-const TitleDetailModel kTitleDetail = kDetailAzureSentinel;
+// Keep old constant names for compatibility, pointing to our mapped items
+final TitleDetailModel kDetailAzureSentinel = getDetailModelForTitle('The Azure Sentinel: Rebirth');
+final TitleDetailModel kDetailStarCrossed = getDetailModelForTitle('Star-Crossed...');
+final TitleDetailModel kDetailVoidWalker = getDetailModelForTitle('Solo Leveling'); // Fallback map
+final TitleDetailModel kDetailFinalQuarter = getDetailModelForTitle('Final Quarter');
+final TitleDetailModel kDetailEternalHorizon = getDetailModelForTitle('Elara and the Forgotten Kingdom'); // Fallback map

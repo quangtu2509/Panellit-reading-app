@@ -1,145 +1,60 @@
-import 'package:flutter/material.dart';
+import '../../../../core/data/mock_database.dart';
 import '../../discover/data/title_detail_mock_data.dart';
 import 'models/library_completed_item.dart';
 import 'models/library_item.dart';
 import 'models/library_reading_item.dart';
 
-const int kLibraryTotalTitles = 12;
+const int kLibraryTotalTitles = 5;
 
-final List<LibraryItem> kFollowingLibraryItems = [
-  LibraryItem(
-    title: 'The Azure Sentinel: Rebirth',
-    genre: 'Sci-Fi',
-    updatedHoursAgo: 2,
-    chapter: 'Ch. 68',
-    actionLabel: 'Continue',
-    badge: 'NEW',
-    coverColor: Color(0xFF6FAED6),
-    detail: kDetailAzureSentinel,
-  ),
-  LibraryItem(
-    title: 'Void Walker',
-    genre: 'Dark Fantasy',
-    updatedHoursAgo: 5,
-    chapter: 'Ch. 89',
-    actionLabel: 'Continue',
-    badge: 'NEW',
-    coverColor: Color(0xFF111827),
-    detail: kDetailVoidWalker,
-  ),
-  LibraryItem(
-    title: 'Star-Crossed...',
-    genre: 'Romance',
-    updatedHoursAgo: 24,
-    chapter: 'Ch. 142',
-    actionLabel: 'Read Now',
-    coverColor: Color(0xFFD7E9F1),
-    detail: kDetailStarCrossed,
-  ),
-  LibraryItem(
-    title: 'Eternal Horizon',
-    genre: 'Adventure',
-    updatedHoursAgo: 72,
-    chapter: 'Ch. 112',
-    actionLabel: 'Resume',
-    badge: 'NEW',
-    coverColor: Color(0xFFD8EAF4),
-    detail: kDetailEternalHorizon,
-  ),
-];
+final List<LibraryItem> kFollowingLibraryItems = MockDatabase.titles
+    .take(4)
+    .toList()
+    .asMap()
+    .entries
+    .map((entry) => LibraryItem(
+          title: entry.value.title,
+          genre: entry.value.genres.last,
+          updatedHoursAgo: (entry.key + 1) * 2,
+          chapter: entry.value.chapters.isNotEmpty
+              ? 'Ch. ${entry.value.chapters.first.number}'
+              : 'Ch. 1',
+          actionLabel: entry.key % 2 == 0 ? 'Continue' : 'Read Now',
+          badge: entry.key < 2 ? 'NEW' : null,
+          coverColor: entry.value.coverColor,
+          detail: getDetailModelForTitle(entry.value.title),
+        ))
+    .toList();
 
-final List<LibraryReadingItem> kReadingLibraryItems = [
-  LibraryReadingItem(
-    title: 'Final Quarter',
-    typeLabel: 'MANGA',
-    unitLabel: 'Chapter',
-    currentUnit: 12,
-    totalUnit: 24,
-    lastReadHoursAgo: 2,
-    coverColor: Color(0xFFE7E7E7),
-    detail: kDetailFinalQuarter,
-  ),
-  LibraryReadingItem(
-    title: 'The Azure Sentinel: Rebirth',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Volume',
-    currentUnit: 32,
-    totalUnit: 68,
-    lastReadHoursAgo: 5,
-    coverColor: Color(0xFF6FAED6),
-    detail: kDetailAzureSentinel,
-  ),
-  LibraryReadingItem(
-    title: 'Void Walker',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Chapter',
-    currentUnit: 40,
-    totalUnit: 89,
-    lastReadHoursAgo: 24,
-    coverColor: Color(0xFF111827),
-    detail: kDetailVoidWalker,
-  ),
-  LibraryReadingItem(
-    title: 'Eternal Horizon',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Volume',
-    currentUnit: 64,
-    totalUnit: 112,
-    lastReadHoursAgo: 72,
-    coverColor: Color(0xFFD8EAF4),
-    detail: kDetailEternalHorizon,
-  ),
-];
+final List<LibraryReadingItem> kReadingLibraryItems = MockDatabase.titles
+    .take(4)
+    .toList()
+    .asMap()
+    .entries
+    .map((entry) => LibraryReadingItem(
+          title: entry.value.title,
+          typeLabel: entry.value.type.toUpperCase(),
+          unitLabel: 'Chapter',
+          currentUnit: entry.value.chapters.isNotEmpty ? entry.value.chapters.length ~/ 2 : 1,
+          totalUnit: entry.value.chapters.length,
+          lastReadHoursAgo: (entry.key + 1) * 3,
+          coverColor: entry.value.coverColor,
+          detail: getDetailModelForTitle(entry.value.title),
+        ))
+    .toList();
 
-final List<LibraryCompletedItem> kCompletedLibraryItems = [
-  LibraryCompletedItem(
-    title: 'Star-Crossed...',
-    typeLabel: 'MANGA',
-    unitLabel: 'Chapter',
-    totalUnit: 142,
-    completedHoursAgo: 12,
-    rating: 4.6,
-    coverColor: Color(0xFFD7E9F1),
-    detail: kDetailStarCrossed,
-  ),
-  LibraryCompletedItem(
-    title: 'Void Walker',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Volume',
-    totalUnit: 89,
-    completedHoursAgo: 36,
-    rating: 4.7,
-    coverColor: Color(0xFF111827),
-    detail: kDetailVoidWalker,
-  ),
-  LibraryCompletedItem(
-    title: 'Final Quarter',
-    typeLabel: 'MANGA',
-    unitLabel: 'Chapter',
-    totalUnit: 24,
-    completedHoursAgo: 96,
-    rating: 4.3,
-    coverColor: Color(0xFFE7E7E7),
-    detail: kDetailFinalQuarter,
-  ),
-  LibraryCompletedItem(
-    title: 'Eternal Horizon',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Chapter',
-    totalUnit: 112,
-    completedHoursAgo: 168,
-    rating: 4.9,
-    coverColor: Color(0xFFD8EAF4),
-    detail: kDetailEternalHorizon,
-  ),
-  LibraryCompletedItem(
-    title: 'The Azure Sentinel: Rebirth',
-    typeLabel: 'NOVEL',
-    unitLabel: 'Chapter',
-    totalUnit: 68,
-    completedHoursAgo: 216,
-    rating: 4.9,
-    coverColor: Color(0xFF6FAED6),
-    detail: kDetailAzureSentinel,
-  ),
-];
+final List<LibraryCompletedItem> kCompletedLibraryItems = MockDatabase.titles
+    .take(3)
+    .toList()
+    .asMap()
+    .entries
+    .map((entry) => LibraryCompletedItem(
+          title: entry.value.title,
+          typeLabel: entry.value.type.toUpperCase(),
+          unitLabel: 'Chapter',
+          totalUnit: entry.value.chapters.length,
+          completedHoursAgo: (entry.key + 1) * 24,
+          rating: entry.value.rating,
+          coverColor: entry.value.coverColor,
+          detail: getDetailModelForTitle(entry.value.title),
+        ))
+    .toList();

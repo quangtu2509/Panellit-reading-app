@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class SearchResultModel {
   final String title;
+  final String typeLabel; // 'Novel' or 'Manga'
   final String author;
   final List<String> genres;
   final double rating;
@@ -11,6 +12,7 @@ class SearchResultModel {
 
   const SearchResultModel({
     required this.title,
+    required this.typeLabel,
     required this.author,
     required this.genres,
     required this.rating,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/smooth_page_route.dart';
 import '../../data/models/search_models.dart';
 import '../../data/search_mock_data.dart';
+import '../../data/title_detail_mock_data.dart';
 import '../theme/search_colors.dart';
 import '../widgets/search/search_bottom_nav.dart';
 import '../widgets/search/search_default_section.dart';
@@ -139,6 +140,7 @@ class _SearchPageState extends State<SearchPage> {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
+          detail: getDetailModelForTitle(result.title),
           isGuest: detailIsGuest,
           onHomeTap: widget.onHomeTap,
           onLibraryTap: widget.onLibraryTap,

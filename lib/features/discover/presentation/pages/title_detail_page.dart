@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/smooth_page_route.dart';
-import '../../data/title_detail_mock_data.dart';
+
 import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
+import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
+import '../../../reader_novel/data/novel_mock_data.dart';
 import '../../../reading/data/reading_progress_store.dart';
 import '../theme/title_detail_colors.dart';
 import '../widgets/detail/detail_bottom_nav.dart';
@@ -24,7 +26,7 @@ class TitleDetailPage extends StatefulWidget {
 
   const TitleDetailPage({
     super.key,
-    this.detail = kTitleDetail,
+    required this.detail,
     this.isGuest = false,
     required this.onHomeTap,
     required this.onLibraryTap,
@@ -114,18 +116,32 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   }
 
   void _openReading(int chapterNumber) {
-    Navigator.of(context).push(
-      buildSmoothPageRoute(
-        MangaReadingPage(
-          title: _detail.title,
-          chapterLabel: 'Chapter $chapterNumber',
-          chapterNumber: chapterNumber,
-          isGuest: widget.isGuest,
-          isSaved: _savedChapterNumber == chapterNumber,
-          onSaveChapter: _saveChapter,
+    if (_detail.genres.contains('Novel') || _detail.genres.contains('NOVEL')) {
+      Navigator.of(context).push(
+        buildSmoothPageRoute(
+          NovelReadingPage(
+            novel: getNovelModelForTitle(_detail.title),
+            initialChapterIndex: chapterNumber > 0 ? chapterNumber - 1 : 0,
+            isGuest: widget.isGuest,
+            isSaved: _savedChapterNumber == chapterNumber,
+            onSaveChapter: _saveChapter,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      Navigator.of(context).push(
+        buildSmoothPageRoute(
+          MangaReadingPage(
+            title: _detail.title,
+            chapterLabel: 'Chapter $chapterNumber',
+            chapterNumber: chapterNumber,
+            isGuest: widget.isGuest,
+            isSaved: _savedChapterNumber == chapterNumber,
+            onSaveChapter: _saveChapter,
+          ),
+        ),
+      );
+    }
   }
 
   @override

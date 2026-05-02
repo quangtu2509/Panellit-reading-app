@@ -5,6 +5,7 @@ import '../../../library/presentation/pages/library_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
+import '../../../discover/presentation/pages/category_results_page.dart';
 import '../../../discover/data/models/title_detail_model.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../data/home_mock_data.dart';
@@ -75,6 +76,21 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  void _openCategory(BuildContext context, String category) {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        CategoryResultsPage(
+          category: category,
+          isGuest: isGuest,
+          onHomeTap: () => _openHome(context),
+          onLibraryTap: () => _openLibrary(context),
+          onSearchTap: () => _openSearch(context),
+          onProfileTap: () => _openProfile(context),
+        ),
+      ),
+    );
+  }
+
   void _openDetail(BuildContext context, TitleDetailModel detail) {
     Navigator.of(context).push(
       buildSmoothPageRoute(
@@ -106,6 +122,7 @@ class HomePage extends StatelessWidget {
                     notification.isUnread,
               ),
               onNotificationTap: () => _openNotifications(context),
+              onCategoryTap: (cat) => _openCategory(context, cat),
             ),
             Expanded(
               child: HomePageContent(

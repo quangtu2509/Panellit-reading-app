@@ -182,7 +182,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
             itemCount: _chapters.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final label = _chapters[index];
               final isSelected = index == _chapterIndex;

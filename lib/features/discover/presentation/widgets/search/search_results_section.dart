@@ -123,26 +123,33 @@ class _SearchResultCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            item.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: SearchColors.title,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: SearchColors.title,
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.bookmark_border_rounded,
+                              color: SearchColors.subtitle,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.bookmark_border_rounded,
-                          color: SearchColors.subtitle,
-                        ),
+                        const SizedBox(height: 4),
+                        _TypeBadge(label: item.typeLabel),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -210,6 +217,56 @@ class _SearchResultCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small pill badge that shows whether a title is a "Novel" or "Manga".
+class _TypeBadge extends StatelessWidget {
+  final String label;
+
+  const _TypeBadge({required this.label});
+
+  // Novel → purple tones; Manga → blue tones; anything else → grey.
+  Color get _background {
+    switch (label) {
+      case 'Novel':
+        return const Color(0xFFEDE9F8);
+      case 'Manga':
+        return const Color(0xFFE0EEF9);
+      default:
+        return const Color(0xFFEEEEEE);
+    }
+  }
+
+  Color get _foreground {
+    switch (label) {
+      case 'Novel':
+        return const Color(0xFF6D28D9);
+      case 'Manga':
+        return const Color(0xFF0F6F9B);
+      default:
+        return const Color(0xFF666666);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: _background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: _foreground,
+          letterSpacing: 0.4,
         ),
       ),
     );
