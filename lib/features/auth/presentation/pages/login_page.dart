@@ -10,8 +10,40 @@ import '../widgets/auth_page_header.dart';
 import '../widgets/auth_section_icon.dart';
 import '../widgets/auth_social_button.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  static const String _mockEmail = 'user123@gmail.com';
+  static const String _mockPassword = 'user123';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    if (email != _mockEmail || password != _mockPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password.')),
+      );
+      return;
+    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const HomePage(isGuest: false)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +95,10 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const AuthTextField(
+                          AuthTextField(
                             hintText: 'name@example.com',
                             icon: Icons.mail_outline_rounded,
+                            controller: _emailController,
                           ),
                           const SizedBox(height: 14),
                           const Text(
@@ -77,10 +110,11 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const AuthTextField(
+                          AuthTextField(
                             hintText: '........',
                             icon: Icons.lock_outline_rounded,
                             obscureText: true,
+                            controller: _passwordController,
                           ),
                           const SizedBox(height: 12),
                           Row(
@@ -132,14 +166,7 @@ class LoginPage extends StatelessWidget {
                           AuthGradientButton(
                             label: 'Login',
                             icon: Icons.arrow_forward,
-                            onPressed: () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const HomePage(isGuest: false),
-                                ),
-                              );
-                            },
+                            onPressed: _handleLogin,
                           ),
                           const SizedBox(height: 16),
                           const AuthDividerWithText(text: 'or continue with'),

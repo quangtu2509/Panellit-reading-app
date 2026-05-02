@@ -5,8 +5,15 @@ import '../../theme/title_detail_colors.dart';
 
 class DetailChaptersSection extends StatefulWidget {
   final List<ChapterUpdateModel> chapters;
+  final ValueChanged<int> onChapterTap;
+  final int? savedChapterNumber;
 
-  const DetailChaptersSection({super.key, required this.chapters});
+  const DetailChaptersSection({
+    super.key,
+    required this.chapters,
+    required this.onChapterTap,
+    this.savedChapterNumber,
+  });
 
   @override
   State<DetailChaptersSection> createState() => _DetailChaptersSectionState();
@@ -108,7 +115,12 @@ class _DetailChaptersSectionState extends State<DetailChaptersSection> {
               itemCount: chapters.length,
               separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
-                return _ChapterTile(item: chapters[index]);
+                final chapter = chapters[index];
+                return _ChapterTile(
+                  item: chapter,
+                  isSaved: chapter.chapterNumber == widget.savedChapterNumber,
+                  onTap: () => widget.onChapterTap(chapter.chapterNumber),
+                );
               },
             ),
           ),
@@ -120,101 +132,148 @@ class _DetailChaptersSectionState extends State<DetailChaptersSection> {
 
 class _ChapterTile extends StatelessWidget {
   final ChapterUpdateModel item;
+  final bool isSaved;
+  final VoidCallback onTap;
 
-  const _ChapterTile({required this.item});
+  const _ChapterTile({
+    required this.item,
+    required this.isSaved,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9FBFD),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: TitleDetailColors.divider),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F2F6),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '${item.chapterNumber}',
-              style: const TextStyle(
-                color: Color(0xFF67758C),
-                fontWeight: FontWeight.w800,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSaved ? const Color(0xFFFFF7D1) : const Color(0xFFF9FBFD),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSaved
+                ? const Color(0xFFFFC107)
+                : TitleDetailColors.divider,
+          ),
+          boxShadow: isSaved
+              ? const [
+                  BoxShadow(
+                    color: Color(0x1AF2B705),
+                    blurRadius: 12,
+                    offset: Offset(0, 6),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isSaved
+                    ? const Color(0xFFFFECB3)
+                    : const Color(0xFFF0F2F6),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${item.chapterNumber}',
+                style: TextStyle(
+                  color: isSaved
+                      ? const Color(0xFF8A6400)
+                      : const Color(0xFF67758C),
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          height: 1.1,
-                          fontWeight: FontWeight.w700,
-                          color: TitleDetailColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    if (item.isNew)
-                      Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: TitleDetailColors.brand,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          'NEW',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 10,
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            height: 1.1,
+                            fontWeight: FontWeight.w700,
+                            color: TitleDetailColors.textPrimary,
                           ),
                         ),
-                      )
-                    else if (item.isRead)
-                      const Padding(
-                        padding: EdgeInsets.only(left: 6),
-                        child: Icon(
-                          Icons.check_circle_outline_rounded,
-                          color: TitleDetailColors.brand,
-                          size: 18,
-                        ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.timeLabel,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: TitleDetailColors.textSecondary,
+                      if (isSaved)
+                        Container(
+                          margin: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFC107),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'SAVED',
+                            style: TextStyle(
+                              color: Color(0xFF3A2B00),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 10,
+                            ),
+                          ),
+                        )
+                      else if (item.isNew)
+                        Container(
+                          margin: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: TitleDetailColors.brand,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'NEW',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 10,
+                            ),
+                          ),
+                        )
+                      else if (item.isRead)
+                        const Padding(
+                          padding: EdgeInsets.only(left: 6),
+                          child: Icon(
+                            Icons.check_circle_outline_rounded,
+                            color: TitleDetailColors.brand,
+                            size: 18,
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    item.timeLabel,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: TitleDetailColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

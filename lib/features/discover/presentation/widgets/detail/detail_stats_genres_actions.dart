@@ -5,8 +5,13 @@ import '../../theme/title_detail_colors.dart';
 
 class DetailStatsGenresActions extends StatelessWidget {
   final TitleDetailModel detail;
+  final VoidCallback? onReadTap;
 
-  const DetailStatsGenresActions({super.key, required this.detail});
+  const DetailStatsGenresActions({
+    super.key,
+    required this.detail,
+    this.onReadTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,33 +59,40 @@ class DetailStatsGenresActions extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Container(
-                height: 54,
-                decoration: BoxDecoration(
-                  color: TitleDetailColors.brand,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onReadTap,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x334F46E5),
-                      blurRadius: 18,
-                      offset: Offset(0, 8),
+                  child: Ink(
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: TitleDetailColors.brand,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x334F46E5),
+                          blurRadius: 18,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.menu_book_outlined, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text(
-                      'Read Now',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.menu_book_outlined, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text(
+                          'Read Now',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
