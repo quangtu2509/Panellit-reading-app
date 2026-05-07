@@ -1,43 +1,16 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
+# Frontend
+panellit_reading_app/build/
+panellit_reading_app/.dart_tool/
+panellit_reading_app/.packages
+
+# Backend
+panellit_backend/node_modules/
+panellit_backend/.env
+panellit_backend/dist/
+
+# OS
 .DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-macOS/
-out/
+Thumbs.db
 
-# IntelliJ / Android Studio
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Visual Studio Code
+# Ignore VS Code personal settings
 .vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-
-# Web related
-lib/generated_plugin_registrant.dart
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Exceptions to above rules.
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
