@@ -15,6 +15,7 @@ class TitleDetailModel {
   final List<CommunityReviewModel> reviews;
   final List<RelatedStoryModel> relatedStories;
   final Color coverColor;
+  final String? coverUrl;
 
   const TitleDetailModel({
     required this.id,
@@ -31,6 +32,7 @@ class TitleDetailModel {
     required this.reviews,
     required this.relatedStories,
     required this.coverColor,
+    this.coverUrl,
   });
 }
 

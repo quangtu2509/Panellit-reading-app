@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'package:panellit_reading_app/features/discover/data/models/title_detail_model.dart';
 import '../theme/reading_colors.dart';
 import '../../../../core/network/manga_repository.dart';
 
@@ -11,6 +11,7 @@ class MangaReadingPage extends StatefulWidget {
   final String chapterLabel;
   final int chapterNumber;
   final String? chapterApiData;
+  final List<ChapterUpdateModel> allChapters;
   final bool isGuest;
   final ValueChanged<int?>? onSaveChapter;
   final bool isSaved;
@@ -21,6 +22,7 @@ class MangaReadingPage extends StatefulWidget {
     required this.chapterLabel,
     required this.chapterNumber,
     this.chapterApiData,
+    required this.allChapters,
     required this.isGuest,
     this.onSaveChapter,
     this.isSaved = false,
@@ -38,60 +40,33 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   late bool _isSavedLocal;
   bool _showGuestHintVisible = false;
   Timer? _guestHintTimer;
-  late final List<String> _chapters;
+  
+  // Track current chapter state dynamically for navigation
+  late String _currentChapterLabel;
+  late int _currentChapterNumber;
+  late String? _currentChapterApiData;
   late int _chapterIndex;
+
   final ScrollController _scrollController = ScrollController();
   
   List<String> _imageUrls = [];
   bool _isLoadingImages = false;
 
-  static const List<_PanelSpec> _panels = [
-    _PanelSpec(
-      height: 420,
-      gradient: LinearGradient(
-        colors: [Color(0xFF0E1A24), Color(0xFF4B6CB7)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    ),
-    _PanelSpec(
-      height: 320,
-      gradient: LinearGradient(
-        colors: [Color(0xFF232526), Color(0xFF414345)],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ),
-    ),
-    _PanelSpec(
-      height: 500,
-      gradient: LinearGradient(
-        colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-      ),
-    ),
-    _PanelSpec(
-      height: 400,
-      gradient: LinearGradient(
-        colors: [Color(0xFF141E30), Color(0xFF243B55)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    ),
-  ];
 
   @override
   void initState() {
     super.initState();
     _isSavedLocal = widget.isGuest ? false : widget.isSaved;
 
-    _chapters = [
-      'Chapter ${widget.chapterNumber - 1}',
-      'Chapter ${widget.chapterNumber}',
-      'Chapter ${widget.chapterNumber + 1}',
-      'Chapter ${widget.chapterNumber + 2}',
-    ];
-    _chapterIndex = 1;
+    _currentChapterLabel = widget.chapterLabel;
+    _currentChapterNumber = widget.chapterNumber;
+    _currentChapterApiData = widget.chapterApiData;
+
+    // Find the index of current chapter in the full list
+    _chapterIndex = widget.allChapters.indexWhere(
+      (c) => c.chapterNumber == widget.chapterNumber,
+    );
+    if (_chapterIndex == -1) _chapterIndex = 0;
 
     _magicController = AnimationController(
       vsync: this,
@@ -106,11 +81,17 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   }
 
   Future<void> _fetchImages() async {
-    if (widget.chapterApiData == null || widget.chapterApiData!.isEmpty) return;
+    if (_currentChapterApiData == null || _currentChapterApiData!.isEmpty) {
+      setState(() {
+        _imageUrls = [];
+        _isLoadingImages = false;
+      });
+      return;
+    }
     
     setState(() => _isLoadingImages = true);
     final repo = MangaRepository();
-    final images = await repo.getChapterImages(widget.chapterApiData!);
+    final images = await repo.getChapterImages(_currentChapterApiData!);
     
     if (mounted) {
       setState(() {
@@ -155,8 +136,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     });
   }
 
-  String get _currentChapterLabel => _chapters[_chapterIndex];
-  bool get _canGoPrev => _chapterIndex < _chapters.length - 1;
+  bool get _canGoPrev => _chapterIndex < widget.allChapters.length - 1;
   bool get _canGoNext => _chapterIndex > 0;
 
   void _scrollToTop() {
@@ -168,24 +148,35 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   }
 
   void _updateChapterIndex(int nextIndex) {
+    if (nextIndex < 0 || nextIndex >= widget.allChapters.length) return;
+
+    final chapter = widget.allChapters[nextIndex];
     setState(() {
       _chapterIndex = nextIndex;
+      _currentChapterLabel = chapter.title;
+      _currentChapterNumber = chapter.chapterNumber;
+      _currentChapterApiData = chapter.chapterApiData;
+      _isSavedLocal = false; // Reset saved state for new chapter
     });
     _scrollToTop();
+    _fetchImages();
+  }
+
+
+  void _goToNextChapter() {
+    if (!_canGoNext) {
+      return;
+    }
+    // In OTruyen, next chapter (higher number) is a smaller index
+    _updateChapterIndex(_chapterIndex - 1);
   }
 
   void _goToPreviousChapter() {
     if (!_canGoPrev) {
       return;
     }
+    // In OTruyen, previous chapter (lower number) is a larger index
     _updateChapterIndex(_chapterIndex + 1);
-  }
-
-  void _goToNextChapter() {
-    if (!_canGoNext) {
-      return;
-    }
-    _updateChapterIndex(_chapterIndex - 1);
   }
 
   void _openChapterPicker() {
@@ -199,10 +190,11 @@ class _MangaReadingPageState extends State<MangaReadingPage>
         return SafeArea(
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-            itemCount: _chapters.length,
+            itemCount: widget.allChapters.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
-              final label = _chapters[index];
+              final chapter = widget.allChapters[index];
+              final label = 'Chapter ${chapter.title}';
               final isSelected = index == _chapterIndex;
               return ListTile(
                 title: Text(
@@ -267,7 +259,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
                       _isSavedLocal = !_isSavedLocal;
                     });
                     final nextValue = _isSavedLocal
-                        ? widget.chapterNumber
+                        ? _currentChapterNumber
                         : null;
                     widget.onSaveChapter?.call(nextValue);
                   },
@@ -305,7 +297,23 @@ class _MangaReadingPageState extends State<MangaReadingPage>
 
   Widget _buildPanels() {
     if (_isLoadingImages) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: ReadingColors.magicPrimary),
+            SizedBox(height: 16),
+            Text(
+              'Loading pages...',
+              style: TextStyle(
+                color: ReadingColors.topBarSubtle,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
     }
     
     if (_imageUrls.isNotEmpty) {
@@ -316,21 +324,49 @@ class _MangaReadingPageState extends State<MangaReadingPage>
         itemBuilder: (context, index) {
           return Image.network(
             _imageUrls[index],
-            fit: BoxFit.cover,
+            width: double.infinity,
+            fit: BoxFit.fitWidth,
             errorBuilder: (context, error, stackTrace) => Container(
               height: 300,
+              width: double.infinity,
               color: Colors.grey[900],
-              child: const Center(
-                child: Icon(Icons.broken_image, color: Colors.white54, size: 48),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Page ${index + 1} failed to load',
+                      style: const TextStyle(color: Colors.white54, fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
             ),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
+              final total = loadingProgress.expectedTotalBytes;
+              final current = loadingProgress.cumulativeBytesLoaded;
               return Container(
                 height: 400,
+                width: double.infinity,
                 color: const Color(0xFF141E30),
-                child: const Center(
-                  child: CircularProgressIndicator(color: ReadingColors.magicPrimary),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: ReadingColors.magicPrimary,
+                        value: total != null ? current / total : null,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Page ${index + 1}',
+                        style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -339,15 +375,23 @@ class _MangaReadingPageState extends State<MangaReadingPage>
       );
     }
 
-    // Fallback to mock panels
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.only(bottom: 140),
-      itemCount: _panels.length,
-      itemBuilder: (context, index) {
-        final panel = _panels[index];
-        return _ReadingPanel(panel: panel, index: index + 1);
-      },
+    // No images available
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.image_not_supported_outlined, color: Colors.grey[400], size: 64),
+          const SizedBox(height: 16),
+          Text(
+            'No pages available for this chapter',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -462,68 +506,6 @@ class _ReaderTopBar extends StatelessWidget {
   }
 }
 
-class _ReadingPanel extends StatelessWidget {
-  final _PanelSpec panel;
-  final int index;
-
-  const _ReadingPanel({required this.panel, required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: panel.height,
-      margin: const EdgeInsets.fromLTRB(12, 14, 12, 0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: panel.gradient,
-        border: Border.all(color: ReadingColors.panelEdge),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 20,
-            offset: Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -40,
-            top: -20,
-            child: Transform.rotate(
-              angle: -math.pi / 8,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [Color(0x55FFFFFF), Color(0x00FFFFFF)],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Page $index',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _ReaderControlBar extends StatelessWidget {
   final String chapterLabel;
@@ -818,9 +800,3 @@ class _MagicFab extends StatelessWidget {
   }
 }
 
-class _PanelSpec {
-  final double height;
-  final LinearGradient gradient;
-
-  const _PanelSpec({required this.height, required this.gradient});
-}

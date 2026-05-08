@@ -146,6 +146,7 @@ class _HomePageState extends State<HomePage> {
       reviews: const [],
       relatedStories: const [],
       coverColor: const Color(0xFF0D2742),
+      coverUrl: item.cover,
     );
   }
 
@@ -206,11 +207,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _openCategory(BuildContext context, String category) {
+  /// Map from OTruyen slug → human-readable display name (mirrors home_top_bar.dart).
+  static const Map<String, String> _slugToName = {
+    'manga':         'Manga',
+    'manhwa':        'Manhwa',
+    'manhua':        'Manhua',
+    'webtoon':       'Webtoon',
+    'action':        'Action',
+    'adventure':     'Adventure',
+    'comedy':        'Comedy',
+    'drama':         'Drama',
+    'fantasy':       'Fantasy',
+    'harem':         'Harem',
+    'historical':    'Historical',
+    'horror':        'Horror',
+    'martial-arts':  'Martial Arts',
+    'mystery':       'Mystery',
+    'psychological': 'Psychological',
+    'romance':       'Romance',
+    'school-life':   'School Life',
+    'sci-fi':        'Sci-fi',
+    'seinen':        'Seinen',
+    'shounen':       'Shounen',
+    'slice-of-life': 'Slice of Life',
+    'sports':        'Sports',
+    'supernatural':  'Supernatural',
+    'tragedy':       'Tragedy',
+    'xuyen-khong':   'Xuyên Không',
+    'chuyen-sinh':   'Chuyển Sinh',
+  };
+
+  void _openCategory(BuildContext context, String slug) {
+    final displayName = _slugToName[slug] ?? slug;
     Navigator.of(context).push(
       buildSmoothPageRoute(
         CategoryResultsPage(
-          category: category,
+          categoryName: displayName,
+          categorySlug: slug,
           isGuest: widget.isGuest,
           onHomeTap: () => _openHome(context),
           onLibraryTap: () => _openLibrary(context),

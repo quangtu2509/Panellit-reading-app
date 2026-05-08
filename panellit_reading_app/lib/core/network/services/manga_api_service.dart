@@ -29,6 +29,17 @@ class MangaApiService {
     }
   }
 
+  /// Fetch a paginated list of manga for a given category slug.
+  /// Calls: GET /api/manga/category/{slug}?page={page}
+  Future<ApiCategoryResult> getCategoryManga(String slug, {int page = 1}) async {
+    try {
+      final response = await _dio.get('/api/manga/category/$slug', queryParameters: {'page': page});
+      return ApiCategoryResult.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleError(e, 'getCategoryManga($slug)');
+    }
+  }
+
   /// Extract the chapter ID from a chapter_api_data URL.
   /// Example: "https://sv1.otruyencdn.com/v1/api/chapter/6568621ae120ddf21985fed6"
   /// → returns "6568621ae120ddf21985fed6"

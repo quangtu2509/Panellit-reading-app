@@ -58,21 +58,22 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
 
   Future<void> _fetchApiData() async {
     final repo = MangaRepository();
-    // Map mockId to OTruyen slug
-    final slug = _currentDetail.id == 'solo_leveling'
-        ? 'toi-thang-cap-mot-minh'
-        : _currentDetail.id.replaceAll('_', '-');
+    final slug = _currentDetail.id;
 
     try {
       final api = await repo.getMangaDetail(slug: slug);
       if (!mounted) return;
-      
-      int idx = api.chapters.length;
-      final mappedChapters = api.chapters.map((c) {
-        final currentIdx = idx--;
+
+      // Map API chapters using their real chapter name as identifier.
+      // API returns chapters oldest→newest order. We assign a sequential
+      // index (1-based) for internal identification but display the real
+      // chapterName from the API.
+      final mappedChapters = api.chapters.asMap().entries.map((entry) {
+        final c = entry.value;
+        final displayName = c.chapterName.isNotEmpty ? c.chapterName : c.chapterTitle;
         return ChapterUpdateModel(
-          chapterNumber: currentIdx,
-          title: c.chapterName.isNotEmpty ? c.chapterName : c.chapterTitle,
+          chapterNumber: entry.key + 1,
+          title: displayName,
           timeLabel: 'Recently',
           chapterApiData: c.chapterApiData,
         );
@@ -88,12 +89,13 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           chapters: api.chapters.length,
           readsLabel: _currentDetail.readsLabel,
           synopsis: api.summary.isNotEmpty ? api.summary : _currentDetail.synopsis,
-          genres: _currentDetail.genres,
+          genres: api.categories.isNotEmpty ? api.categories : _currentDetail.genres,
           chapterUpdates: mappedChapters,
           reviewSummary: _currentDetail.reviewSummary,
-          reviews: const [], // Removed mock data
-          relatedStories: const [], // Removed mock data
+          reviews: const [],
+          relatedStories: const [],
           coverColor: _currentDetail.coverColor,
+          coverUrl: api.cover.isNotEmpty ? api.cover : _currentDetail.coverUrl,
         );
       });
     } catch (e) {
@@ -199,6 +201,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
             chapterLabel: chapter.title,
             chapterNumber: chapterNumber,
             chapterApiData: chapter.chapterApiData,
+            allChapters: _detail.chapterUpdates,
             isGuest: widget.isGuest,
             isSaved: _savedChapterNumber == chapterNumber,
             onSaveChapter: _saveChapter,

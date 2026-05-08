@@ -58,6 +58,7 @@ panellit_backend/
 - **[2026-05-07]**: **Client Integration Started**: Flutter app đã hoàn thiện layer Network (Dio + Repository) và sẵn sàng kết nối với Backend.
 - **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home` — lấy danh sách truyện mới cập nhật từ OTruyen, trả về title, slug, cover, categories, chaptersLatest.
 - **[2026-05-08]**: **Search Endpoint**: Thêm `GET /api/manga/search?keyword=xxx` — tìm kiếm truyện qua OTruyen `/tim-kiem`. Route được đặt **trước** `/:slug` để tránh collision.
+- **[2026-05-08]**: **Image Proxy Endpoint**: Thêm `GET /api/manga/image-proxy?url=...` — proxy ảnh từ OTruyen CDN với Referer header. Bypass hotlink protection, stream ảnh trực tiếp tới Flutter client. Cache 24h.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

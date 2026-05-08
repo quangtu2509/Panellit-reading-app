@@ -1,7 +1,7 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 11 — Tích hợp API Search OTruyen ✅ DONE
+- **Task đang thực hiện**: Phase 13 — Fix Cover Image, Chapter Ordering & Reading Screen ✅ DONE
 - **Trạng thái**: Hoàn thành
-- **Tệp đang tác động chính**: `search_page.dart`, `search_api_service.dart`, `search_api_model.dart`, `search_models.dart`, `search_results_section.dart`
+- **Tệp đang tác động chính**: `title_detail_model.dart`, `detail_header_hero.dart`, `title_detail_page.dart`, `manga_reading_page.dart`, `manga_repository.dart`
 - **Vấn đề đang gặp (Nếu có)**: Không
 # Frontend Development Progress - Panellit Reading App
 
@@ -271,6 +271,20 @@
 - [x] Create `NovelSmartSidebar` — thin handle strip on left edge; long-press or drag-right opens full-height panel with smooth slide animation + scrim; tap scrim or close button to dismiss
 - [x] Wire `TitleDetailPage` "Read Now" button to route correctly to `NovelReadingPage` (instead of MangaReadingPage) for novel genres
 - [x] Create `NovelReadingPage` — composes all widgets, manages chapter state, save/bookmark state, sidebar open/close, guest-hint logic
+
+### Phase 13: Fix Cover Image, Chapter Ordering & Reading Screen ✅
+
+- [x] Thêm `coverUrl` (optional) vào `TitleDetailModel` để truyền URL ảnh bìa thật từ API.
+- [x] Cập nhật `DetailHeaderHero` — hiển thị ảnh bìa thật bằng `Image.network` với loading/error fallback, thay vì chỉ hiện màu `coverColor`.
+- [x] Fix thứ tự chapter trong `TitleDetailPage._fetchApiData`: dùng index tuần tự (1-based) thay vì đếm ngược (`idx--`) gây đảo số.
+- [x] Hiển thị đúng `chapterName` từ API (ví dụ: "1.1", "2.1") thay vì số index giả.
+- [x] Truyền `coverUrl` qua tất cả skeleton models: `home_page.dart`, `search_page.dart`, `category_results_page.dart`.
+- [x] Fix `MangaReadingPage` chapter label: hiển thị tên chapter thật thay vì "Chapter N" giả.
+- [x] Xóa hardcoded slug mapping (`solo_leveling` → `toi-thang-cap-mot-minh`) — slug đã đến trực tiếp từ API.
+- [x] **Fix ảnh chapter trong reading screen**: Thêm backend endpoint `GET /api/manga/image-proxy?url=...` để proxy ảnh CDN với Referer header, bypass hotlink protection.
+- [x] Cập nhật `MangaRepository.getChapterImages` — rewrite CDN URLs thành proxy URLs qua backend.
+- [x] Cải thiện `MangaReadingPage._buildPanels()`: `BoxFit.fitWidth` (full-width), progress indicator với phần trăm, error state rõ ràng.
+- [x] Xóa bỏ các widget mock panel cũ (`_PanelSpec`, `_ReadingPanel`, `_panels`, `dart:math` import).
 
 ### Phase 12: Xóa bỏ hoàn toàn Mock Data ✅
 

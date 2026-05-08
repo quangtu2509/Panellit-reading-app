@@ -27,6 +27,7 @@ class OTruyenService {
         author: item.author,
         status: item.status,
         summary: item.content,
+        categories: (item.category || []).map((c) => c.name),
         chapters: item.chapters[0]?.server_data || [],
       };
     } catch (error) {
@@ -99,6 +100,45 @@ class OTruyenService {
       }));
     } catch (error) {
       console.error(`OTruyenService [getHomeFeed] Error:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch manga list by category/genre slug
+   * API: https://otruyenapi.com/v1/api/the-loai/{slug}?page=1
+   */
+  async getCategoryManga(slug, page = 1) {
+    try {
+      const response = await axiosClient.get(`${API_BASE}/the-loai/${slug}`, {
+        params: { page },
+      });
+      const data = response.data;
+
+      if (data.status !== 'success') {
+        throw new Error(`OTruyen category fetch failed for slug: ${slug}`);
+      }
+
+      const items = data.data.items || [];
+      const pagination = data.data.params?.pagination || {};
+      return {
+        categoryName: data.data.seoOnPage?.titleHead || slug,
+        totalItems: pagination.totalItems || items.length,
+        currentPage: page,
+        items: items.map((item) => ({
+          title: item.name,
+          slug: item.slug,
+          cover: `${CDN_BASE}/${item.thumb_url}`,
+          status: item.status,
+          categories: (item.category || []).map((c) => c.name),
+          chaptersLatest: (item.chaptersLatest || []).map((c) => ({
+            chapterName: c.chapter_name,
+            chapterApiData: c.chapter_api_data || '',
+          })),
+        })),
+      };
+    } catch (error) {
+      console.error(`OTruyenService [getCategoryManga] Error:`, error.message);
       throw error;
     }
   }

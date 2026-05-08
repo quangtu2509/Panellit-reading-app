@@ -189,6 +189,7 @@ class _SearchPageState extends State<SearchPage> {
       reviews: const [],
       relatedStories: const [],
       coverColor: result.coverColor,
+      coverUrl: result.coverUrl,
     );
   }
 
