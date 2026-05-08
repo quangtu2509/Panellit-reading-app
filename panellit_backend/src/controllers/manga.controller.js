@@ -20,6 +20,16 @@ class MangaController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async getHomeFeed(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const feed = await otruyenService.getHomeFeed(page);
+      res.json(feed);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new MangaController();

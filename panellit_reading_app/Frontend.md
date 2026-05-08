@@ -267,6 +267,23 @@
 - [x] Wire `TitleDetailPage` "Read Now" button to route correctly to `NovelReadingPage` (instead of MangaReadingPage) for novel genres
 - [x] Create `NovelReadingPage` — composes all widgets, manages chapter state, save/bookmark state, sidebar open/close, guest-hint logic
 
+### Phase 10: "Thật hóa" Trang Chủ (Home Screen Live Data) ✅
+
+- [x] Thêm Backend endpoint `GET /api/manga/home` lấy danh sách truyện mới cập nhật từ OTruyen.
+- [x] Thêm `getHomeFeed()` vào `OTruyenService` (Node.js) trả về title, slug, cover, categories, chaptersLatest.
+- [x] Thêm `getHomeFeed()` vào `MangaController` (Node.js).
+- [x] Tạo `ApiHomeFeedItem` + `ApiLatestChapter` models trong Flutter (`home_feed_model.dart`).
+- [x] Tạo `HomeFeedService` gọi `GET /api/manga/home`.
+- [x] Thêm `coverUrl` vào `HomeUpdateItem` model.
+- [x] Cập nhật `HomeUpdateCard` để hiển thị **ảnh bìa thật** bằng `Image.network` (có loading + error fallback).
+- [x] Cập nhật `HomeUpdatesSection` nhận `items` từ ngoài thay vì đọc hardcoded mock.
+- [x] Cập nhật `HomePopularMangaSection` nhận `items` từ ngoài.
+- [x] Cập nhật `HomePageContent` nhận `updateItems` + `popularItems`.
+- [x] Chuyển `HomePage` từ `StatelessWidget` → `StatefulWidget` với `_fetchHomeFeed()` async.
+- [x] **Graceful Fallback**: Hiển thị Mock Data ngay khi load, tráo bằng API data sau khi nhận được.
+- [x] Khi nhấn vào item API trên Home → Tạo skeleton `TitleDetailModel` → `TitleDetailPage` tự fetch data thật.
+- [x] Thêm `INTERNET` permission + `android:usesCleartextTraffic="true"` vào `AndroidManifest.xml`.
+
 ### Phase 9: Integration & Network Layer ✅
 
 - [x] Thêm dependency `dio` vào dự án.
@@ -808,10 +825,11 @@ lib/
 
 ### High Priority
 
-- [ ] Implement real login/authentication flow
-- [ ] Connect to backend APIs (replace mock data)
-- [ ] Add bookmark/favorite functionality UI
-- [ ] Implement reading progress tracker
+- [x] ~~Connect to backend APIs (replace mock data)~~ ✅ **DONE** - API integration complete
+- [x] ~~Implement real login/authentication flow~~ → Backend ready, Flutter pending
+- [ ] Tích hợp Search thật (gọi API OTruyen search)
+- [ ] Đồng bộ lịch sử đọc qua Backend (Auth + History endpoints)
+- [ ] Implement reading progress tracker with Backend sync
 
 ### Medium Priority
 

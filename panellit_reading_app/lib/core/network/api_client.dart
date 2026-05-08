@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 /// Singleton Dio client for all Backend API requests.
 /// Base URL points to the Panellit Backend running locally (or replace with production URL).
 class ApiClient {
-  static const String baseUrl = 'http://10.0.2.2:3000'; // Android emulator → localhost
-  // Use 'http://localhost:3000' for web/desktop
+  static const String baseUrl =
+      'http://10.0.2.2:3000'; // Android emulator → localhost
+  // Use 'http://localhost:3000' for web/desktop or unit tests
   // Use your machine's IP (e.g. 'http://192.168.1.10:3000') for a real device on the same Wi-Fi
 
   static final ApiClient _instance = ApiClient._internal();

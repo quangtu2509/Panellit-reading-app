@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 
-import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import 'home_section_header.dart';
 import 'home_update_card.dart';
 
 class HomeUpdatesSection extends StatelessWidget {
+  final List<HomeUpdateItem> items;
   final ValueChanged<HomeUpdateItem> onItemTap;
 
-  const HomeUpdatesSection({super.key, required this.onItemTap});
+  const HomeUpdatesSection({
+    super.key,
+    required this.items,
+    required this.onItemTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    final displayItems = items.take(4).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -21,30 +29,23 @@ class HomeUpdatesSection extends StatelessWidget {
           actionLabel: 'See All',
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          height: 250,
-          child: GridView.count(
-            physics: const NeverScrollableScrollPhysics(),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 14,
             mainAxisSpacing: 14,
             childAspectRatio: 0.73,
-            children: [
-              HomeUpdateCard(
-                item: kHomeUpdates[0],
-                onTap: () => onItemTap(kHomeUpdates[0]),
-              ),
-              HomeUpdateCard(
-                item: kHomeUpdates[1],
-                onTap: () => onItemTap(kHomeUpdates[1]),
-              ),
-              HomeUpdateCard(
-                item: kHomeUpdates[2],
-                onTap: () => onItemTap(kHomeUpdates[2]),
-              ),
-              const SizedBox.shrink(),
-            ],
           ),
+          itemCount: displayItems.length,
+          itemBuilder: (context, index) {
+            final item = displayItems[index];
+            return HomeUpdateCard(
+              item: item,
+              onTap: () => onItemTap(item),
+            );
+          },
         ),
       ],
     );

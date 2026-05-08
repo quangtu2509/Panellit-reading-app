@@ -42,11 +42,27 @@ class HomeUpdateCard extends StatelessWidget {
                 Expanded(
                   child: Stack(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: coverColor,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
+                      // Show real cover image or fallback color
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: item.coverUrl != null && item.coverUrl!.isNotEmpty
+                            ? Image.network(
+                                item.coverUrl!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, e, st) => Container(color: coverColor),
+                                loadingBuilder: (ctx, child, progress) {
+                                  if (progress == null) return child;
+                                  return Container(
+                                    color: coverColor,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(color: coverColor),
                       ),
                       Positioned(
                         top: 0,
@@ -83,6 +99,8 @@ class HomeUpdateCard extends StatelessWidget {
     );
   }
 }
+
+
 
 class _MiniTag extends StatelessWidget {
   final String label;

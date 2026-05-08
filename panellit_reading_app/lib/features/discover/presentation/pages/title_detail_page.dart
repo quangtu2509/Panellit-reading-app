@@ -15,6 +15,7 @@ import '../widgets/detail/detail_related_section.dart';
 import '../widgets/detail/detail_reviews_section.dart';
 import '../widgets/detail/detail_stats_genres_actions.dart';
 import '../widgets/detail/detail_synopsis_section.dart';
+import '../../../../core/network/manga_repository.dart';
 
 class TitleDetailPage extends StatefulWidget {
   final TitleDetailModel detail;
@@ -41,14 +42,61 @@ class TitleDetailPage extends StatefulWidget {
 class _TitleDetailPageState extends State<TitleDetailPage> {
   int? _savedChapterNumber;
   bool _resumePromptShown = false;
+  late TitleDetailModel _currentDetail;
 
-  TitleDetailModel get _detail => widget.detail;
+  TitleDetailModel get _detail => _currentDetail;
 
   @override
   void initState() {
     super.initState();
+    _currentDetail = widget.detail;
+    _fetchApiData();
     if (!widget.isGuest) {
       _loadSavedChapter();
+    }
+  }
+
+  Future<void> _fetchApiData() async {
+    final repo = MangaRepository();
+    // Map mockId to OTruyen slug
+    final slug = _currentDetail.id == 'solo_leveling'
+        ? 'toi-thang-cap-mot-minh'
+        : _currentDetail.id.replaceAll('_', '-');
+
+    final result = await repo.getMangaDetail(slug: slug, mockId: _currentDetail.id);
+
+    if (mounted && result.isFromApi && result.apiData != null) {
+      final api = result.apiData!;
+      
+      int idx = api.chapters.length;
+      final mappedChapters = api.chapters.map((c) {
+        final currentIdx = idx--;
+        return ChapterUpdateModel(
+          chapterNumber: currentIdx,
+          title: c.chapterName.isNotEmpty ? c.chapterName : c.chapterTitle,
+          timeLabel: 'Recently',
+          chapterApiData: c.chapterApiData,
+        );
+      }).toList();
+
+      setState(() {
+        _currentDetail = TitleDetailModel(
+          id: _currentDetail.id,
+          title: api.title.isNotEmpty ? api.title : _currentDetail.title,
+          author: api.author,
+          status: api.status,
+          rating: _currentDetail.rating,
+          chapters: api.chapters.length,
+          readsLabel: _currentDetail.readsLabel,
+          synopsis: api.summary.isNotEmpty ? api.summary : _currentDetail.synopsis,
+          genres: _currentDetail.genres,
+          chapterUpdates: mappedChapters,
+          reviewSummary: _currentDetail.reviewSummary,
+          reviews: _currentDetail.reviews,
+          relatedStories: _currentDetail.relatedStories,
+          coverColor: _currentDetail.coverColor,
+        );
+      });
     }
   }
 
@@ -129,12 +177,23 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
         ),
       );
     } else {
+      // Find the specific ChapterUpdateModel
+      final chapter = _detail.chapterUpdates.firstWhere(
+        (c) => c.chapterNumber == chapterNumber,
+        orElse: () => ChapterUpdateModel(
+          chapterNumber: chapterNumber,
+          title: 'Chapter $chapterNumber',
+          timeLabel: 'Unknown',
+        ),
+      );
+
       Navigator.of(context).push(
         buildSmoothPageRoute(
           MangaReadingPage(
             title: _detail.title,
-            chapterLabel: 'Chapter $chapterNumber',
+            chapterLabel: chapter.title,
             chapterNumber: chapterNumber,
+            chapterApiData: chapter.chapterApiData,
             isGuest: widget.isGuest,
             isSaved: _savedChapterNumber == chapterNumber,
             onSaveChapter: _saveChapter,

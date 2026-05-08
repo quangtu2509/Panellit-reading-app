@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../discover/data/models/title_detail_model.dart';
+import '../../data/models/home_content_models.dart';
 import 'home_featured_banner.dart';
 import 'home_popular_manga_section.dart';
 import 'home_top_webnovels_section.dart';
@@ -10,6 +11,8 @@ class HomePageContent extends StatelessWidget {
   final String featuredTitle;
   final String featuredSubtitle;
   final TitleDetailModel featuredDetail;
+  final List<HomeUpdateItem> updateItems;
+  final List<HomeRankItem> popularItems;
   final ValueChanged<TitleDetailModel> onOpenDetail;
 
   const HomePageContent({
@@ -17,6 +20,8 @@ class HomePageContent extends StatelessWidget {
     required this.featuredTitle,
     required this.featuredSubtitle,
     required this.featuredDetail,
+    required this.updateItems,
+    required this.popularItems,
     required this.onOpenDetail,
   });
 
@@ -31,9 +36,15 @@ class HomePageContent extends StatelessWidget {
           onTap: () => onOpenDetail(featuredDetail),
         ),
         const SizedBox(height: 28),
-        HomeUpdatesSection(onItemTap: (item) => onOpenDetail(item.detail)),
+        HomeUpdatesSection(
+          items: updateItems,
+          onItemTap: (item) => onOpenDetail(item.detail),
+        ),
         const SizedBox(height: 24),
-        HomePopularMangaSection(onItemTap: (item) => onOpenDetail(item.detail)),
+        HomePopularMangaSection(
+          items: popularItems,
+          onItemTap: (item) => onOpenDetail(item.detail),
+        ),
         const SizedBox(height: 24),
         HomeTopWebnovelsSection(onItemTap: (item) => onOpenDetail(item.detail)),
       ],

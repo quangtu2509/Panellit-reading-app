@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TitleDetailModel {
+  final String id;
   final String title;
   final String author;
   final String status;
@@ -16,6 +17,7 @@ class TitleDetailModel {
   final Color coverColor;
 
   const TitleDetailModel({
+    required this.id,
     required this.title,
     required this.author,
     required this.status,
@@ -40,6 +42,7 @@ class ChapterUpdateModel {
   final String timeLabel;
   final bool isNew;
   final bool isRead;
+  final String? chapterApiData;
 
   const ChapterUpdateModel({
     required this.chapterNumber,
@@ -47,6 +50,7 @@ class ChapterUpdateModel {
     required this.timeLabel,
     this.isNew = false,
     this.isRead = false,
+    this.chapterApiData,
   });
 }
 

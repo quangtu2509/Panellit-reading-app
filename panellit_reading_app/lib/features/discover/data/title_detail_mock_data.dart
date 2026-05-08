@@ -6,6 +6,7 @@ import 'models/title_detail_model.dart';
 // Helper to convert MockTitle to TitleDetailModel
 TitleDetailModel _mapToDetailModel(MockTitle mock) {
   return TitleDetailModel(
+    id: mock.id,
     title: mock.title,
     author: mock.author,
     status: mock.status,

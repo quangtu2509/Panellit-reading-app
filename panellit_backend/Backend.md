@@ -51,6 +51,7 @@ panellit_backend/
 - **[2026-05-03]**: Thêm route chào mừng (`/`) và endpoint `/health`.
 - **[2026-05-03]**: Cài đặt `nodemon` và cấu hình lệnh `npm run dev`.
 - **[2026-05-07]**: **Client Integration Started**: Flutter app đã hoàn thiện layer Network (Dio + Repository) và sẵn sàng kết nối với Backend.
+- **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home` — lấy danh sách truyện mới cập nhật từ OTruyen, trả về title, slug, cover, categories, chaptersLatest.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

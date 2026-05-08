@@ -36,6 +36,38 @@ class OTruyenService {
   }
 
   /**
+   * Fetch home feed: newly updated manga list
+   * API: https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=1
+   */
+  async getHomeFeed(page = 1) {
+    try {
+      const response = await axiosClient.get(`${API_BASE}/danh-sach/truyen-moi?page=${page}`);
+      const data = response.data;
+
+      if (data.status !== 'success') {
+        throw new Error('Failed to fetch home feed from OTruyen');
+      }
+
+      const items = data.data.items || [];
+      return items.map((item) => ({
+        title: item.name,
+        slug: item.slug,
+        cover: `${CDN_BASE}/${item.thumb_url}`,
+        status: item.status,
+        categories: (item.category || []).map((c) => c.name),
+        updatedAt: item.updatedAt || '',
+        chaptersLatest: (item.chaptersLatest || []).map((c) => ({
+          chapterName: c.chapter_name,
+          chapterApiData: c.chapter_api_data || '',
+        })),
+      }));
+    } catch (error) {
+      console.error(`OTruyenService [getHomeFeed] Error:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
    * Fetch chapter image paths and map them to absolute URLs
    * API: https://sv1.otruyencdn.com/v1/api/chapter/{chapterId}
    */

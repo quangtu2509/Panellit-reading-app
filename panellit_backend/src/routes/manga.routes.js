@@ -4,22 +4,22 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/manga/{slug}:
+ * /api/manga/home:
  *   get:
- *     summary: Get manga details by slug
+ *     summary: Get home feed (newly updated manga list)
  *     tags: [Manga]
  *     parameters:
- *       - in: path
- *         name: slug
- *         required: true
+ *       - in: query
+ *         name: page
  *         schema:
- *           type: string
- *         description: The manga slug (e.g., toi-thang-cap-mot-minh)
+ *           type: integer
+ *         description: Page number (default 1)
  *     responses:
  *       200:
- *         description: Manga details fetched successfully
+ *         description: Home feed fetched successfully
  */
-router.get('/:slug', (req, res) => mangaController.getDetails(req, res));
+// ⚠️ IMPORTANT: Specific routes MUST be registered before dynamic /:slug
+router.get('/home', (req, res) => mangaController.getHomeFeed(req, res));
 
 /**
  * @swagger
@@ -39,5 +39,24 @@ router.get('/:slug', (req, res) => mangaController.getDetails(req, res));
  *         description: Chapter images fetched successfully
  */
 router.get('/chapter/:chapterId', (req, res) => mangaController.getChapter(req, res));
+
+/**
+ * @swagger
+ * /api/manga/{slug}:
+ *   get:
+ *     summary: Get manga details by slug
+ *     tags: [Manga]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The manga slug (e.g., toi-thang-cap-mot-minh)
+ *     responses:
+ *       200:
+ *         description: Manga details fetched successfully
+ */
+router.get('/:slug', (req, res) => mangaController.getDetails(req, res));
 
 module.exports = router;

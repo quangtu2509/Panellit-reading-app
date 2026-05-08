@@ -6,6 +6,7 @@ class HomeUpdateItem {
   final String timeAgo;
   final String episode;
   final String coverTone;
+  final String? coverUrl;
   final TitleDetailModel detail;
 
   const HomeUpdateItem({
@@ -14,6 +15,7 @@ class HomeUpdateItem {
     required this.timeAgo,
     required this.episode,
     required this.coverTone,
+    this.coverUrl,
     required this.detail,
   });
 }
