@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
-import 'home_novel_row.dart';
 import 'home_section_header.dart';
 
 class HomeTopWebnovelsSection extends StatelessWidget {
@@ -36,15 +34,7 @@ class HomeTopWebnovelsSection extends StatelessWidget {
             ],
           ),
           child: Column(
-            children: kHomeTopWebnovels.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              return HomeNovelRow(
-                item: item,
-                isLast: index == kHomeTopWebnovels.length - 1,
-                onTap: () => onItemTap(item),
-              );
-            }).toList(),
+            children: [],
           ),
         ),
       ],

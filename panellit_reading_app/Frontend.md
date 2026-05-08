@@ -1,3 +1,8 @@
+## 🚧 Current Focus (Mục tiêu hiện tại)
+- **Task đang thực hiện**: Phase 11 — Tích hợp API Search OTruyen ✅ DONE
+- **Trạng thái**: Hoàn thành
+- **Tệp đang tác động chính**: `search_page.dart`, `search_api_service.dart`, `search_api_model.dart`, `search_models.dart`, `search_results_section.dart`
+- **Vấn đề đang gặp (Nếu có)**: Không
 # Frontend Development Progress - Panellit Reading App
 
 ## 📋 Tổng Quan (Overview)
@@ -266,6 +271,28 @@
 - [x] Create `NovelSmartSidebar` — thin handle strip on left edge; long-press or drag-right opens full-height panel with smooth slide animation + scrim; tap scrim or close button to dismiss
 - [x] Wire `TitleDetailPage` "Read Now" button to route correctly to `NovelReadingPage` (instead of MangaReadingPage) for novel genres
 - [x] Create `NovelReadingPage` — composes all widgets, manages chapter state, save/bookmark state, sidebar open/close, guest-hint logic
+
+### Phase 12: Xóa bỏ hoàn toàn Mock Data ✅
+
+- [x] Gỡ bỏ các import và tham chiếu đến `MockDatabase`, `kSearchSuggestionSeeds`, `kSearchResultsCatalog`, `kHomeUpdates`, `kHomePopularManga`, `kLibraryFollowing`, v.v.
+- [x] Xóa toàn bộ các file mock data (`mock_database.dart`, `search_mock_data.dart`, `title_detail_mock_data.dart`, `home_mock_data.dart`, `library_mock_data.dart`, `novel_mock_data.dart`).
+- [x] Thay thế fallback UI tạm thời bằng các state rỗng (empty array `[]`) hoặc skeleton models (trong `category_results_page.dart`, `title_detail_page.dart`).
+- [x] Xóa bỏ fallback của mock DB trong `MangaRepository`.
+
+### Phase 11: Tích hợp API Search OTruyen ✅
+
+- [x] Thêm `searchManga()` vào `OTruyenService` (Node.js) — gọi `/tim-kiem?keyword=`.
+- [x] Thêm `searchManga()` vào `MangaController` (Node.js).
+- [x] Đăng ký route `GET /api/manga/search` **trước** `/:slug` để tránh route collision.
+- [x] Tạo `ApiSearchResult` + `ApiSearchResponse` models trong Flutter (`search_api_model.dart`).
+- [x] Tạo `SearchApiService` gọi `GET /api/manga/search`.
+- [x] Thêm `slug` + `coverUrl` vào `SearchResultModel`.
+- [x] Cập nhật `_SearchResultCard` để hiển thị **ảnh bìa thật** bằng `Image.network`.
+- [x] Viết lại `SearchPage`: thay filter mock bằng `_searchService.searchManga()` với **debounce 500ms**.
+- [x] Loading spinner trong khi chờ API response.
+- [x] **Graceful Fallback**: Nếu API thất bại, tự động filter mock catalog local.
+- [x] Navigation từ kết quả tìm kiếm → `TitleDetailPage` (dùng skeleton model nếu không có trong mock DB).
+- [x] `kSearchResultsCatalog` vẫn được giữ lại làm fallback, không xóa.
 
 ### Phase 10: "Thật hóa" Trang Chủ (Home Screen Live Data) ✅
 

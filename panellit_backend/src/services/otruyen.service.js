@@ -36,6 +36,42 @@ class OTruyenService {
   }
 
   /**
+   * Search manga by keyword
+   * API: https://otruyenapi.com/v1/api/tim-kiem?keyword={keyword}&page=1
+   */
+  async searchManga(keyword, page = 1) {
+    try {
+      const response = await axiosClient.get(`${API_BASE}/tim-kiem`, {
+        params: { keyword, page },
+      });
+      const data = response.data;
+
+      if (data.status !== 'success') {
+        throw new Error('OTruyen search failed');
+      }
+
+      const items = data.data.items || [];
+      return {
+        totalItems: data.data.params?.pagination?.totalItems || items.length,
+        currentPage: page,
+        items: items.map((item) => ({
+          title: item.name,
+          slug: item.slug,
+          cover: `${CDN_BASE}/${item.thumb_url}`,
+          status: item.status,
+          categories: (item.category || []).map((c) => c.name),
+          chaptersLatest: (item.chaptersLatest || []).map((c) => ({
+            chapterName: c.chapter_name,
+          })),
+        })),
+      };
+    } catch (error) {
+      console.error(`OTruyenService [searchManga] Error:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
    * Fetch home feed: newly updated manga list
    * API: https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=1
    */

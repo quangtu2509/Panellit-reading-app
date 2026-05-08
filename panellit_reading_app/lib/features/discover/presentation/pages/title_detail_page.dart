@@ -5,7 +5,7 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
 import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
-import '../../../reader_novel/data/novel_mock_data.dart';
+import '../../../reader_novel/data/models/novel_reading_model.dart';
 import '../../../reading/data/reading_progress_store.dart';
 import '../theme/title_detail_colors.dart';
 import '../widgets/detail/detail_bottom_nav.dart';
@@ -63,10 +63,9 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
         ? 'toi-thang-cap-mot-minh'
         : _currentDetail.id.replaceAll('_', '-');
 
-    final result = await repo.getMangaDetail(slug: slug, mockId: _currentDetail.id);
-
-    if (mounted && result.isFromApi && result.apiData != null) {
-      final api = result.apiData!;
+    try {
+      final api = await repo.getMangaDetail(slug: slug);
+      if (!mounted) return;
       
       int idx = api.chapters.length;
       final mappedChapters = api.chapters.map((c) {
@@ -92,11 +91,13 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           genres: _currentDetail.genres,
           chapterUpdates: mappedChapters,
           reviewSummary: _currentDetail.reviewSummary,
-          reviews: _currentDetail.reviews,
-          relatedStories: _currentDetail.relatedStories,
+          reviews: const [], // Removed mock data
+          relatedStories: const [], // Removed mock data
           coverColor: _currentDetail.coverColor,
         );
       });
+    } catch (e) {
+      // API call failed, keep skeleton/existing details
     }
   }
 
@@ -168,7 +169,11 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
       Navigator.of(context).push(
         buildSmoothPageRoute(
           NovelReadingPage(
-            novel: getNovelModelForTitle(_detail.title),
+            novel: NovelReadingModel(
+              title: _detail.title,
+              author: _detail.author,
+              chapters: const [],
+            ),
             initialChapterIndex: chapterNumber > 0 ? chapterNumber - 1 : 0,
             isGuest: widget.isGuest,
             isSaved: _savedChapterNumber == chapterNumber,

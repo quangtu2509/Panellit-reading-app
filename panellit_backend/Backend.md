@@ -1,3 +1,8 @@
+## 🚧 Current Focus (Mục tiêu hiện tại)
+- **Task đang thực hiện**: [Tên task hiện tại, ví dụ: Tích hợp API Search OTruyen]
+- **Trạng thái**: [Đang làm / Đang fix bug / Chờ review]
+- **Tệp đang tác động chính**:
+- **Vấn đề đang gặp (Nếu có)**: [Ghi chú bug hoặc logic chưa giải quyết được]
 # Panellit Backend Documentation
 
 Hệ thống Backend cho ứng dụng Panellit được xây dựng theo kiến trúc MVC Layered, tập trung vào hiệu suất và khả năng tích hợp dữ liệu từ bên thứ ba (OTruyen).
@@ -52,6 +57,7 @@ panellit_backend/
 - **[2026-05-03]**: Cài đặt `nodemon` và cấu hình lệnh `npm run dev`.
 - **[2026-05-07]**: **Client Integration Started**: Flutter app đã hoàn thiện layer Network (Dio + Repository) và sẵn sàng kết nối với Backend.
 - **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home` — lấy danh sách truyện mới cập nhật từ OTruyen, trả về title, slug, cover, categories, chaptersLatest.
+- **[2026-05-08]**: **Search Endpoint**: Thêm `GET /api/manga/search?keyword=xxx` — tìm kiếm truyện qua OTruyen `/tim-kiem`. Route được đặt **trước** `/:slug` để tránh collision.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

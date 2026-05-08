@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/router/smooth_page_route.dart';
 import '../../../discover/data/models/search_models.dart';
-import '../../../discover/data/search_mock_data.dart';
-import '../../../discover/data/title_detail_mock_data.dart';
+import '../../../discover/data/models/title_detail_model.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../../discover/presentation/widgets/search/search_results_section.dart';
 
@@ -28,19 +27,33 @@ class CategoryResultsPage extends StatelessWidget {
   });
 
   List<SearchResultModel> get _results {
-    final q = category.toLowerCase();
-    return kSearchResultsCatalog
-        .where(
-          (item) => item.genres.any((g) => g.toLowerCase() == q),
-        )
-        .toList();
+    return const [];
   }
 
   void _openDetail(BuildContext context, SearchResultModel item) {
     Navigator.of(context).push(
       buildSmoothPageRoute(
         TitleDetailPage(
-          detail: getDetailModelForTitle(item.title),
+          detail: TitleDetailModel(
+            id: item.slug,
+            title: item.title,
+            author: item.author,
+            status: '',
+            rating: item.rating,
+            chapters: 0,
+            readsLabel: '',
+            synopsis: '',
+            genres: item.genres,
+            chapterUpdates: const [],
+            reviewSummary: const ReviewSummaryModel(
+              average: 0,
+              ratingsCountLabel: '',
+              bars: {},
+            ),
+            reviews: const [],
+            relatedStories: const [],
+            coverColor: item.coverColor,
+          ),
           isGuest: isGuest || item.openAsGuest,
           onHomeTap: onHomeTap,
           onLibraryTap: onLibraryTap,

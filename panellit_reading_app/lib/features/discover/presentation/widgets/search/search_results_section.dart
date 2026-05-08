@@ -114,9 +114,27 @@ class _SearchResultCard extends StatelessWidget {
                 width: 104,
                 height: 140,
                 decoration: BoxDecoration(
-                  color: item.coverColor,
                   borderRadius: BorderRadius.circular(16),
+                  color: item.coverColor,
                 ),
+                clipBehavior: Clip.antiAlias,
+                child: item.coverUrl != null && item.coverUrl!.isNotEmpty
+                    ? Image.network(
+                        item.coverUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (ctx, e, st) =>
+                            Container(color: item.coverColor),
+                        loadingBuilder: (_, child, progress) {
+                          if (progress == null) return child;
+                          return Container(
+                            color: item.coverColor,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
+                      )
+                    : null,
               ),
               const SizedBox(width: 14),
               Expanded(

@@ -5,7 +5,6 @@ import '../../../home/presentation/pages/home_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
-import '../../data/library_mock_data.dart';
 import '../../data/models/library_completed_item.dart';
 import '../../data/models/library_item.dart';
 import '../../data/models/library_reading_item.dart';
@@ -169,11 +168,11 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildFollowingTab() {
-    final sortedItems = _sortedFollowingItems(kFollowingLibraryItems);
+    final sortedItems = _sortedFollowingItems(const []);
 
     return LibraryTabSection(
       topPadding: 18,
-      title: '$kLibraryTotalTitles Titles',
+      title: '0 Titles',
       selectedSort: _followingSort,
       onSortSelected: (value) {
         setState(() {
@@ -196,7 +195,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildReadingTab() {
-    final sortedItems = _sortedReadingItems(kReadingLibraryItems);
+    final sortedItems = _sortedReadingItems(const []);
 
     return LibraryTabSection(
       topPadding: 16,
@@ -221,7 +220,7 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   Widget _buildCompletedTab() {
-    final sortedItems = _sortedCompletedItems(kCompletedLibraryItems);
+    final sortedItems = _sortedCompletedItems(const []);
 
     return LibraryTabSection(
       topPadding: 16,

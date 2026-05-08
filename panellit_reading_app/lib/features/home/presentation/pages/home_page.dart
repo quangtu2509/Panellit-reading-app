@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/smooth_page_route.dart';
-import '../../../../core/data/mock_database.dart';
 import '../../../../core/network/models/home_feed_model.dart';
 import '../../../../core/network/services/home_feed_service.dart';
 import '../../../library/presentation/pages/library_page.dart';
@@ -10,9 +9,7 @@ import '../../../discover/presentation/pages/notifications_page.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../../discover/presentation/pages/category_results_page.dart';
 import '../../../discover/data/models/title_detail_model.dart';
-import '../../../discover/data/title_detail_mock_data.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
-import '../../data/home_mock_data.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
 import '../widgets/home_bottom_nav.dart';
@@ -30,11 +27,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // ── State ────────────────────────────────────────────────────────────────
-  List<HomeUpdateItem> _updateItems = kHomeUpdates; // Start with mock
-  List<HomeRankItem> _popularItems = kHomePopularManga; // Start with mock
-  TitleDetailModel _featuredDetail = kHomeFeaturedDetail;
-  String _featuredTitle = kHomeFeaturedTitle;
-  String _featuredSubtitle = kHomeFeaturedSubtitle;
+  List<HomeUpdateItem> _updateItems = []; // Empty start
+  List<HomeRankItem> _popularItems = []; // Empty start
+  TitleDetailModel _featuredDetail = TitleDetailModel(
+    id: '',
+    title: '',
+    author: '',
+    status: '',
+    rating: 0,
+    chapters: 0,
+    readsLabel: '',
+    synopsis: '',
+    genres: const [],
+    chapterUpdates: const [],
+    reviewSummary: const ReviewSummaryModel(average: 0, ratingsCountLabel: '', bars: {}),
+    reviews: const [],
+    relatedStories: const [],
+    coverColor: Colors.black,
+  );
+  String _featuredTitle = '';
+  String _featuredSubtitle = '';
 
   final HomeFeedService _feedService = HomeFeedService();
 
@@ -89,7 +101,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         _updateItems = updates;
-        _popularItems = popular.isEmpty ? kHomePopularManga : popular;
+        _popularItems = popular;
         _featuredDetail = featuredDetail;
         _featuredTitle = featured.title;
         _featuredSubtitle = featured.categories.isNotEmpty
@@ -104,13 +116,6 @@ class _HomePageState extends State<HomePage> {
   /// Build a minimal TitleDetailModel from an API feed item.
   /// The real data will be loaded lazily when user opens the detail page.
   TitleDetailModel _buildDetailFromFeedItem(ApiHomeFeedItem item) {
-    // Check if we have this item in mock database first
-    final mockMatch = MockDatabase.titles.where(
-      (t) => t.title.toLowerCase() == item.title.toLowerCase(),
-    );
-    if (mockMatch.isNotEmpty) {
-      return getDetailModelForTitle(mockMatch.first.title);
-    }
 
     // Build a skeleton detail model — the TitleDetailPage will load the real data via API
     return TitleDetailModel(
@@ -241,12 +246,8 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             HomeTopBar(
-              title: kHomeAppName,
-              hasUnreadNotifications: kHomeNotifications.any(
-                (n) =>
-                    n.type == HomeNotificationType.savedWorkChapterUpdate &&
-                    n.isUnread,
-              ),
+              title: 'Panellit',
+              hasUnreadNotifications: false,
               onNotificationTap: () => _openNotifications(context),
               onCategoryTap: (cat) => _openCategory(context, cat),
             ),

@@ -23,6 +23,30 @@ router.get('/home', (req, res) => mangaController.getHomeFeed(req, res));
 
 /**
  * @swagger
+ * /api/manga/search:
+ *   get:
+ *     summary: Search manga by keyword
+ *     tags: [Manga]
+ *     parameters:
+ *       - in: query
+ *         name: keyword
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search keyword
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (default 1)
+ *     responses:
+ *       200:
+ *         description: Search results
+ */
+router.get('/search', (req, res) => mangaController.searchManga(req, res));
+
+/**
+ * @swagger
  * /api/manga/chapter/{chapterId}:
  *   get:
  *     summary: Get chapter images by ID
