@@ -16,16 +16,18 @@ model User {
   name      String?
   password  String
   histories History[]
+  bookmarks Bookmark[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
 model Manga {
-  slug      String    @id
+  slug      String     @id
   title     String
   cover     String?
   histories History[]
-  createdAt DateTime  @default(now())
+  bookmarks Bookmark[]
+  createdAt DateTime   @default(now())
   updatedAt DateTime  @updatedAt
 }
 
@@ -38,6 +40,18 @@ model History {
   chapterId      String
   lastPageIndex  Int      @default(0)
   updatedAt      DateTime @updatedAt
+
+  @@unique([userId, mangaSlug])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  manga     Manga    @relation(fields: [mangaSlug], references: [slug])
+  mangaSlug String
+  chapterId Int?     // the chapter number they saved
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, mangaSlug])
 }

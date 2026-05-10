@@ -34,6 +34,22 @@ class HistoryController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async deleteHistory(req, res) {
+    try {
+      const userId = req.user.id;
+      const { mangaSlug } = req.params;
+      
+      if (!mangaSlug) {
+        return res.status(400).json({ error: 'mangaSlug is required' });
+      }
+
+      await historyService.deleteHistory(userId, mangaSlug);
+      res.json({ message: 'History deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new HistoryController();

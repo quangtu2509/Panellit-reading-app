@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/smooth_page_route.dart';
 import '../../../../core/network/models/history_api_model.dart';
 import '../../../../core/network/services/history_api_service.dart';
+import '../../../../core/network/services/bookmark_api_service.dart';
+import '../../../../core/network/models/bookmark_api_model.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
@@ -14,7 +16,6 @@ import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../../discover/data/models/title_detail_model.dart';
 import '../theme/library_colors.dart';
 import '../widgets/library_bottom_nav.dart';
-import '../widgets/library_card.dart';
 import '../widgets/library_completed_card.dart';
 import '../widgets/library_recommend_banner.dart';
 import '../widgets/library_tab_section.dart';
@@ -30,17 +31,26 @@ class LibraryPage extends StatefulWidget {
 }
 
 class _LibraryPageState extends State<LibraryPage> {
-  LibrarySortOption _followingSort  = LibrarySortOption.newestToOldest;
-  LibrarySortOption _completedSort  = LibrarySortOption.newestToOldest;
+  LibrarySortOption _bookmarksSort = LibrarySortOption.newestToOldest;
+  LibrarySortOption _continueSort = LibrarySortOption.newestToOldest;
+  LibrarySortOption _completedSort = LibrarySortOption.newestToOldest;
+  String _bookmarksStatusFilter = 'All'; // 'All', 'Ongoing', 'Completed'
 
   // ── Reading history (from backend) ──────────────────────────────────────
   List<ApiHistoryItem> _historyItems = [];
   bool _isLoadingHistory             = false;
 
+  // ── Bookmarks (from backend) ────────────────────────────────────────────
+  List<ApiBookmarkItem> _bookmarkItems = [];
+  bool _isLoadingBookmarks             = false;
+
   @override
   void initState() {
     super.initState();
-    if (!widget.isGuest) _fetchHistory();
+    if (!widget.isGuest) {
+      _fetchHistory();
+      _fetchBookmarks();
+    }
   }
 
   Future<void> _fetchHistory() async {
@@ -55,6 +65,21 @@ class _LibraryPageState extends State<LibraryPage> {
     setState(() {
       _historyItems     = items;
       _isLoadingHistory = false;
+    });
+  }
+
+  Future<void> _fetchBookmarks() async {
+    final isLoggedIn = await AuthService.instance.isLoggedIn();
+    if (!isLoggedIn || !mounted) return;
+
+    setState(() => _isLoadingBookmarks = true);
+
+    final items = await BookmarkApiService().getMyBookmarks();
+
+    if (!mounted) return;
+    setState(() {
+      _bookmarkItems     = items;
+      _isLoadingBookmarks = false;
     });
   }
 
@@ -165,8 +190,8 @@ class _LibraryPageState extends State<LibraryPage> {
                     fontWeight: FontWeight.w600,
                   ),
                   tabs: [
-                    Tab(text: 'Following'),
-                    Tab(text: 'Reading'),
+                    Tab(text: 'Bookmarks'),
+                    Tab(text: 'Continue'),
                     Tab(text: 'Completed'),
                   ],
                 ),
@@ -174,8 +199,8 @@ class _LibraryPageState extends State<LibraryPage> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    _buildFollowingTab(),
-                    _buildReadingTab(),
+                    _buildBookmarksTab(),
+                    _buildContinueTab(),
                     _buildCompletedTab(),
                   ],
                 ),
@@ -192,34 +217,152 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  Widget _buildFollowingTab() {
-    final sortedItems = _sortedFollowingItems(const []);
+  Widget _buildBookmarksTab() {
+    // Guest mode: show login prompt
+    if (widget.isGuest) {
+      return _buildLoginPrompt();
+    }
+
+    // Loading state
+    if (_isLoadingBookmarks) {
+      return const Center(
+        child: CircularProgressIndicator(color: LibraryColors.primary),
+      );
+    }
+
+    final sortedItems = _sortedBookmarkItems(_bookmarkItems);
 
     return LibraryTabSection(
       topPadding: 18,
-      title: '0 Titles',
-      selectedSort: _followingSort,
+      title: '${sortedItems.length} Titles',
+      selectedSort: _bookmarksSort,
       onSortSelected: (value) {
         setState(() {
-          _followingSort = value;
+          _bookmarksSort = value;
         });
       },
       children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['All', 'Ongoing', 'Completed'].map((status) {
+              final isSelected = _bookmarksStatusFilter == status;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0, bottom: 16.0),
+                child: FilterChip(
+                  label: Text(status),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() {
+                        _bookmarksStatusFilter = status;
+                      });
+                    }
+                  },
+                  selectedColor: LibraryColors.primary.withValues(alpha: 0.15),
+                  checkmarkColor: LibraryColors.primary,
+                  labelStyle: TextStyle(
+                    color: isSelected ? LibraryColors.primary : const Color(0xFF5B6A7A),
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  backgroundColor: LibraryColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: isSelected ? LibraryColors.primary : const Color(0xFFE9EDF1),
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        if (sortedItems.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Column(
+              children: [
+                const Icon(Icons.bookmark_border, size: 64, color: Color(0xFFBCC6D1)),
+                const SizedBox(height: 16),
+                const Text(
+                  'No bookmarks yet',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Color(0xFF334155),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Save your favorite mangas to read them later.',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: Color(0xFF94A3B8),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 28),
-            child: LibraryCard(
-              item: item,
-              onTap: () => _openDetail(item.detail),
+            child: Dismissible(
+              key: Key(item.mangaSlug),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.shade400,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+              ),
+              onDismissed: (_) {
+                setState(() {
+                  _bookmarkItems.removeWhere((e) => e.mangaSlug == item.mangaSlug);
+                });
+                BookmarkApiService().deleteBookmark(item.mangaSlug);
+              },
+              child: _BookmarkCard(
+                item: item,
+                onTap: () {
+                  final skeletonDetail = TitleDetailModel(
+                    id: item.mangaSlug,
+                    title: item.manga.title,
+                    coverUrl: item.manga.cover,
+                    author: 'Unknown',
+                    status: 'Ongoing',
+                    rating: 0.0,
+                    chapters: 0,
+                    readsLabel: '0',
+                    coverColor: Colors.grey,
+                    genres: const [],
+                    synopsis: 'Loading...',
+                    chapterUpdates: const [],
+                    relatedStories: const [],
+                    reviews: const [],
+                    reviewSummary: const ReviewSummaryModel(
+                      average: 0,
+                      ratingsCountLabel: '0',
+                      bars: {},
+                    ),
+                  );
+                  _openDetail(skeletonDetail);
+                },
+              ),
             ),
           );
         }),
-        const LibraryRecommendBanner(),
+        if (sortedItems.isNotEmpty) const LibraryRecommendBanner(),
       ],
     );
   }
 
-  Widget _buildReadingTab() {
+  Widget _buildContinueTab() {
     // Guest mode: show login prompt
     if (widget.isGuest) {
       return _buildLoginPrompt();
@@ -265,42 +408,69 @@ class _LibraryPageState extends State<LibraryPage> {
     }
 
     // Real history list
+    final sortedItems = _sortedContinueItems(_historyItems);
+
     return RefreshIndicator(
       onRefresh: _fetchHistory,
       color: LibraryColors.primary,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(18, 20, 18, 32),
-        itemCount: _historyItems.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 14),
-        itemBuilder: (context, index) {
-          final item = _historyItems[index];
-          return _HistoryCard(
-            item: item,
-            onTap: () => _openDetail(
-              TitleDetailModel(
-                id:       item.mangaSlug,
-                title:    item.manga.title.isNotEmpty ? item.manga.title : item.mangaSlug,
-                author:   '',
-                status:   '',
-                rating:   0,
-                chapters: 0,
-                readsLabel: '',
-                synopsis:   '',
-                genres:     const [],
-                chapterUpdates: const [],
-                reviewSummary: const ReviewSummaryModel(
-                  average: 0,
-                  ratingsCountLabel: '',
-                  bars: {},
+      child: LibraryTabSection(
+        topPadding: 16,
+        selectedSort: _continueSort,
+        onSortSelected: (value) {
+          setState(() {
+            _continueSort = value;
+          });
+        },
+        children: sortedItems.map((item) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Dismissible(
+              key: Key(item.mangaSlug),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.shade400,
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                reviews:       const [],
-                relatedStories: const [],
-                coverColor: const Color(0xFF1C2333),
-                coverUrl:   item.manga.cover,
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+              ),
+              onDismissed: (_) {
+                setState(() {
+                  _historyItems.removeWhere((e) => e.mangaSlug == item.mangaSlug);
+                });
+                HistoryApiService().deleteHistory(item.mangaSlug);
+              },
+              child: _HistoryCard(
+                item: item,
+                onTap: () => _openDetail(
+                  TitleDetailModel(
+                    id:       item.mangaSlug,
+                    title:    item.manga.title.isNotEmpty ? item.manga.title : item.mangaSlug,
+                    author:   '',
+                    status:   '',
+                    rating:   0,
+                    chapters: 0,
+                    readsLabel: '',
+                    synopsis:   '',
+                    genres:     const [],
+                    chapterUpdates: const [],
+                    reviewSummary: const ReviewSummaryModel(
+                      average: 0,
+                      ratingsCountLabel: '',
+                      bars: {},
+                    ),
+                    reviews:       const [],
+                    relatedStories: const [],
+                    coverColor: const Color(0xFF1C2333),
+                    coverUrl:   item.manga.cover,
+                  ),
+                ),
               ),
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
@@ -365,9 +535,25 @@ class _LibraryPageState extends State<LibraryPage> {
         ...sortedItems.map((item) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24),
-            child: LibraryCompletedCard(
-              item: item,
-              onTap: () => _openDetail(item.detail),
+            child: Dismissible(
+              key: Key(item.title),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.shade400,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
+              ),
+              onDismissed: (_) {
+                // Remove from actual local data source if we had one.
+              },
+              child: LibraryCompletedCard(
+                item: item,
+                onTap: () => _openDetail(item.detail),
+              ),
             ),
           );
         }),
@@ -375,27 +561,53 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  List<LibraryItem> _sortedFollowingItems(List<LibraryItem> items) {
-    final result = List<LibraryItem>.from(items);
+  List<ApiBookmarkItem> _sortedBookmarkItems(List<ApiBookmarkItem> items) {
+    // Filter first
+    final filtered = items.where((item) {
+      if (_bookmarksStatusFilter == 'All') return true;
+      // Since ApiBookmarkItem doesn't have status from backend right now,
+      // we'll just return true for everything. If backend adds status later, we can filter here.
+      return true;
+    }).toList();
 
-    switch (_followingSort) {
+    final result = List<ApiBookmarkItem>.from(filtered);
+
+    switch (_bookmarksSort) {
       case LibrarySortOption.az:
-        result.sort((a, b) => a.title.compareTo(b.title));
+        result.sort((a, b) => a.manga.title.compareTo(b.manga.title));
         break;
       case LibrarySortOption.za:
-        result.sort((a, b) => b.title.compareTo(a.title));
+        result.sort((a, b) => b.manga.title.compareTo(a.manga.title));
         break;
       case LibrarySortOption.newestToOldest:
-        result.sort((a, b) => a.updatedHoursAgo.compareTo(b.updatedHoursAgo));
+        result.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
         break;
       case LibrarySortOption.oldestToNewest:
-        result.sort((a, b) => b.updatedHoursAgo.compareTo(a.updatedHoursAgo));
+        result.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
         break;
     }
 
     return result;
   }
 
+  List<ApiHistoryItem> _sortedContinueItems(List<ApiHistoryItem> items) {
+    final result = List<ApiHistoryItem>.from(items);
+    switch (_continueSort) {
+      case LibrarySortOption.az:
+        result.sort((a, b) => a.manga.title.compareTo(b.manga.title));
+        break;
+      case LibrarySortOption.za:
+        result.sort((a, b) => b.manga.title.compareTo(a.manga.title));
+        break;
+      case LibrarySortOption.newestToOldest:
+        result.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        break;
+      case LibrarySortOption.oldestToNewest:
+        result.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+        break;
+    }
+    return result;
+  }
 
   List<LibraryCompletedItem> _sortedCompletedItems(
     List<LibraryCompletedItem> items,
@@ -425,7 +637,107 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 }
 
-// \u2500\u2500 Private widget: one card in the reading-history list \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// ── Private widget: one card in the bookmarks list ────────────────────────────────────────
+
+class _BookmarkCard extends StatelessWidget {
+  final ApiBookmarkItem item;
+  final VoidCallback onTap;
+
+  const _BookmarkCard({required this.item, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 86,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                image: item.manga.cover.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(item.manga.cover),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: item.manga.cover.isEmpty
+                  ? const Center(child: Icon(Icons.image_not_supported, color: Colors.grey))
+                  : null,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.manga.title,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF1E293B),
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(Icons.bookmark, size: 16, color: LibraryColors.primary),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            item.chapterId != null
+                                ? 'Saved Chapter ${item.chapterId}'
+                                : 'Saved Manga',
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: LibraryColors.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.chevron_right,
+                          size: 18,
+                          color: Color(0xFF94A3B8),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Private widget: one card in the reading-history list ──────────────────────────────────
 
 class _HistoryCard extends StatelessWidget {
   final ApiHistoryItem item;
@@ -507,6 +819,16 @@ class _HistoryCard extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: 0.5, // Mock value until backend provides total chapters
+                        backgroundColor: const Color(0xFFE9EDF1),
+                        valueColor: const AlwaysStoppedAnimation<Color>(LibraryColors.primary),
+                        minHeight: 4,
+                      ),
                     ),
                   ],
                 ),

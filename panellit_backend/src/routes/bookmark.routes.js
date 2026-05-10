@@ -1,17 +1,17 @@
 const express = require('express');
-const historyController = require('../controllers/history.controller');
+const bookmarkController = require('../controllers/bookmark.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const router = express.Router();
 
-// All history routes require authentication
+// All bookmark routes require authentication
 router.use(authMiddleware);
 
 /**
  * @swagger
- * /api/history/sync:
+ * /api/bookmarks/toggle:
  *   post:
- *     summary: Sync reading progress
- *     tags: [History]
+ *     summary: Toggle bookmark / save reading progress
+ *     tags: [Bookmarks]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -22,40 +22,41 @@ router.use(authMiddleware);
  *             type: object
  *             required:
  *               - mangaSlug
- *               - chapterId
  *             properties:
  *               mangaSlug:
  *                 type: string
  *               chapterId:
- *                 type: string
- *               lastPageIndex:
  *                 type: integer
+ *               mangaTitle:
+ *                 type: string
+ *               coverUrl:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Progress synced successfully
+ *         description: Bookmark toggled successfully
  */
-router.post('/sync', (req, res) => historyController.sync(req, res));
+router.post('/toggle', (req, res) => bookmarkController.toggleBookmark(req, res));
 
 /**
  * @swagger
- * /api/history/me:
+ * /api/bookmarks/me:
  *   get:
- *     summary: Get user's reading history
- *     tags: [History]
+ *     summary: Get user's bookmarks
+ *     tags: [Bookmarks]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User history fetched successfully
+ *         description: User bookmarks fetched successfully
  */
-router.get('/me', (req, res) => historyController.getMyHistory(req, res));
+router.get('/me', (req, res) => bookmarkController.getMyBookmarks(req, res));
 
 /**
  * @swagger
- * /api/history/{mangaSlug}:
+ * /api/bookmarks/{mangaSlug}:
  *   delete:
- *     summary: Delete user's reading history for a manga
- *     tags: [History]
+ *     summary: Delete user's bookmark for a manga
+ *     tags: [Bookmarks]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -66,8 +67,8 @@ router.get('/me', (req, res) => historyController.getMyHistory(req, res));
  *           type: string
  *     responses:
  *       200:
- *         description: History deleted successfully
+ *         description: Bookmark deleted successfully
  */
-router.delete('/:mangaSlug', (req, res) => historyController.deleteHistory(req, res));
+router.delete('/:mangaSlug', (req, res) => bookmarkController.deleteBookmark(req, res));
 
 module.exports = router;

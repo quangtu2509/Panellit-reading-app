@@ -6,7 +6,6 @@ import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
 import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
 import '../../../reader_novel/data/models/novel_reading_model.dart';
-import '../../../reading/data/reading_progress_store.dart';
 import '../theme/title_detail_colors.dart';
 import '../widgets/detail/detail_bottom_nav.dart';
 import '../widgets/detail/detail_chapters_section.dart';
@@ -16,6 +15,8 @@ import '../widgets/detail/detail_reviews_section.dart';
 import '../widgets/detail/detail_stats_genres_actions.dart';
 import '../widgets/detail/detail_synopsis_section.dart';
 import '../../../../core/network/manga_repository.dart';
+import '../../../../core/network/services/bookmark_api_service.dart';
+import '../../../../core/network/models/bookmark_api_model.dart';
 
 class TitleDetailPage extends StatefulWidget {
   final TitleDetailModel detail;
@@ -50,9 +51,13 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   void initState() {
     super.initState();
     _currentDetail = widget.detail;
-    _fetchApiData();
-    if (!widget.isGuest) {
-      _loadSavedChapter();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _fetchApiData();
+    if (!widget.isGuest && mounted) {
+      await _loadSavedChapter();
     }
   }
 
@@ -104,14 +109,26 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   }
 
   Future<void> _loadSavedChapter() async {
-    final saved = await ReadingProgressStore.loadSavedChapter(_detail.title);
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _savedChapterNumber = saved;
-    });
-    _scheduleResumePrompt();
+    try {
+      final bookmarks = await BookmarkApiService().getMyBookmarks();
+      final bookmark = bookmarks.cast<ApiBookmarkItem?>().firstWhere(
+            (b) => b?.mangaSlug == _detail.id,
+            orElse: () => null,
+          );
+      
+      if (!mounted) return;
+      
+      if (bookmark != null) {
+        setState(() {
+          _savedChapterNumber = bookmark.chapterId ?? 1; // Default to 1 if just bookmarked manga
+        });
+        _scheduleResumePrompt();
+      } else {
+        setState(() {
+          _savedChapterNumber = null;
+        });
+      }
+    } catch (_) {}
   }
 
   void _scheduleResumePrompt() {
@@ -156,14 +173,30 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
     }
   }
 
-  void _saveChapter(int? chapterNumber) {
+  Future<void> _saveChapter(int? chapterNumber) async {
     if (widget.isGuest) {
       return;
     }
+    
+    // Optimistic UI update
     setState(() {
       _savedChapterNumber = chapterNumber;
     });
-    ReadingProgressStore.saveChapter(_detail.title, chapterNumber);
+
+    final result = await BookmarkApiService().toggleBookmark(
+      mangaSlug: _detail.id,
+      mangaTitle: _detail.title,
+      coverUrl: _detail.coverUrl ?? '',
+      chapterId: chapterNumber,
+    );
+
+    // Sync state with backend response if needed
+    if (mounted && result['isSaved'] == false && chapterNumber != null) {
+      // Revert if failed
+      setState(() {
+        _savedChapterNumber = null;
+      });
+    }
   }
 
   void _openReading(int chapterNumber) {

@@ -56,4 +56,13 @@ class HistoryApiService {
       return [];
     }
   }
+
+  /// Deletes a manga from the reading history.
+  Future<void> deleteHistory(String mangaSlug) async {
+    try {
+      await _dio.delete('/api/history/$mangaSlug');
+    } catch (_) {
+      // Fire-and-forget: silently ignore failures.
+    }
+  }
 }

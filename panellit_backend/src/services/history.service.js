@@ -50,6 +50,15 @@ class HistoryService {
       },
     });
   }
+
+  async deleteHistory(userId, mangaSlug) {
+    return await prisma.history.deleteMany({
+      where: {
+        userId,
+        mangaSlug,
+      },
+    });
+  }
 }
 
 module.exports = new HistoryService();
