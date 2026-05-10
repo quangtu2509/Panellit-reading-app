@@ -17,7 +17,7 @@ class MangaReadingPage extends StatefulWidget {
   final List<ChapterUpdateModel> allChapters;
   final bool isGuest;
   final ValueChanged<int?>? onSaveChapter;
-  final bool isSaved;
+  final int? savedChapterNumber;
   /// OTruyen slug — used to sync reading progress to the backend.
   final String mangaSlug;
   /// Absolute cover image URL — stored alongside history for Library display.
@@ -32,7 +32,7 @@ class MangaReadingPage extends StatefulWidget {
     required this.allChapters,
     required this.isGuest,
     this.onSaveChapter,
-    this.isSaved = false,
+    this.savedChapterNumber,
     this.mangaSlug = '',
     this.coverUrl  = '',
   });
@@ -46,7 +46,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   late final AnimationController _magicController;
   late final Animation<double> _magicExpand;
   bool _isExpanded = false;
-  late bool _isSavedLocal;
+  int? _localSavedChapterNumber;
   bool _showGuestHintVisible = false;
   Timer? _guestHintTimer;
   
@@ -65,7 +65,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   @override
   void initState() {
     super.initState();
-    _isSavedLocal = widget.isGuest ? false : widget.isSaved;
+    _localSavedChapterNumber = widget.isGuest ? null : widget.savedChapterNumber;
 
     _currentChapterLabel = widget.chapterLabel;
     _currentChapterNumber = widget.chapterNumber;
@@ -131,11 +131,11 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   void didUpdateWidget(covariant MangaReadingPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isGuest) {
-      _isSavedLocal = false;
+      _localSavedChapterNumber = null;
       return;
     }
-    if (oldWidget.isSaved != widget.isSaved) {
-      _isSavedLocal = widget.isSaved;
+    if (oldWidget.savedChapterNumber != widget.savedChapterNumber) {
+      _localSavedChapterNumber = widget.savedChapterNumber;
     }
   }
 
@@ -174,7 +174,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
       _currentChapterLabel = chapter.title;
       _currentChapterNumber = chapter.chapterNumber;
       _currentChapterApiData = chapter.chapterApiData;
-      _isSavedLocal = false; // Reset saved state for new chapter
+      // We DO NOT reset _localSavedChapterNumber here!
     });
     _scrollToTop();
     _fetchImages();
@@ -282,7 +282,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
                 _ReaderTopBar(
                   title: widget.title,
                   chapterLabel: _currentChapterLabel,
-                  isSaved: _isSavedLocal,
+                  isSaved: _localSavedChapterNumber == _currentChapterNumber,
                   isGuest: widget.isGuest,
                   showGuestHint: _showGuestHintVisible,
                   onSaveTap: () {
@@ -291,12 +291,13 @@ class _MangaReadingPageState extends State<MangaReadingPage>
                       return;
                     }
                     setState(() {
-                      _isSavedLocal = !_isSavedLocal;
+                      if (_localSavedChapterNumber == _currentChapterNumber) {
+                        _localSavedChapterNumber = null;
+                      } else {
+                        _localSavedChapterNumber = _currentChapterNumber;
+                      }
                     });
-                    final nextValue = _isSavedLocal
-                        ? _currentChapterNumber
-                        : null;
-                    widget.onSaveChapter?.call(nextValue);
+                    widget.onSaveChapter?.call(_localSavedChapterNumber);
                   },
                 ),
                 Expanded(child: _buildPanels()),

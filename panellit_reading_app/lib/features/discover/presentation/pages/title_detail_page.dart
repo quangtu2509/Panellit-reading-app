@@ -203,7 +203,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
             chapterApiData: chapter.chapterApiData,
             allChapters: _detail.chapterUpdates,
             isGuest: widget.isGuest,
-            isSaved: _savedChapterNumber == chapterNumber,
+            savedChapterNumber: _savedChapterNumber,
             onSaveChapter: _saveChapter,
             mangaSlug: _detail.id,
             coverUrl:  _detail.coverUrl ?? '',
