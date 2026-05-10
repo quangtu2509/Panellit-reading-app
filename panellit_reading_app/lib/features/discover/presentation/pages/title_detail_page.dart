@@ -205,6 +205,8 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
             isGuest: widget.isGuest,
             isSaved: _savedChapterNumber == chapterNumber,
             onSaveChapter: _saveChapter,
+            mangaSlug: _detail.id,
+            coverUrl:  _detail.coverUrl ?? '',
           ),
         ),
       );

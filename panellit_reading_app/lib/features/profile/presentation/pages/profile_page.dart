@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../../app/router/smooth_page_route.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/user_stats_service.dart';
+import '../../../../core/storage/token_storage.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 import '../theme/profile_colors.dart';
 import '../widgets/profile_bottom_nav.dart';
+import 'account_settings_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final bool isGuest;
@@ -50,6 +57,8 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// ── Top bar: ← back arrow + title ────────────────────────────────────────────
+
 class _ProfileTopBar extends StatelessWidget {
   const _ProfileTopBar();
 
@@ -57,39 +66,18 @@ class _ProfileTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // ← back arrow (replaces 3-line menu icon)
         IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(Icons.menu_rounded, size: 30),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 22),
           color: ProfileColors.primary,
         ),
-        const SizedBox(width: 6),
-        const Text(
-          'Panellit',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: ProfileColors.primary,
-          ),
-        ),
-        const Spacer(),
+        const SizedBox(width: 4),
         const Text(
           'Profile',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: ProfileColors.textSecondary,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: const Color(0xFFEAF3FB),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.settings_rounded,
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
             color: ProfileColors.primary,
           ),
         ),
@@ -98,9 +86,10 @@ class _ProfileTopBar extends StatelessWidget {
   }
 }
 
+// ── Guest placeholder ─────────────────────────────────────────────────────────
+
 class _GuestSection extends StatelessWidget {
   final VoidCallback onLoginTap;
-
   const _GuestSection({required this.onLoginTap});
 
   @override
@@ -111,11 +100,7 @@ class _GuestSection extends StatelessWidget {
         color: ProfileColors.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 24,
-            offset: Offset(0, 8),
-          ),
+          BoxShadow(color: Color(0x0F000000), blurRadius: 24, offset: Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -127,30 +112,20 @@ class _GuestSection extends StatelessWidget {
               color: Color(0xFFEAF3FB),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.person_outline_rounded,
-              size: 42,
-              color: ProfileColors.primary,
-            ),
+            child: const Icon(Icons.person_outline_rounded,
+                size: 42, color: ProfileColors.primary),
           ),
           const SizedBox(height: 16),
           const Text(
             'You are browsing as a guest',
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: ProfileColors.textPrimary,
-            ),
+                fontSize: 20, fontWeight: FontWeight.w800, color: ProfileColors.textPrimary),
           ),
           const SizedBox(height: 8),
           const Text(
             'Login to unlock your library, history, and personalized settings.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.4,
-              color: ProfileColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, height: 1.4, color: ProfileColors.textSecondary),
           ),
           const SizedBox(height: 18),
           SizedBox(
@@ -161,15 +136,11 @@ class _GuestSection extends StatelessWidget {
                 backgroundColor: ProfileColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               icon: const Icon(Icons.login_rounded),
-              label: const Text(
-                'Login to Continue',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
+              label: const Text('Login to Continue',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -178,61 +149,124 @@ class _GuestSection extends StatelessWidget {
   }
 }
 
-class _ProfileContent extends StatelessWidget {
+// ── Logged-in profile content ─────────────────────────────────────────────────
+
+class _ProfileContent extends StatefulWidget {
   const _ProfileContent();
 
   @override
+  State<_ProfileContent> createState() => _ProfileContentState();
+}
+
+class _ProfileContentState extends State<_ProfileContent> {
+  String _email  = '';
+  String _name   = '';
+  int _readHours = 0;
+  int _streak    = 0;
+  bool _loading  = true;
+
+  // Refresh timer — updates stats every 60 s while Profile is visible
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 60), (_) => _loadStats());
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    final email = await TokenStorage.instance.getUserEmail() ?? '';
+    final name  = await TokenStorage.instance.getUserName() ?? 'user1';
+    final hours = await UserStatsService.instance.getReadHours();
+    final streak = await UserStatsService.instance.getStreakDays();
+    if (mounted) {
+      setState(() {
+        _email     = email;
+        _name      = name;
+        _readHours = hours;
+        _streak    = streak;
+        _loading   = false;
+      });
+    }
+  }
+
+  Future<void> _loadStats() async {
+    final hours  = await UserStatsService.instance.getReadHours();
+    final streak = await UserStatsService.instance.getStreakDays();
+    if (mounted) setState(() { _readHours = hours; _streak = streak; });
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await AuthService.instance.logout();
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (_) => false,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        _ProfileHeader(),
-        SizedBox(height: 18),
-        _StatsCard(),
-        SizedBox(height: 18),
-        _ProfileSection(
-          title: 'YOUR LIBRARY',
-          items: [
-            _ProfileTileData(
-              icon: Icons.history_rounded,
-              title: 'Reading History',
-            ),
-            _ProfileTileData(
-              icon: Icons.chat_bubble_outline_rounded,
-              title: 'My Comments',
-            ),
-            _ProfileTileData(
-              icon: Icons.download_rounded,
-              title: 'Downloaded Stories',
-            ),
-          ],
+    if (_loading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 80),
+          child: CircularProgressIndicator(color: ProfileColors.primary),
         ),
-        SizedBox(height: 16),
+      );
+    }
+
+    return Column(
+      children: [
+        _ProfileHeader(email: _email, name: _name),
+        const SizedBox(height: 18),
+        _StatsCard(readHours: _readHours, streak: _streak),
+        const SizedBox(height: 18),
+        // PREFERENCES section — Account Settings only
         _ProfileSection(
           title: 'PREFERENCES',
           items: [
             _ProfileTileData(
-              icon: Icons.star_rounded,
-              title: 'Subscription Plan (Pro)',
-            ),
-            _ProfileTileData(
-              icon: Icons.manage_accounts_outlined,
+              icon: Icons.manage_accounts_rounded,
               title: 'Account Settings',
+              onTap: () async {
+                final changed = await Navigator.of(context).push<bool>(
+                  buildSmoothPageRoute(
+                    AccountSettingsPage(currentEmail: _email, currentName: _name),
+                  ),
+                );
+                if (changed == true) {
+                  _loadData(); // refresh name
+                }
+              },
             ),
             _ProfileTileData(
               icon: Icons.privacy_tip_outlined,
               title: 'Privacy Policy',
+              onTap: () {}, // placeholder
             ),
           ],
         ),
-        SizedBox(height: 16),
-        _LogoutButton(),
+        const SizedBox(height: 16),
+        _LogoutButton(onTap: () => _logout(context)),
       ],
     );
   }
 }
 
+// ── Profile header (avatar + email) ──────────────────────────────────────────
+
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader();
+  final String email;
+  final String name;
+  const _ProfileHeader({required this.email, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -269,48 +303,37 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 10,
-          children: [
-            const Text(
-              'Alex Reader',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: ProfileColors.textPrimary,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: ProfileColors.badge,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text(
-                'PREMIUM',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
-                  letterSpacing: 0.6,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          name.isNotEmpty ? name : 'user1',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: ProfileColors.textPrimary,
+          ),
         ),
-        const SizedBox(height: 6),
-        const Text(
-          'alex.reader@example.com',
-          style: TextStyle(fontSize: 14, color: ProfileColors.textSecondary),
+        const SizedBox(height: 4),
+        Text(
+          email,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: ProfileColors.textSecondary,
+          ),
         ),
       ],
     );
   }
 }
 
+// ── Stats card ────────────────────────────────────────────────────────────────
+
 class _StatsCard extends StatelessWidget {
-  const _StatsCard();
+  final int readHours;
+  final int streak;
+
+  const _StatsCard({required this.readHours, required this.streak});
 
   @override
   Widget build(BuildContext context) {
@@ -320,21 +343,15 @@ class _StatsCard extends StatelessWidget {
         color: ProfileColors.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x0B000000),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
+          BoxShadow(color: Color(0x0B000000), blurRadius: 20, offset: Offset(0, 8)),
         ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          _StatItem(value: '142', label: 'BOOKS'),
-          _Divider(),
-          _StatItem(value: '345h', label: 'READ TIME'),
-          _Divider(),
-          _StatItem(value: '12 Day', label: 'STREAK'),
+        children: [
+          _StatItem(value: '${readHours}h', label: 'READ TIME'),
+          _VerticalDivider(),
+          _StatItem(value: '$streak Day${streak == 1 ? '' : 's'}', label: 'STREAK'),
         ],
       ),
     );
@@ -344,7 +361,6 @@ class _StatsCard extends StatelessWidget {
 class _StatItem extends StatelessWidget {
   final String value;
   final String label;
-
   const _StatItem({required this.value, required this.label});
 
   @override
@@ -374,13 +390,20 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-class _Divider extends StatelessWidget {
-  const _Divider();
-
+class _VerticalDivider extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Container(width: 1, height: 42, color: ProfileColors.border);
-  }
+  Widget build(BuildContext context) =>
+      Container(width: 1, height: 42, color: ProfileColors.border);
+}
+
+// ── Preference section ────────────────────────────────────────────────────────
+
+class _ProfileTileData {
+  final IconData icon;
+  final String title;
+  final VoidCallback? onTap;
+
+  const _ProfileTileData({required this.icon, required this.title, this.onTap});
 }
 
 class _ProfileSection extends StatelessWidget {
@@ -397,11 +420,7 @@ class _ProfileSection extends StatelessWidget {
         color: ProfileColors.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x0B000000),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
+          BoxShadow(color: Color(0x0B000000), blurRadius: 20, offset: Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -424,80 +443,82 @@ class _ProfileSection extends StatelessWidget {
   }
 }
 
-class _ProfileTileData {
-  final IconData icon;
-  final String title;
-
-  const _ProfileTileData({required this.icon, required this.title});
-}
-
 class _ProfileTile extends StatelessWidget {
   final _ProfileTileData item;
-
   const _ProfileTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: ProfileColors.border)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAF3FB),
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: item.onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: ProfileColors.border)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF3FB),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(item.icon, color: ProfileColors.primary),
             ),
-            child: Icon(item.icon, color: ProfileColors.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              item.title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: ProfileColors.textPrimary,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                item.title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: ProfileColors.textPrimary,
+                ),
               ),
             ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: Color(0xFFB0B6BE)),
-        ],
+            const Icon(Icons.chevron_right_rounded, color: Color(0xFFB0B6BE)),
+          ],
+        ),
       ),
     );
   }
 }
 
+// ── Logout button ─────────────────────────────────────────────────────────────
+
 class _LogoutButton extends StatelessWidget {
-  const _LogoutButton();
+  final VoidCallback onTap;
+  const _LogoutButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: BoxDecoration(
-        color: ProfileColors.logoutBackground,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.logout_rounded, color: ProfileColors.logoutText),
-          SizedBox(width: 8),
-          Text(
-            'Logout',
-            style: TextStyle(
-              color: ProfileColors.logoutText,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: ProfileColors.logoutBackground,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout_rounded, color: ProfileColors.logoutText),
+            SizedBox(width: 8),
+            Text(
+              'Logout',
+              style: TextStyle(
+                color: ProfileColors.logoutText,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,8 +1,9 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 13 — Fix Cover Image, Chapter Ordering & Reading Screen ✅ DONE
-- **Trạng thái**: Hoàn thành
-- **Tệp đang tác động chính**: `title_detail_model.dart`, `detail_header_hero.dart`, `title_detail_page.dart`, `manga_reading_page.dart`, `manga_repository.dart`
-- **Vấn đề đang gặp (Nếu có)**: Không
+- **Task đang thực hiện**: Phase 14 — Library & Reading Progress Persistence
+- **Trạng thái**: Đang thực hiện
+- **Tệp đang tác động chính**: `library_repository.dart`, `manga_repository.dart`, `auth_service.dart`, `library_page.dart`
+- **Vấn đề đang gặp (Nếu có)**: Đang thiết kế API cho lưu trữ tiến độ đọc
+
 # Frontend Development Progress - Panellit Reading App
 
 ## 📋 Tổng Quan (Overview)

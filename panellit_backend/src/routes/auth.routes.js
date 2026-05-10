@@ -1,5 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/auth.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 const router = express.Router();
 
 /**
@@ -57,5 +58,66 @@ router.post('/register', (req, res) => authController.register(req, res));
  *         description: Invalid credentials
  */
 router.post('/login', (req, res) => authController.login(req, res));
+
+/**
+ * @swagger
+ * /api/auth/update-name:
+ *   put:
+ *     summary: Update user display name
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Name updated successfully
+ *       400:
+ *         description: Error updating name
+ *       401:
+ *         description: Unauthorized
+ */
+router.put('/update-name', authMiddleware, (req, res) => authController.updateName(req, res));
+
+/**
+ * @swagger
+ * /api/auth/update-password:
+ *   put:
+ *     summary: Update user password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       400:
+ *         description: Error updating password
+ *       401:
+ *         description: Unauthorized
+ */
+router.put('/update-password', authMiddleware, (req, res) => authController.updatePassword(req, res));
 
 module.exports = router;

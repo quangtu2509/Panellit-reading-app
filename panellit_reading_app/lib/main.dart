@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/splash_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF2F3F5),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2AA6DF)),
       ),
-      home: const LoginPage(),
+      home: const SplashPage(),
     );
   }
 }

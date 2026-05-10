@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:panellit_reading_app/features/discover/data/models/title_detail_model.dart';
 import '../theme/reading_colors.dart';
 import '../../../../core/network/manga_repository.dart';
+import '../../../../core/network/services/history_api_service.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/user_stats_service.dart';
 
 class MangaReadingPage extends StatefulWidget {
   final String title;
@@ -15,6 +18,10 @@ class MangaReadingPage extends StatefulWidget {
   final bool isGuest;
   final ValueChanged<int?>? onSaveChapter;
   final bool isSaved;
+  /// OTruyen slug — used to sync reading progress to the backend.
+  final String mangaSlug;
+  /// Absolute cover image URL — stored alongside history for Library display.
+  final String coverUrl;
 
   const MangaReadingPage({
     super.key,
@@ -26,6 +33,8 @@ class MangaReadingPage extends StatefulWidget {
     required this.isGuest,
     this.onSaveChapter,
     this.isSaved = false,
+    this.mangaSlug = '',
+    this.coverUrl  = '',
   });
 
   @override
@@ -78,6 +87,11 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     );
 
     _fetchImages();
+
+    // Start read-time tracking for logged-in users
+    if (!widget.isGuest) {
+      UserStatsService.instance.startSession();
+    }
   }
 
   Future<void> _fetchImages() async {
@@ -103,6 +117,10 @@ class _MangaReadingPageState extends State<MangaReadingPage>
 
   @override
   void dispose() {
+    // End read-time tracking
+    if (!widget.isGuest) {
+      UserStatsService.instance.endSession();
+    }
     _scrollController.dispose();
     _magicController.dispose();
     _guestHintTimer?.cancel();
@@ -160,6 +178,23 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     });
     _scrollToTop();
     _fetchImages();
+
+    // Fire-and-forget: sync reading progress for logged-in users.
+    if (!widget.isGuest && widget.mangaSlug.isNotEmpty) {
+      _syncProgress(chapter);
+    }
+  }
+
+  /// Silently sync reading position to the backend.
+  Future<void> _syncProgress(ChapterUpdateModel chapter) async {
+    final isLoggedIn = await AuthService.instance.isLoggedIn();
+    if (!isLoggedIn) return;
+    await HistoryApiService().syncProgress(
+      mangaSlug:  widget.mangaSlug,
+      chapterId:  chapter.chapterApiData ?? '',
+      mangaTitle: widget.title,
+      coverUrl:   widget.coverUrl,
+    );
   }
 
 

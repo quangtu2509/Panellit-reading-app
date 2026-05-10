@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../storage/token_storage.dart';
 
 /// Singleton Dio client for all Backend API requests.
 /// Base URL points to the Panellit Backend running locally (or replace with production URL).
@@ -24,7 +25,20 @@ class ApiClient {
       ),
     );
 
-    // Logging interceptor for debug builds only
+    // ── Auth interceptor: gắn Bearer token vào mọi request nếu có ──────────
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await TokenStorage.instance.getToken();
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+      ),
+    );
+
+    // ── Logging interceptor (debug only) ────────────────────────────────────
     if (kDebugMode) {
       _dio.interceptors.add(
         LogInterceptor(

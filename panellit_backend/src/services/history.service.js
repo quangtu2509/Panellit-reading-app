@@ -1,15 +1,20 @@
 const prisma = require('../config/database');
 
 class HistoryService {
-  async syncProgress(userId, mangaSlug, chapterId, lastPageIndex) {
+  async syncProgress(userId, mangaSlug, chapterId, lastPageIndex, mangaTitle, coverUrl) {
     // Ensure the manga exists in our local record (slug as primary key)
     // In a real app, you might fetch metadata from OTruyen if it doesn't exist
     await prisma.manga.upsert({
       where: { slug: mangaSlug },
-      update: {},
+      update: {
+        // Update title/cover if provided (may have improved data on re-sync)
+        ...(mangaTitle && { title: mangaTitle }),
+        ...(coverUrl   && { cover: coverUrl }),
+      },
       create: {
-        slug: mangaSlug,
-        title: mangaSlug, // Placeholder, title should be updated from metadata service
+        slug:  mangaSlug,
+        title: mangaTitle || mangaSlug,
+        cover: coverUrl   || null,
       },
     });
 
