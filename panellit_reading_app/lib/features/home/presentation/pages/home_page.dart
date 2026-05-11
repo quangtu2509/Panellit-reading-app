@@ -130,8 +130,9 @@ class _HomePageState extends State<HomePage> {
               : 'Read now';
         }
       });
-    } catch (_) {
-      // Silently keep mock data on failure
+    } catch (e) {
+      // Log lỗi để dễ debug — UI vẫn hiện màn hình trống thay vì crash
+      debugPrint('[HomePage] _fetchHomeFeed failed: $e');
     }
   }
 

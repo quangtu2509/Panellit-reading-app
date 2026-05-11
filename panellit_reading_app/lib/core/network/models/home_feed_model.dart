@@ -20,15 +20,20 @@ class ApiHomeFeedItem {
 
   factory ApiHomeFeedItem.fromJson(Map<String, dynamic> json) {
     final rawChapters = json['chaptersLatest'] as List<dynamic>? ?? [];
+    final rawCategories = json['categories'] as List<dynamic>? ?? [];
     return ApiHomeFeedItem(
       title: json['title']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       cover: json['cover']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
-      categories: List<String>.from(json['categories'] as List? ?? []),
+      categories: rawCategories
+          .map((e) => e?.toString())
+          .whereType<String>()
+          .toList(),
       updatedAt: json['updatedAt']?.toString() ?? '',
       chaptersLatest: rawChapters
-          .map((c) => ApiLatestChapter.fromJson(c as Map<String, dynamic>))
+          .whereType<Map<String, dynamic>>()
+          .map((c) => ApiLatestChapter.fromJson(c))
           .toList(),
     );
   }

@@ -5,6 +5,7 @@ class ApiSearchResult {
   final String cover;
   final String status;
   final List<String> categories;
+  final bool isNovel;
 
   const ApiSearchResult({
     required this.title,
@@ -12,15 +13,21 @@ class ApiSearchResult {
     required this.cover,
     required this.status,
     required this.categories,
+    this.isNovel = false,
   });
 
   factory ApiSearchResult.fromJson(Map<String, dynamic> json) {
+    final rawCategories = json['categories'] as List<dynamic>? ?? [];
     return ApiSearchResult(
       title: json['title']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       cover: json['cover']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
-      categories: List<String>.from(json['categories'] as List? ?? []),
+      categories: rawCategories
+          .map((e) => e?.toString())
+          .whereType<String>()
+          .toList(),
+      isNovel: json['isNovel'] == true,
     );
   }
 }
@@ -43,7 +50,8 @@ class ApiSearchResponse {
       totalItems: (json['totalItems'] as num?)?.toInt() ?? rawItems.length,
       currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
       items: rawItems
-          .map((e) => ApiSearchResult.fromJson(e as Map<String, dynamic>))
+          .whereType<Map<String, dynamic>>()
+          .map((e) => ApiSearchResult.fromJson(e))
           .toList(),
     );
   }

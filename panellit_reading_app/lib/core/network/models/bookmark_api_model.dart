@@ -1,24 +1,30 @@
 import 'history_api_model.dart'; // To reuse ApiMangaRef
 
 class ApiBookmarkItem {
-  final String mangaSlug;
+  final String? mangaSlug;
+  final String? novelSlug;
   final int? chapterId;
   final DateTime updatedAt;
-  final ApiMangaRef manga;
+  final ApiMangaRef? manga;
+  final ApiMangaRef? novel;
 
   const ApiBookmarkItem({
-    required this.mangaSlug,
+    this.mangaSlug,
+    this.novelSlug,
     this.chapterId,
     required this.updatedAt,
-    required this.manga,
+    this.manga,
+    this.novel,
   });
 
   factory ApiBookmarkItem.fromJson(Map<String, dynamic> json) {
     return ApiBookmarkItem(
-      mangaSlug: json['mangaSlug']?.toString() ?? '',
+      mangaSlug: json['mangaSlug']?.toString(),
+      novelSlug: json['novelSlug']?.toString(),
       chapterId: (json['chapterId'] as num?)?.toInt(),
       updatedAt: DateTime.tryParse(json['updatedAt']?.toString() ?? '') ?? DateTime.now(),
-      manga: ApiMangaRef.fromJson(json['manga'] as Map<String, dynamic>? ?? {}),
+      manga: json['manga'] != null ? ApiMangaRef.fromJson(json['manga'] as Map<String, dynamic>) : null,
+      novel: json['novel'] != null ? ApiMangaRef.fromJson(json['novel'] as Map<String, dynamic>) : null,
     );
   }
 }

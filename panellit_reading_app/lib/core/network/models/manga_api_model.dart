@@ -43,15 +43,25 @@ class ApiMangaDetail {
 
   factory ApiMangaDetail.fromJson(Map<String, dynamic> json) {
     final rawChapters = json['chapters'] as List<dynamic>? ?? [];
+    final rawCategories = json['categories'] as List<dynamic>? ?? [];
+    final rawAuthor = json['author'];
     return ApiMangaDetail(
       title: json['title']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       cover: json['cover']?.toString() ?? '',
-      author: (json['author'] as List<dynamic>?)?.join(', ') ?? 'Unknown',
+      author: rawAuthor is List
+          ? rawAuthor.map((e) => e?.toString() ?? '').join(', ')
+          : rawAuthor?.toString() ?? 'Unknown',
       status: json['status']?.toString() ?? '',
       summary: json['summary']?.toString() ?? '',
-      categories: List<String>.from(json['categories'] as List? ?? []),
-      chapters: rawChapters.map((c) => ApiChapter.fromJson(c as Map<String, dynamic>)).toList(),
+      categories: rawCategories
+          .map((e) => e?.toString())
+          .whereType<String>()
+          .toList(),
+      chapters: rawChapters
+          .whereType<Map<String, dynamic>>()
+          .map((c) => ApiChapter.fromJson(c))
+          .toList(),
     );
   }
 }
@@ -67,9 +77,13 @@ class ApiChapterImages {
   });
 
   factory ApiChapterImages.fromJson(Map<String, dynamic> json) {
+    final rawImages = json['images'] as List<dynamic>? ?? [];
     return ApiChapterImages(
       chapterId: json['chapterId']?.toString() ?? '',
-      images: List<String>.from(json['images'] as List? ?? []),
+      images: rawImages
+          .map((e) => e?.toString())
+          .whereType<String>()
+          .toList(),
     );
   }
 }
@@ -94,13 +108,17 @@ class ApiCategoryItem {
 
   factory ApiCategoryItem.fromJson(Map<String, dynamic> json) {
     final chapters = json['chaptersLatest'] as List<dynamic>? ?? [];
+    final rawCategories = json['categories'] as List<dynamic>? ?? [];
     return ApiCategoryItem(
       title: json['title']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       cover: json['cover']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
-      categories: List<String>.from(json['categories'] as List? ?? []),
-      latestChapterName: chapters.isNotEmpty
+      categories: rawCategories
+          .map((e) => e?.toString())
+          .whereType<String>()
+          .toList(),
+      latestChapterName: chapters.isNotEmpty && chapters.first is Map
           ? (chapters.first['chapterName']?.toString() ?? '')
           : '',
     );

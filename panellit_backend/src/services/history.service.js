@@ -1,42 +1,34 @@
 const prisma = require('../config/database');
 
 class HistoryService {
-  async syncProgress(userId, mangaSlug, chapterId, lastPageIndex, mangaTitle, coverUrl) {
-    // Ensure the manga exists in our local record (slug as primary key)
-    // In a real app, you might fetch metadata from OTruyen if it doesn't exist
-    await prisma.manga.upsert({
-      where: { slug: mangaSlug },
-      update: {
-        // Update title/cover if provided (may have improved data on re-sync)
-        ...(mangaTitle && { title: mangaTitle }),
-        ...(coverUrl   && { cover: coverUrl }),
-      },
-      create: {
-        slug:  mangaSlug,
-        title: mangaTitle || mangaSlug,
-        cover: coverUrl   || null,
-      },
-    });
-
-    // Upsert the reading history for the user
-    return await prisma.history.upsert({
-      where: {
-        userId_mangaSlug: {
-          userId,
-          mangaSlug,
+  async syncProgress(userId, { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl }) {
+    if (mangaSlug) {
+      await prisma.manga.upsert({
+        where: { slug: mangaSlug },
+        update: {
+          ...(mangaTitle && { title: mangaTitle }),
+          ...(coverUrl && { cover: coverUrl }),
         },
-      },
-      update: {
-        chapterId,
-        lastPageIndex,
-      },
-      create: {
-        userId,
-        mangaSlug,
-        chapterId,
-        lastPageIndex,
-      },
-    });
+        create: {
+          slug: mangaSlug,
+          title: mangaTitle || mangaSlug,
+          cover: coverUrl || null,
+        },
+      });
+
+      return await prisma.history.upsert({
+        where: { userId_mangaSlug: { userId, mangaSlug } },
+        update: { chapterId, lastPageIndex },
+        create: { userId, mangaSlug, chapterId, lastPageIndex },
+      });
+    } else if (novelSlug) {
+      return await prisma.history.upsert({
+        where: { userId_novelSlug: { userId, novelSlug } },
+        update: { lastPageIndex },
+        create: { userId, novelSlug, lastPageIndex },
+      });
+    }
+    throw new Error('mangaSlug or novelSlug is required');
   }
 
   async getUserHistory(userId) {
@@ -44,6 +36,7 @@ class HistoryService {
       where: { userId },
       include: {
         manga: true,
+        novel: true,
       },
       orderBy: {
         updatedAt: 'desc',
@@ -51,11 +44,14 @@ class HistoryService {
     });
   }
 
-  async deleteHistory(userId, mangaSlug) {
+  async deleteHistory(userId, slug) {
     return await prisma.history.deleteMany({
       where: {
         userId,
-        mangaSlug,
+        OR: [
+          { mangaSlug: slug },
+          { novelSlug: slug },
+        ],
       },
     });
   }

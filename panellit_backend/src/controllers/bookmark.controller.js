@@ -4,19 +4,12 @@ class BookmarkController {
   async toggleBookmark(req, res) {
     try {
       const userId = req.user.id;
-      const { mangaSlug, chapterId, mangaTitle, coverUrl } = req.body;
-
-      if (!mangaSlug) {
-        return res.status(400).json({ error: 'mangaSlug is required' });
+      const { mangaSlug, novelSlug } = req.body;
+      if (!mangaSlug && !novelSlug) {
+        return res.status(400).json({ error: 'mangaSlug or novelSlug is required' });
       }
 
-      const result = await bookmarkService.toggleBookmark(
-        userId,
-        mangaSlug,
-        mangaTitle    || null,
-        coverUrl      || null,
-        chapterId     !== undefined ? chapterId : null
-      );
+      const result = await bookmarkService.toggleBookmark(userId, req.body);
 
       res.json(result);
     } catch (error) {

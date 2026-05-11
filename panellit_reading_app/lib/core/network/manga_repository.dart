@@ -17,6 +17,16 @@ class MangaRepository {
     }
   }
 
+  Future<ApiMangaDetail> getNovelDetail({
+    required String slug,
+  }) async {
+    try {
+      return await _api.getNovelDetail(slug);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Fetch chapter images by the chapter API data URL.
   /// Returns proxy URLs that route through our backend to bypass CDN hotlink protection.
   /// Returns an empty list on failure.

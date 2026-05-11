@@ -6,21 +6,24 @@ class BookmarkApiService {
   final Dio _dio = ApiClient().dio;
 
   Future<Map<String, dynamic>> toggleBookmark({
-    required String mangaSlug,
+    String? mangaSlug,
+    String? novelSlug,
     int? chapterId,
-    required String mangaTitle,
-    required String coverUrl,
+    String? mangaTitle,
+    String? novelTitle,
+    String? coverUrl,
   }) async {
     try {
-      final response = await _dio.post(
-        '/api/bookmarks/toggle',
-        data: {
-          'mangaSlug':  mangaSlug,
-          'chapterId':  chapterId,
-          'mangaTitle': mangaTitle,
-          'coverUrl':   coverUrl,
-        },
-      );
+      final data = <String, dynamic>{
+        'chapterId': chapterId,
+        'coverUrl': coverUrl,
+      };
+      if (mangaSlug != null) data['mangaSlug'] = mangaSlug;
+      if (novelSlug != null) data['novelSlug'] = novelSlug;
+      if (mangaTitle != null) data['mangaTitle'] = mangaTitle;
+      if (novelTitle != null) data['novelTitle'] = novelTitle;
+
+      final response = await _dio.post('/api/bookmarks/toggle', data: data);
       return response.data as Map<String, dynamic>;
     } catch (_) {
       return {'isSaved': false};

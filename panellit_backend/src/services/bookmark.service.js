@@ -1,59 +1,63 @@
 const prisma = require('../config/database');
 
 class BookmarkService {
-  async toggleBookmark(userId, mangaSlug, mangaTitle, coverUrl, chapterId) {
-    // Ensure the manga exists in our local record
-    await prisma.manga.upsert({
-      where: { slug: mangaSlug },
-      update: {
-        ...(mangaTitle && { title: mangaTitle }),
-        ...(coverUrl   && { cover: coverUrl }),
-      },
-      create: {
-        slug:  mangaSlug,
-        title: mangaTitle || mangaSlug,
-        cover: coverUrl   || null,
-      },
-    });
-
-    const existingBookmark = await prisma.bookmark.findUnique({
-      where: {
-        userId_mangaSlug: {
-          userId,
-          mangaSlug,
+  async toggleBookmark(userId, { mangaSlug, novelSlug, mangaTitle, novelTitle, coverUrl, chapterId }) {
+    if (mangaSlug) {
+      await prisma.manga.upsert({
+        where: { slug: mangaSlug },
+        update: {
+          ...(mangaTitle && { title: mangaTitle }),
+          ...(coverUrl && { cover: coverUrl }),
         },
-      },
-    });
+        create: {
+          slug: mangaSlug,
+          title: mangaTitle || mangaSlug,
+          cover: coverUrl || null,
+        },
+      });
 
-    if (existingBookmark) {
-      // If no chapterId is provided, or the user clicks save again (toggling), delete it
-      if (chapterId === null) {
-        await prisma.bookmark.delete({
-          where: { id: existingBookmark.id },
-        });
+      const existingBookmark = await prisma.bookmark.findUnique({
+        where: { userId_mangaSlug: { userId, mangaSlug } },
+      });
+
+      if (existingBookmark) {
+        if (chapterId === null) {
+          await prisma.bookmark.delete({ where: { id: existingBookmark.id } });
+          return { isSaved: false };
+        } else {
+          await prisma.bookmark.update({
+            where: { id: existingBookmark.id },
+            data: { chapterId },
+          });
+          return { isSaved: true, chapterId };
+        }
+      } else {
+        if (chapterId !== null) {
+          await prisma.bookmark.create({
+            data: { userId, mangaSlug, chapterId },
+          });
+          return { isSaved: true, chapterId };
+        }
+        return { isSaved: false };
+      }
+    } else if (novelSlug) {
+      // Novel metadata is already in our DB usually, but let's ensure it's there
+      // (Novel is local, Manga is remote-synced)
+      const existingBookmark = await prisma.bookmark.findUnique({
+        where: { userId_novelSlug: { userId, novelSlug } },
+      });
+
+      if (existingBookmark) {
+        await prisma.bookmark.delete({ where: { id: existingBookmark.id } });
         return { isSaved: false };
       } else {
-        // Update the chapterId if it changed
-        await prisma.bookmark.update({
-          where: { id: existingBookmark.id },
-          data: { chapterId },
-        });
-        return { isSaved: true, chapterId };
-      }
-    } else {
-      if (chapterId !== null) {
-        // Create new bookmark
         await prisma.bookmark.create({
-          data: {
-            userId,
-            mangaSlug,
-            chapterId,
-          },
+          data: { userId, novelSlug },
         });
-        return { isSaved: true, chapterId };
+        return { isSaved: true };
       }
-      return { isSaved: false };
     }
+    throw new Error('mangaSlug or novelSlug is required');
   }
 
   async getUserBookmarks(userId) {
@@ -61,6 +65,7 @@ class BookmarkService {
       where: { userId },
       include: {
         manga: true,
+        novel: true,
       },
       orderBy: {
         updatedAt: 'desc',
@@ -68,11 +73,14 @@ class BookmarkService {
     });
   }
 
-  async deleteBookmark(userId, mangaSlug) {
+  async deleteBookmark(userId, slug) {
     return await prisma.bookmark.deleteMany({
       where: {
         userId,
-        mangaSlug,
+        OR: [
+          { mangaSlug: slug },
+          { novelSlug: slug },
+        ],
       },
     });
   }

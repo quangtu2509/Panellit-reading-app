@@ -307,10 +307,15 @@ class _LibraryPageState extends State<LibraryPage> {
             ),
           ),
         ...sortedItems.map((item) {
+          final slug = item.mangaSlug ?? item.novelSlug ?? '';
+          final title = item.manga?.title ?? item.novel?.title ?? 'Unknown';
+          final cover = item.manga?.cover ?? item.novel?.cover ?? '';
+          final isNovel = item.novelSlug != null;
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 28),
             child: Dismissible(
-              key: Key(item.mangaSlug),
+              key: Key(slug),
               direction: DismissDirection.endToStart,
               background: Container(
                 decoration: BoxDecoration(
@@ -323,24 +328,24 @@ class _LibraryPageState extends State<LibraryPage> {
               ),
               onDismissed: (_) {
                 setState(() {
-                  _bookmarkItems.removeWhere((e) => e.mangaSlug == item.mangaSlug);
+                  _bookmarkItems.removeWhere((e) => (e.mangaSlug ?? e.novelSlug) == slug);
                 });
-                BookmarkApiService().deleteBookmark(item.mangaSlug);
+                BookmarkApiService().deleteBookmark(slug);
               },
               child: _BookmarkCard(
                 item: item,
                 onTap: () {
                   final skeletonDetail = TitleDetailModel(
-                    id: item.mangaSlug,
-                    title: item.manga.title,
-                    coverUrl: item.manga.cover,
+                    id: slug,
+                    title: title,
+                    coverUrl: cover,
                     author: 'Unknown',
                     status: 'Ongoing',
                     rating: 0.0,
                     chapters: 0,
                     readsLabel: '0',
                     coverColor: Colors.grey,
-                    genres: const [],
+                    genres: isNovel ? const ['Light Novel'] : const [],
                     synopsis: 'Loading...',
                     chapterUpdates: const [],
                     relatedStories: const [],
@@ -350,6 +355,7 @@ class _LibraryPageState extends State<LibraryPage> {
                       ratingsCountLabel: '0',
                       bars: {},
                     ),
+                    pdfUrl: isNovel ? 'placeholder' : null, // Mark as novel to trigger PDF reader logic
                   );
                   _openDetail(skeletonDetail);
                 },
@@ -422,10 +428,15 @@ class _LibraryPageState extends State<LibraryPage> {
           });
         },
         children: sortedItems.map((item) {
+          final slug = item.mangaSlug ?? item.novelSlug ?? '';
+          final title = item.manga?.title ?? item.novel?.title ?? slug;
+          final cover = item.manga?.cover ?? item.novel?.cover ?? '';
+          final isNovel = item.novelSlug != null;
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Dismissible(
-              key: Key(item.mangaSlug),
+              key: Key(slug),
               direction: DismissDirection.endToStart,
               background: Container(
                 decoration: BoxDecoration(
@@ -438,33 +449,34 @@ class _LibraryPageState extends State<LibraryPage> {
               ),
               onDismissed: (_) {
                 setState(() {
-                  _historyItems.removeWhere((e) => e.mangaSlug == item.mangaSlug);
+                  _historyItems.removeWhere((e) => (e.mangaSlug ?? e.novelSlug) == slug);
                 });
-                HistoryApiService().deleteHistory(item.mangaSlug);
+                HistoryApiService().deleteHistory(slug);
               },
               child: _HistoryCard(
                 item: item,
                 onTap: () => _openDetail(
                   TitleDetailModel(
-                    id:       item.mangaSlug,
-                    title:    item.manga.title.isNotEmpty ? item.manga.title : item.mangaSlug,
-                    author:   '',
-                    status:   '',
-                    rating:   0,
+                    id: slug,
+                    title: title,
+                    author: '',
+                    status: '',
+                    rating: 0,
                     chapters: 0,
                     readsLabel: '',
-                    synopsis:   '',
-                    genres:     const [],
+                    synopsis: '',
+                    genres: isNovel ? const ['Light Novel'] : const [],
                     chapterUpdates: const [],
                     reviewSummary: const ReviewSummaryModel(
                       average: 0,
                       ratingsCountLabel: '',
                       bars: {},
                     ),
-                    reviews:       const [],
+                    reviews: const [],
                     relatedStories: const [],
                     coverColor: const Color(0xFF1C2333),
-                    coverUrl:   item.manga.cover,
+                    coverUrl: cover,
+                    pdfUrl: isNovel ? 'placeholder' : null,
                   ),
                 ),
               ),
@@ -574,10 +586,10 @@ class _LibraryPageState extends State<LibraryPage> {
 
     switch (_bookmarksSort) {
       case LibrarySortOption.az:
-        result.sort((a, b) => a.manga.title.compareTo(b.manga.title));
+        result.sort((a, b) => (a.manga?.title ?? a.novel?.title ?? '').compareTo(b.manga?.title ?? b.novel?.title ?? ''));
         break;
       case LibrarySortOption.za:
-        result.sort((a, b) => b.manga.title.compareTo(a.manga.title));
+        result.sort((a, b) => (b.manga?.title ?? b.novel?.title ?? '').compareTo(a.manga?.title ?? a.novel?.title ?? ''));
         break;
       case LibrarySortOption.newestToOldest:
         result.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -594,10 +606,10 @@ class _LibraryPageState extends State<LibraryPage> {
     final result = List<ApiHistoryItem>.from(items);
     switch (_continueSort) {
       case LibrarySortOption.az:
-        result.sort((a, b) => a.manga.title.compareTo(b.manga.title));
+        result.sort((a, b) => (a.manga?.title ?? a.novel?.title ?? '').compareTo(b.manga?.title ?? b.novel?.title ?? ''));
         break;
       case LibrarySortOption.za:
-        result.sort((a, b) => b.manga.title.compareTo(a.manga.title));
+        result.sort((a, b) => (b.manga?.title ?? b.novel?.title ?? '').compareTo(a.manga?.title ?? a.novel?.title ?? ''));
         break;
       case LibrarySortOption.newestToOldest:
         result.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -647,6 +659,10 @@ class _BookmarkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = item.manga?.title ?? item.novel?.title ?? 'Unknown';
+    final cover = item.manga?.cover ?? item.novel?.cover ?? '';
+    final isNovel = item.novelSlug != null;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -670,14 +686,14 @@ class _BookmarkCard extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
-                image: item.manga.cover.isNotEmpty
+                image: cover.isNotEmpty
                     ? DecorationImage(
-                        image: NetworkImage(item.manga.cover),
+                        image: NetworkImage(cover),
                         fit: BoxFit.cover,
                       )
                     : null,
               ),
-              child: item.manga.cover.isEmpty
+              child: cover.isEmpty
                   ? const Center(child: Icon(Icons.image_not_supported, color: Colors.grey))
                   : null,
             ),
@@ -688,7 +704,7 @@ class _BookmarkCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.manga.title,
+                      title,
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.bold,
@@ -706,9 +722,11 @@ class _BookmarkCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            item.chapterId != null
-                                ? 'Saved Chapter ${item.chapterId}'
-                                : 'Saved Manga',
+                            isNovel
+                                ? 'Saved Novel'
+                                : (item.chapterId != null
+                                    ? 'Saved Chapter ${item.chapterId}'
+                                    : 'Saved Manga'),
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w600,
@@ -747,6 +765,10 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = item.manga?.title ?? item.novel?.title ?? (item.mangaSlug ?? item.novelSlug ?? '');
+    final cover = item.manga?.cover ?? item.novel?.cover ?? '';
+    final isNovel = item.novelSlug != null;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -767,9 +789,9 @@ class _HistoryCard extends StatelessWidget {
             ClipRRect(
               borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(14)),
-              child: item.manga.cover.isNotEmpty
+              child: cover.isNotEmpty
                   ? Image.network(
-                      item.manga.cover,
+                      cover,
                       width: 72,
                       height: 96,
                       fit: BoxFit.cover,
@@ -789,9 +811,7 @@ class _HistoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.manga.title.isNotEmpty
-                          ? item.manga.title
-                          : item.mangaSlug,
+                      title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -808,7 +828,7 @@ class _HistoryCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Chapter ${item.chapterId}',
+                            isNovel ? 'Novel Progress' : 'Chapter ${item.chapterId}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -823,10 +843,10 @@ class _HistoryCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
+                      child: const LinearProgressIndicator(
                         value: 0.5, // Mock value until backend provides total chapters
-                        backgroundColor: const Color(0xFFE9EDF1),
-                        valueColor: const AlwaysStoppedAnimation<Color>(LibraryColors.primary),
+                        backgroundColor: Color(0xFFE9EDF1),
+                        valueColor: AlwaysStoppedAnimation<Color>(LibraryColors.primary),
                         minHeight: 4,
                       ),
                     ),

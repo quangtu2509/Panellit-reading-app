@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 14 — Library & Reading Progress Persistence
-- **Trạng thái**: Đang thực hiện
-- **Tệp đang tác động chính**: `library_repository.dart`, `manga_repository.dart`, `auth_service.dart`, `library_page.dart`
-- **Vấn đề đang gặp (Nếu có)**: Đang thiết kế API cho lưu trữ tiến độ đọc
+- **Task đang thực hiện**: Phase 16 — Backend & Frontend Sync (Light Novels & Bugs)
+- **Trạng thái**: Hoàn thành
+- **Tệp đang tác động chính**: `library_page.dart`
+- **Vấn đề đang gặp (Nếu có)**: Đã hoàn tất và fix xong lỗi `Null Check`.
 
 # Frontend Development Progress - Panellit Reading App
 
@@ -276,6 +276,15 @@
 - [x] Wire `TitleDetailPage` "Read Now" button to route correctly to `NovelReadingPage` (instead of MangaReadingPage) for novel genres
 - [x] Create `NovelReadingPage` — composes all widgets, manages chapter state, save/bookmark state, sidebar open/close, guest-hint logic
 
+### Phase 16: Backend & Frontend Sync (Light Novels & Bugs) ✅
+
+- [x] Sửa lỗi null check khi truy xuất `manga.title` và `manga.cover` trong `library_page.dart`.
+- [x] Hiển thị chính xác tiến trình và metadata của Light Novel trong các tab "Bookmarks" và "Continue Reading" (sử dụng Null-safe operators).
+- [x] Sửa lỗi Syntax (trùng biến `mangaSlug`) trong `history.controller.js` ở Backend.
+- [x] Tích hợp `UserStatsService` vào `PdfReadingPage` để tính giờ đọc và chuỗi streak cho Novel.
+- [x] Tích hợp `HistoryApiService` vào `PdfReadingPage` để tự động lưu vị trí trang PDF (progress sync) lên Database.
+- [x] Cập nhật API Search để kết hợp và phân loại kết quả Manga và Novel (`isNovel: true`).
+
 ### Phase 15: PDF Reading Support (Light Novels) ✅
 
 - [x] Tích hợp thư viện `flutter_pdfview` để hiển thị file PDF.
@@ -360,6 +369,15 @@
 3. **Chapter Box Extra Whitespace** → Changed từ fixed height → ConstrainedBox với maxHeight
 4. **Synopsis Not Expandable** → Implemented real TextPainter overflow detection + toggle
 5. **Chapters Horizontal Instead of Vertical** → Changed scrollDirection & layout
+
+### Phase 17: Fix Network Connectivity (Real Device vs Emulator) ✅
+
+- [x] **Xác định nguyên nhân**: App dùng `http://10.0.2.2:3000` (URL chỉ dành cho Android Emulator), không hoạt động khi test trên thiết bị thật (real device).
+- [x] **Sửa `api_client.dart`**: Đổi `baseUrl` sang `http://172.16.3.106:3000` (IP máy tính trên Wi-Fi).
+- [x] **Thêm comment hướng dẫn**: Cấu trúc rõ ràng 3 môi trường (Emulator / Real Device / Web).
+- [x] **Thêm debug logging**: Thay `catch (_) {}` bằng `debugPrint` trong `_fetchHomeFeed()` để lỗi mạng hiển thị trong Flutter console.
+
+> ⚠️ **Lưu ý quan trọng**: Mỗi khi IP máy tính thay đổi (đổi mạng Wi-Fi), phải cập nhật `baseUrl` trong `api_client.dart`. IP hiện tại: `172.16.3.106`.
 
 ### Validation Status
 

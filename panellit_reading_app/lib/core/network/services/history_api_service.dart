@@ -19,23 +19,26 @@ class HistoryApiService {
   /// [coverUrl]     — absolute cover image URL
   /// [lastPageIndex] — zero-based page within the chapter (default 0)
   Future<void> syncProgress({
-    required String mangaSlug,
-    required String chapterId,
-    required String mangaTitle,
-    required String coverUrl,
+    String? mangaSlug,
+    String? novelSlug,
+    String? chapterId,
+    String? mangaTitle,
+    String? novelTitle,
+    String? coverUrl,
     int lastPageIndex = 0,
   }) async {
     try {
-      await _dio.post(
-        '/api/history/sync',
-        data: {
-          'mangaSlug':     mangaSlug,
-          'chapterId':     chapterId,
-          'mangaTitle':    mangaTitle,
-          'coverUrl':      coverUrl,
-          'lastPageIndex': lastPageIndex,
-        },
-      );
+      final data = <String, dynamic>{
+        'coverUrl': coverUrl,
+        'lastPageIndex': lastPageIndex,
+      };
+      if (mangaSlug != null) data['mangaSlug'] = mangaSlug;
+      if (novelSlug != null) data['novelSlug'] = novelSlug;
+      if (chapterId != null) data['chapterId'] = chapterId;
+      if (mangaTitle != null) data['mangaTitle'] = mangaTitle;
+      if (novelTitle != null) data['novelTitle'] = novelTitle;
+
+      await _dio.post('/api/history/sync', data: data);
     } catch (_) {
       // Fire-and-forget: silently ignore failures so the UI is never blocked.
     }

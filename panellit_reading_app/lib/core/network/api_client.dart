@@ -4,11 +4,15 @@ import '../storage/token_storage.dart';
 
 /// Singleton Dio client for all Backend API requests.
 /// Base URL points to the Panellit Backend running locally (or replace with production URL).
+///
+/// ⚙️  HOW TO SWITCH ENVIRONMENTS:
+///   - Android Emulator : 'http://10.0.2.2:3000'
+///   - Real Device (Wi-Fi): 'http://172.16.3.106:3000'  ← máy tính hiện tại
+///   - Web / Desktop    : 'http://localhost:3000'
 class ApiClient {
-  static const String baseUrl =
-      'http://10.0.2.2:3000'; // Android emulator → localhost
-  // Use 'http://localhost:3000' for web/desktop or unit tests
-  // Use your machine's IP (e.g. 'http://192.168.1.10:3000') for a real device on the same Wi-Fi
+  // ─── ⚠️  Đổi URL tùy môi trường test ────────────────────────────────────
+  static const String baseUrl = 'http://172.16.3.106:3000'; // Real Device
+  // static const String baseUrl = 'http://10.0.2.2:3000';   // Android Emulator
 
   static final ApiClient _instance = ApiClient._internal();
   late final Dio _dio;

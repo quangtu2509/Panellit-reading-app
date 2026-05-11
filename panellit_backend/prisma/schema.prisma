@@ -35,35 +35,42 @@ model History {
   id             String   @id @default(uuid())
   user           User     @relation(fields: [userId], references: [id])
   userId         String
-  manga          Manga    @relation(fields: [mangaSlug], references: [slug])
-  mangaSlug      String
-  chapterId      String
+  manga          Manga?   @relation(fields: [mangaSlug], references: [slug])
+  mangaSlug      String?
+  novel          Novel?   @relation(fields: [novelSlug], references: [slug])
+  novelSlug      String?
+  chapterId      String?  // Optional for novels
   lastPageIndex  Int      @default(0)
   updatedAt      DateTime @updatedAt
 
   @@unique([userId, mangaSlug])
+  @@unique([userId, novelSlug])
 }
 
 model Bookmark {
   id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id])
   userId    String
-  manga     Manga    @relation(fields: [mangaSlug], references: [slug])
-  mangaSlug String
+  manga     Manga?   @relation(fields: [mangaSlug], references: [slug])
+  mangaSlug String?
+  novel     Novel?   @relation(fields: [novelSlug], references: [slug])
+  novelSlug String?
   chapterId Int?     // the chapter number they saved
   updatedAt DateTime @updatedAt
 
   @@unique([userId, mangaSlug])
+  @@unique([userId, novelSlug])
 }
 
 model Novel {
-  id          String   @id @default(uuid())
-  slug        String   @unique
+  slug        String     @id
   title       String
   author      String?
   cover       String?
   pdfUrl      String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  histories   History[]
+  bookmarks   Bookmark[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }

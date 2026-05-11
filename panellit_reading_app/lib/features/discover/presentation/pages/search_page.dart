@@ -118,7 +118,7 @@ class _SearchPageState extends State<SearchPage> {
     return SearchResultModel(
       title: api.title,
       slug: api.slug,
-      typeLabel: 'Manga',
+      typeLabel: api.isNovel ? 'Novel' : 'Manga',
       author: '',
       genres: api.categories,
       rating: 0,
@@ -190,6 +190,7 @@ class _SearchPageState extends State<SearchPage> {
       relatedStories: const [],
       coverColor: result.coverColor,
       coverUrl: result.coverUrl,
+      pdfUrl: result.typeLabel == 'Novel' ? 'placeholder' : null,
     );
   }
 

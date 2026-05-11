@@ -39,8 +39,41 @@ class MangaController {
         return res.status(400).json({ error: 'keyword query param is required' });
       }
       const page = parseInt(req.query.page) || 1;
-      const result = await otruyenService.searchManga(keyword.trim(), page);
-      res.json(result);
+      
+      // Search remote Manga
+      const mangaResult = await otruyenService.searchManga(keyword.trim(), page);
+      
+      // Search local Novels (only on first page for now, or simple filter)
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+      const localNovels = await prisma.novel.findMany({
+        where: {
+          OR: [
+            { title: { contains: keyword, mode: 'insensitive' } },
+            { author: { contains: keyword, mode: 'insensitive' } },
+          ]
+        }
+      });
+
+      // Merge results
+      // Note: We might want to wrap novels to match the manga structure
+      const novelItems = localNovels.map(n => ({
+        title: n.title,
+        slug: n.slug,
+        cover: n.cover,
+        author: n.author,
+        isNovel: true, // Flag for frontend
+        categories: ['Light Novel'],
+        chaptersLatest: []
+      }));
+
+      const mergedItems = [...novelItems, ...mangaResult.items];
+
+      res.json({
+        ...mangaResult,
+        totalItems: (mangaResult.totalItems || 0) + novelItems.length,
+        items: mergedItems
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

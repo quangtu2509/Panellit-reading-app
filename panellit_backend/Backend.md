@@ -1,8 +1,9 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: [Tên task hiện tại, ví dụ: Tích hợp API Search OTruyen]
-- **Trạng thái**: [Đang làm / Đang fix bug / Chờ review]
-- **Tệp đang tác động chính**:
-- **Vấn đề đang gặp (Nếu có)**: [Ghi chú bug hoặc logic chưa giải quyết được]
+- **Task đang thực hiện**: Tích hợp Light Novel và sửa lỗi logic Frontend/Backend.
+- **Trạng thái**: Hoàn thành tích hợp Novel, fix bugs.
+- **Tệp đang tác động chính**: `history.controller.js`, `bookmark.service.js`, `library_page.dart`
+- **Vấn đề đang gặp (Nếu có)**: Đã xử lý xong các lỗi cú pháp và lỗi Nullable (Dart).
+
 # Panellit Backend Documentation
 
 Hệ thống Backend cho ứng dụng Panellit được xây dựng theo kiến trúc MVC Layered, tập trung vào hiệu suất và khả năng tích hợp dữ liệu từ bên thứ ba (OTruyen).
@@ -48,10 +49,12 @@ panellit_backend/
     - `POST /api/auth/register`: Đăng ký tài khoản.
     - `POST /api/auth/login`: Đăng nhập, nhận token và thông tin user.
 
-### C. History Sync Module
-- **Models**: `History`, `Manga`
-- **Logic**: Sử dụng kỹ thuật `upsert`. Khi App gửi tiến độ đọc, Backend sẽ kiểm tra xem bản ghi đã tồn tại chưa. Nếu có rồi thì cập nhật số chương/số trang, nếu chưa có thì tạo mới.
-- **Endpoint**: `POST /api/history/sync` (Yêu cầu Token trong header `Authorization`).
+### C. History & Bookmark Module
+- **Models**: `History`, `Bookmark`, `Manga`, `Novel`
+- **Logic**: Sử dụng kỹ thuật `upsert`. 
+    - Hỗ trợ lưu trữ đa thực thể (Manga & Novel) thông qua `mangaSlug` và `novelSlug`.
+    - Khi App gửi tiến độ đọc, Backend sẽ kiểm tra xem bản ghi đã tồn tại chưa. Nếu có rồi thì cập nhật số chương/số trang, nếu chưa có thì tạo mới.
+- **Endpoint**: `POST /api/history/sync` và `POST /api/bookmarks/toggle` (Yêu cầu Token trong header `Authorization`).
 
 ### D. Novel & PDF Storage Module
 - **Models**: `Novel`
@@ -66,20 +69,16 @@ panellit_backend/
     - `GET /api/novels/:slug`: Lấy chi tiết 1 novel theo slug.
 
 ## 3. Nhật ký cập nhật (Update Logs)
-- **[2026-05-03]**: Khởi tạo Backend core structure.
-- **[2026-05-03]**: Hạ cấp Prisma xuống v6 để tương thích tốt nhất với cấu hình direct connection và schema truyền thống.
-- **[2026-05-03]**: Hoàn thiện tích hợp OTruyen API với xử lý mapping ảnh CDN.
-- **[2026-05-03]**: Thêm route chào mừng (`/`) và endpoint `/health`.
-- **[2026-05-03]**: Cài đặt `nodemon` và cấu hình lệnh `npm run dev`.
-- **[2026-05-07]**: **Client Integration Started**: Flutter app đã hoàn thiện layer Network (Dio + Repository) và sẵn sàng kết nối với Backend.
-- **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home` — lấy danh sách truyện mới cập nhật từ OTruyen, trả về title, slug, cover, categories, chaptersLatest.
-- **[2026-05-08]**: **Search Endpoint**: Thêm `GET /api/manga/search?keyword=xxx` — tìm kiếm truyện qua OTruyen `/tim-kiem`. Route được đặt **trước** `/:slug` để tránh collision.
-- **[2026-05-08]**: **Image Proxy Endpoint**: Thêm `GET /api/manga/image-proxy?url=...` — proxy ảnh từ OTruyen CDN với Referer header. Bypass hotlink protection, stream ảnh trực tiếp tới Flutter client. Cache 24h.
+- **[2026-05-03]**: Khởi tạo Backend core structure, hạ cấp Prisma xuống v6, tích hợp OTruyen API.
+- **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home`.
+- **[2026-05-08]**: **Search & Image Proxy**: Thêm API `/search` và `/image-proxy` để xử lý CDN.
 - **[2026-05-11]**: **Novel & PDF Support**: 
     - Thêm model `Novel` vào Prisma schema.
-    - Tích hợp `multer` và cấu hình local storage cho file PDF (~20MB).
-    - Triển khai bộ API `/api/novels` (Upload, List, Detail).
-    - Cấu hình phục vụ file tĩnh qua `/static`.
+    - Cấu hình local storage cho file PDF bằng Multer.
+    - Mở rộng model `History` và `Bookmark` hỗ trợ tùy chọn `novelSlug` bên cạnh `mangaSlug`.
+    - Cập nhật `HistoryController` và `BookmarkController` để chấp nhận payload từ Flutter App cho cả Manga và Light Novel.
+    - Mở rộng chức năng tìm kiếm kết hợp trả về cả Manga từ OTruyen và Novel từ Database nội bộ (có cờ `isNovel: true`).
+    - Khắc phục lỗi `SyntaxError` trùng lặp biến trong `history.controller.js`.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

@@ -7,6 +7,8 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/network/models/novel_api_model.dart';
+import '../../../../core/network/services/history_api_service.dart';
+import '../../../../core/services/user_stats_service.dart';
 
 class PdfReadingPage extends StatefulWidget {
   final ApiNovelModel novel;
@@ -43,12 +45,15 @@ class _PdfReadingPageState extends State<PdfReadingPage>
   void initState() {
     super.initState();
     _downloadAndOpenPdf();
+    UserStatsService.instance.startSession();
   }
 
   @override
   void dispose() {
     _topBarTimer?.cancel();
+    _syncTimer?.cancel();
     _pdfViewerController.dispose();
+    UserStatsService.instance.endSession();
     super.dispose();
   }
 
@@ -261,6 +266,24 @@ class _PdfReadingPageState extends State<PdfReadingPage>
     );
   }
 
+  Timer? _syncTimer;
+
+  void _syncProgress(int page) {
+    if (widget.isGuest) return;
+    
+    _syncTimer?.cancel();
+    _syncTimer = Timer(const Duration(seconds: 2), () async {
+      try {
+        await HistoryApiService().syncProgress(
+          novelSlug: widget.novel.slug,
+          lastPageIndex: page,
+        );
+      } catch (e) {
+        debugPrint('Failed to sync progress: $e');
+      }
+    });
+  }
+
   Widget _buildPdfViewer() {
     return GestureDetector(
       onTap: _toggleTopBar,
@@ -282,6 +305,7 @@ class _PdfReadingPageState extends State<PdfReadingPage>
         onPageChanged: (PdfPageChangedDetails details) {
           if (mounted) {
             setState(() => _currentPage = details.newPageNumber);
+            _syncProgress(details.newPageNumber);
           }
         },
       ),

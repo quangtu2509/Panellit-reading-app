@@ -8,6 +8,7 @@ import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
 import '../../../reader_novel/presentation/pages/pdf_reading_page.dart';
 import '../../../reader_novel/data/models/novel_reading_model.dart';
 import '../../../../core/network/models/novel_api_model.dart';
+import '../../../../core/network/models/manga_api_model.dart';
 import '../theme/title_detail_colors.dart';
 import '../widgets/detail/detail_bottom_nav.dart';
 import '../widgets/detail/detail_chapters_section.dart';
@@ -66,15 +67,19 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   Future<void> _fetchApiData() async {
     final repo = MangaRepository();
     final slug = _currentDetail.id;
+    final isNovel = _currentDetail.pdfUrl != null && _currentDetail.pdfUrl!.isNotEmpty;
 
     try {
-      final api = await repo.getMangaDetail(slug: slug);
+      final ApiMangaDetail api;
+      if (isNovel) {
+        api = await repo.getNovelDetail(slug: slug);
+      } else {
+        api = await repo.getMangaDetail(slug: slug);
+      }
+      
       if (!mounted) return;
 
-      // Map API chapters using their real chapter name as identifier.
-      // API returns chapters oldest→newest order. We assign a sequential
-      // index (1-based) for internal identification but display the real
-      // chapterName from the API.
+      // Map API chapters
       final mappedChapters = api.chapters.asMap().entries.map((entry) {
         final c = entry.value;
         final displayName = c.chapterName.isNotEmpty ? c.chapterName : c.chapterTitle;
@@ -103,6 +108,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           relatedStories: const [],
           coverColor: _currentDetail.coverColor,
           coverUrl: api.cover.isNotEmpty ? api.cover : _currentDetail.coverUrl,
+          pdfUrl: _currentDetail.pdfUrl,
         );
       });
     } catch (e) {
@@ -185,9 +191,13 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
       _savedChapterNumber = chapterNumber;
     });
 
+    final isNovel = _detail.pdfUrl != null && _detail.pdfUrl!.isNotEmpty;
+
     final result = await BookmarkApiService().toggleBookmark(
-      mangaSlug: _detail.id,
-      mangaTitle: _detail.title,
+      mangaSlug: !isNovel ? _detail.id : null,
+      novelSlug: isNovel ? _detail.id : null,
+      mangaTitle: !isNovel ? _detail.title : null,
+      novelTitle: isNovel ? _detail.title : null,
       coverUrl: _detail.coverUrl ?? '',
       chapterId: chapterNumber,
     );
