@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 require('dotenv').config();
@@ -8,11 +9,15 @@ const authRoutes = require('./routes/auth.routes');
 const mangaRoutes = require('./routes/manga.routes');
 const historyRoutes = require('./routes/history.routes');
 const bookmarkRoutes = require('./routes/bookmark.routes');
+const novelRoutes = require('./routes/novel.routes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static files (PDFs, Images)
+app.use('/static', express.static(path.join(__dirname, '../public')));
 
 // Swagger Configuration
 const swaggerOptions = {
@@ -49,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/manga', mangaRoutes);
 app.use('/api/history', historyRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/api/novels', novelRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {

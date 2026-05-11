@@ -13,6 +13,7 @@ class HomePageContent extends StatelessWidget {
   final TitleDetailModel featuredDetail;
   final List<HomeUpdateItem> updateItems;
   final List<HomeRankItem> popularItems;
+  final List<HomeNovelItem> novelItems;
   final ValueChanged<TitleDetailModel> onOpenDetail;
 
   const HomePageContent({
@@ -22,6 +23,7 @@ class HomePageContent extends StatelessWidget {
     required this.featuredDetail,
     required this.updateItems,
     required this.popularItems,
+    required this.novelItems,
     required this.onOpenDetail,
   });
 
@@ -46,7 +48,10 @@ class HomePageContent extends StatelessWidget {
           onItemTap: (item) => onOpenDetail(item.detail),
         ),
         const SizedBox(height: 24),
-        HomeTopWebnovelsSection(onItemTap: (item) => onOpenDetail(item.detail)),
+        HomeTopWebnovelsSection(
+          items: novelItems,
+          onItemTap: (item) => onOpenDetail(item.detail),
+        ),
       ],
     );
   }

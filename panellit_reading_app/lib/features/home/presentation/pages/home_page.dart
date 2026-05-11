@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/smooth_page_route.dart';
 import '../../../../core/network/models/home_feed_model.dart';
 import '../../../../core/network/services/home_feed_service.dart';
+import '../../../../core/network/services/novel_api_service.dart';
+import '../../../../core/network/models/novel_api_model.dart';
 import '../../../library/presentation/pages/library_page.dart';
 import '../../../discover/presentation/pages/search_page.dart';
 import '../../../discover/presentation/pages/notifications_page.dart';
@@ -29,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   // ── State ────────────────────────────────────────────────────────────────
   List<HomeUpdateItem> _updateItems = []; // Empty start
   List<HomeRankItem> _popularItems = []; // Empty start
+  List<HomeNovelItem> _novelItems = []; // Empty start
   TitleDetailModel _featuredDetail = TitleDetailModel(
     id: '',
     title: '',
@@ -49,6 +52,7 @@ class _HomePageState extends State<HomePage> {
   String _featuredSubtitle = '';
 
   final HomeFeedService _feedService = HomeFeedService();
+  final NovelApiService _novelService = NovelApiService();
 
   @override
   void initState() {
@@ -61,7 +65,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchHomeFeed() async {
     try {
       final feedItems = await _feedService.getHomeFeed();
-      if (!mounted || feedItems.isEmpty) return;
+      final novels = await _novelService.getNovels();
+      
+      if (!mounted) return;
 
       // Map API items → HomeUpdateItem (for New Updates section)
       final updates = feedItems.take(4).map((item) {
@@ -96,17 +102,33 @@ class _HomePageState extends State<HomePage> {
       }).toList();
 
       // Use first item as featured
-      final featured = feedItems.first;
-      final featuredDetail = _buildDetailFromFeedItem(featured);
+      final featured = feedItems.isNotEmpty ? feedItems.first : null;
+      final featuredDetail = featured != null ? _buildDetailFromFeedItem(featured) : _featuredDetail;
+
+      // Map novels
+      final mappedNovels = novels.asMap().entries.map((entry) {
+        final item = entry.value;
+        final detail = _buildDetailFromNovelItem(item);
+        return HomeNovelItem(
+          number: '${entry.key + 1}',
+          title: item.title,
+          tag: 'Light Novel',
+          reads: 'New',
+          detail: detail,
+        );
+      }).toList();
 
       setState(() {
         _updateItems = updates;
         _popularItems = popular;
-        _featuredDetail = featuredDetail;
-        _featuredTitle = featured.title;
-        _featuredSubtitle = featured.categories.isNotEmpty
-            ? '${featured.categories.take(2).join(' · ')} · ${featured.status}'
-            : 'Read now';
+        _novelItems = mappedNovels;
+        if (featured != null) {
+          _featuredDetail = featuredDetail;
+          _featuredTitle = featured.title;
+          _featuredSubtitle = featured.categories.isNotEmpty
+              ? '${featured.categories.take(2).join(' · ')} · ${featured.status}'
+              : 'Read now';
+        }
       });
     } catch (_) {
       // Silently keep mock data on failure
@@ -147,6 +169,38 @@ class _HomePageState extends State<HomePage> {
       relatedStories: const [],
       coverColor: const Color(0xFF0D2742),
       coverUrl: item.cover,
+    );
+  }
+
+  TitleDetailModel _buildDetailFromNovelItem(ApiNovelModel item) {
+    return TitleDetailModel(
+      id: item.slug,
+      title: item.title,
+      author: item.author,
+      status: 'Ongoing',
+      rating: 5,
+      chapters: 1,
+      readsLabel: 'PDF',
+      synopsis: item.description ?? '',
+      genres: const ['Light Novel', 'PDF'],
+      chapterUpdates: [
+        ChapterUpdateModel(
+          chapterNumber: 1,
+          title: 'Full Volume',
+          timeLabel: 'Recently',
+          chapterApiData: null,
+        )
+      ],
+      reviewSummary: const ReviewSummaryModel(
+        average: 0,
+        ratingsCountLabel: '',
+        bars: {},
+      ),
+      reviews: const [],
+      relatedStories: const [],
+      coverColor: const Color(0xFF0D2742),
+      coverUrl: item.cover,
+      pdfUrl: item.pdfUrl,
     );
   }
 
@@ -291,6 +345,7 @@ class _HomePageState extends State<HomePage> {
                 featuredDetail: _featuredDetail,
                 updateItems: _updateItems,
                 popularItems: _popularItems,
+                novelItems: _novelItems,
                 onOpenDetail: (detail) => _openDetail(context, detail),
               ),
             ),

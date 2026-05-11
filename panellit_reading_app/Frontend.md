@@ -131,6 +131,7 @@
   - ✅ **[NEW]** Guest vs logged-in review states
   - ✅ **[NEW]** Related comics (thay vì Related Stories)
   - ✅ **[NEW]** Related comics centered horizontal swipe layout
+  - ✅ **[NEW]** **PDF Novel Support**: Tự động nhận diện trường `pdfUrl`. Nếu có, nút "Read Now" sẽ mở `PdfReadingPage` thay vì Manga/Novel text reader.
 
 #### 4. **Profile Module** (`lib/features/profile/`)
 
@@ -171,7 +172,9 @@
   - `api_client.dart` - Singleton Dio client với base URL (support emulator/localhost)
   - `manga_repository.dart` - Repository điều phối dữ liệu giữa API thực và Mock fallback
   - `services/manga_api_service.dart` - Service gọi các endpoint manga/chapter từ Backend
+  - `services/novel_api_service.dart` - **[NEW]** Service gọi các endpoint `/api/novels`
   - `models/manga_api_model.dart` - DTO models cho API response (ApiMangaDetail, ApiChapter, etc.)
+  - `models/novel_api_model.dart` - **[NEW]** DTO model cho Novel data (ApiNovelModel)
 - **Features**:
   - ✅ Tích hợp thư viện `dio` để gọi API.
   - ✅ Cơ chế **Graceful Fallback**: Tự động dùng MockData nếu Backend không phản hồi.
@@ -273,6 +276,18 @@
 - [x] Wire `TitleDetailPage` "Read Now" button to route correctly to `NovelReadingPage` (instead of MangaReadingPage) for novel genres
 - [x] Create `NovelReadingPage` — composes all widgets, manages chapter state, save/bookmark state, sidebar open/close, guest-hint logic
 
+### Phase 15: PDF Reading Support (Light Novels) ✅
+
+- [x] Tích hợp thư viện `flutter_pdfview` để hiển thị file PDF.
+- [x] Tích hợp thư viện `path_provider` để lưu tạm (cache) file PDF đã tải về.
+- [x] Create `PdfReadingPage` — Trang đọc PDF chuyên dụng:
+    - [x] Hiển thị tiến trình tải file (Download Progress %) bằng `Dio.download`.
+    - [x] Giao diện Premium: Tự động ẩn Top bar sau 4 giây, cử chỉ chạm để hiện lại.
+    - [x] Page Indicator & Progress Bar ở dưới cùng.
+- [x] Cập nhật `TitleDetailModel`: Thêm trường `pdfUrl`.
+- [x] Cập nhật `TitleDetailPage`: Logic `_openReading` ưu tiên mở PDF nếu `pdfUrl` tồn tại.
+- [x] Create `NovelApiService` + `ApiNovelModel` để kết nối với backend novel endpoints.
+
 ### Phase 13: Fix Cover Image, Chapter Ordering & Reading Screen ✅
 
 - [x] Thêm `coverUrl` (optional) vào `TitleDetailModel` để truyền URL ảnh bìa thật từ API.
@@ -353,6 +368,10 @@
 - ✅ Navigation wiring verified across Home/Library/Search/Notifications/Detail
 - ✅ Guest state (isGuest flag) propagated through all navigation routes
 - ✅ Profile module integrated with bottom nav across all screens
+- ✅ **[2026-05-11]**: **Light Novel PDF Support**: 
+    - Hoàn thành trình đọc PDF Premium (`PdfReadingPage`) với download progress.
+    - Tích hợp `NovelApiService` để fetch dữ liệu novel từ PostgreSQL.
+    - Cập nhật `TitleDetailPage` tự động chuyển chế độ đọc PDF/Manga dựa trên dữ liệu backend.
 - ✅ LoginPage wiring: Guest mode & Login mode both navigate correctly
 - ✅ All bottom nav widgets accept and use onProfileTap callback
 

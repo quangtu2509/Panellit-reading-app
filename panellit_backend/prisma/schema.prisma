@@ -55,3 +55,15 @@ model Bookmark {
 
   @@unique([userId, mangaSlug])
 }
+
+model Novel {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  author      String?
+  cover       String?
+  pdfUrl      String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

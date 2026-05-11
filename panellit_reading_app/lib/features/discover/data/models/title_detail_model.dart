@@ -16,6 +16,8 @@ class TitleDetailModel {
   final List<RelatedStoryModel> relatedStories;
   final Color coverColor;
   final String? coverUrl;
+  /// If non-null, this title is a PDF novel — links directly to the file.
+  final String? pdfUrl;
 
   const TitleDetailModel({
     required this.id,
@@ -33,6 +35,7 @@ class TitleDetailModel {
     required this.relatedStories,
     required this.coverColor,
     this.coverUrl,
+    this.pdfUrl,
   });
 }
 

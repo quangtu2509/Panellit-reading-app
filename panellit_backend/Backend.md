@@ -20,7 +20,11 @@ panellit_backend/
 │   ├── services/          # Xử lý logic nghiệp vụ và gọi API ngoài (Tầng Service)
 │   ├── utils/             # Các công cụ tiện ích (Axios client, backoff logic)
 │   ├── app.js             # Khởi tạo Express app và đăng ký middleware/route
-│   └── server.js          # Entry point khởi động server
+│   ├── server.js          # Entry point khởi động server
+├── public/                # Thư mục lưu trữ file tĩnh (Local Storage)
+│   └── uploads/
+│       ├── novels/        # Lưu trữ file PDF Light Novel
+│       └── covers/        # Lưu trữ ảnh bìa novel
 ├── .env                   # Chứa các biến môi trường (Database URL, JWT Secret)
 └── README.md              # Hướng dẫn cài đặt và vận hành
 ```
@@ -49,6 +53,18 @@ panellit_backend/
 - **Logic**: Sử dụng kỹ thuật `upsert`. Khi App gửi tiến độ đọc, Backend sẽ kiểm tra xem bản ghi đã tồn tại chưa. Nếu có rồi thì cập nhật số chương/số trang, nếu chưa có thì tạo mới.
 - **Endpoint**: `POST /api/history/sync` (Yêu cầu Token trong header `Authorization`).
 
+### D. Novel & PDF Storage Module
+- **Models**: `Novel`
+- **Storage Strategy**: Local Storage (Thư mục `public/uploads`).
+- **Features**:
+    - **Upload**: Sử dụng `multer` để nhận file PDF (giới hạn 50MB) và ảnh bìa.
+    - **Static Serving**: Cấu hình Express phục vụ file tĩnh qua prefix `/static`.
+    - **Database**: Lưu metadata và đường dẫn tuyệt đối (Public URL) vào PostgreSQL.
+- **Endpoints**:
+    - `POST /api/novels/upload`: Upload PDF và metadata (Yêu cầu Auth).
+    - `GET /api/novels`: Lấy danh sách toàn bộ novel.
+    - `GET /api/novels/:slug`: Lấy chi tiết 1 novel theo slug.
+
 ## 3. Nhật ký cập nhật (Update Logs)
 - **[2026-05-03]**: Khởi tạo Backend core structure.
 - **[2026-05-03]**: Hạ cấp Prisma xuống v6 để tương thích tốt nhất với cấu hình direct connection và schema truyền thống.
@@ -59,6 +75,11 @@ panellit_backend/
 - **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home` — lấy danh sách truyện mới cập nhật từ OTruyen, trả về title, slug, cover, categories, chaptersLatest.
 - **[2026-05-08]**: **Search Endpoint**: Thêm `GET /api/manga/search?keyword=xxx` — tìm kiếm truyện qua OTruyen `/tim-kiem`. Route được đặt **trước** `/:slug` để tránh collision.
 - **[2026-05-08]**: **Image Proxy Endpoint**: Thêm `GET /api/manga/image-proxy?url=...` — proxy ảnh từ OTruyen CDN với Referer header. Bypass hotlink protection, stream ảnh trực tiếp tới Flutter client. Cache 24h.
+- **[2026-05-11]**: **Novel & PDF Support**: 
+    - Thêm model `Novel` vào Prisma schema.
+    - Tích hợp `multer` và cấu hình local storage cho file PDF (~20MB).
+    - Triển khai bộ API `/api/novels` (Upload, List, Detail).
+    - Cấu hình phục vụ file tĩnh qua `/static`.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

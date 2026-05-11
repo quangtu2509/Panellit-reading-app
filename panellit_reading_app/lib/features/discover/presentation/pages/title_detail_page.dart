@@ -5,7 +5,9 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
 import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
+import '../../../reader_novel/presentation/pages/pdf_reading_page.dart';
 import '../../../reader_novel/data/models/novel_reading_model.dart';
+import '../../../../core/network/models/novel_api_model.dart';
 import '../theme/title_detail_colors.dart';
 import '../widgets/detail/detail_bottom_nav.dart';
 import '../widgets/detail/detail_chapters_section.dart';
@@ -200,6 +202,29 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   }
 
   void _openReading(int chapterNumber) {
+    // ── 1. PDF Novel ────────────────────────────────────────────────────────
+    if (_detail.pdfUrl != null && _detail.pdfUrl!.isNotEmpty) {
+      Navigator.of(context).push(
+        buildSmoothPageRoute(
+          PdfReadingPage(
+            novel: ApiNovelModel(
+              id:        _detail.id,
+              slug:      _detail.id,
+              title:     _detail.title,
+              author:    _detail.author,
+              cover:     _detail.coverUrl,
+              pdfUrl:    _detail.pdfUrl!,
+              description: _detail.synopsis,
+              createdAt: DateTime.now(),
+            ),
+            isGuest: widget.isGuest,
+          ),
+        ),
+      );
+      return;
+    }
+
+    // ── 2. Text Novel (legacy) ───────────────────────────────────────────────
     if (_detail.genres.contains('Novel') || _detail.genres.contains('NOVEL')) {
       Navigator.of(context).push(
         buildSmoothPageRoute(
@@ -216,34 +241,35 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           ),
         ),
       );
-    } else {
-      // Find the specific ChapterUpdateModel
-      final chapter = _detail.chapterUpdates.firstWhere(
-        (c) => c.chapterNumber == chapterNumber,
-        orElse: () => ChapterUpdateModel(
-          chapterNumber: chapterNumber,
-          title: 'Chapter $chapterNumber',
-          timeLabel: 'Unknown',
-        ),
-      );
-
-      Navigator.of(context).push(
-        buildSmoothPageRoute(
-          MangaReadingPage(
-            title: _detail.title,
-            chapterLabel: chapter.title,
-            chapterNumber: chapterNumber,
-            chapterApiData: chapter.chapterApiData,
-            allChapters: _detail.chapterUpdates,
-            isGuest: widget.isGuest,
-            savedChapterNumber: _savedChapterNumber,
-            onSaveChapter: _saveChapter,
-            mangaSlug: _detail.id,
-            coverUrl:  _detail.coverUrl ?? '',
-          ),
-        ),
-      );
+      return;
     }
+
+    // ── 3. Manga ─────────────────────────────────────────────────────────────
+    final chapter = _detail.chapterUpdates.firstWhere(
+      (c) => c.chapterNumber == chapterNumber,
+      orElse: () => ChapterUpdateModel(
+        chapterNumber: chapterNumber,
+        title: 'Chapter $chapterNumber',
+        timeLabel: 'Unknown',
+      ),
+    );
+
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        MangaReadingPage(
+          title: _detail.title,
+          chapterLabel: chapter.title,
+          chapterNumber: chapterNumber,
+          chapterApiData: chapter.chapterApiData,
+          allChapters: _detail.chapterUpdates,
+          isGuest: widget.isGuest,
+          savedChapterNumber: _savedChapterNumber,
+          onSaveChapter: _saveChapter,
+          mangaSlug: _detail.id,
+          coverUrl:  _detail.coverUrl ?? '',
+        ),
+      ),
+    );
   }
 
   @override
