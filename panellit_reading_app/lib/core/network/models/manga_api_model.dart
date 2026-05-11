@@ -29,6 +29,7 @@ class ApiMangaDetail {
   final String summary;
   final List<String> categories;
   final List<ApiChapter> chapters;
+  final String? pdfUrl;
 
   const ApiMangaDetail({
     required this.title,
@@ -39,6 +40,7 @@ class ApiMangaDetail {
     required this.summary,
     required this.categories,
     required this.chapters,
+    this.pdfUrl,
   });
 
   factory ApiMangaDetail.fromJson(Map<String, dynamic> json) {

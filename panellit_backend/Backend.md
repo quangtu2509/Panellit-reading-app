@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Tích hợp Light Novel và sửa lỗi logic Frontend/Backend.
-- **Trạng thái**: Hoàn thành tích hợp Novel, fix bugs.
-- **Tệp đang tác động chính**: `history.controller.js`, `bookmark.service.js`, `library_page.dart`
-- **Vấn đề đang gặp (Nếu có)**: Đã xử lý xong các lỗi cú pháp và lỗi Nullable (Dart).
+- **Task đang thực hiện**: Tối ưu hóa Backend cho Real Device Testing.
+- **Trạng thái**: Hoàn thành đồng bộ hóa IP và fix lỗi mapping.
+- **Tệp đang tác động chính**: `manga.controller.js`, `novel.controller.js`
+- **Vấn đề đang gặp (Nếu có)**: Đã đảm bảo Backend có thể truy cập được từ thiết bị trong cùng mạng Wi-Fi.
 
 # Panellit Backend Documentation
 
@@ -72,13 +72,14 @@ panellit_backend/
 - **[2026-05-03]**: Khởi tạo Backend core structure, hạ cấp Prisma xuống v6, tích hợp OTruyen API.
 - **[2026-05-07]**: **Home Feed Endpoint**: Thêm `GET /api/manga/home`.
 - **[2026-05-08]**: **Search & Image Proxy**: Thêm API `/search` và `/image-proxy` để xử lý CDN.
-- **[2026-05-11]**: **Novel & PDF Support**: 
+- **[2026-05-11]**: **Novel & PDF Support & Real Device Optimization**: 
     - Thêm model `Novel` vào Prisma schema.
     - Cấu hình local storage cho file PDF bằng Multer.
     - Mở rộng model `History` và `Bookmark` hỗ trợ tùy chọn `novelSlug` bên cạnh `mangaSlug`.
     - Cập nhật `HistoryController` và `BookmarkController` để chấp nhận payload từ Flutter App cho cả Manga và Light Novel.
     - Mở rộng chức năng tìm kiếm kết hợp trả về cả Manga từ OTruyen và Novel từ Database nội bộ (có cờ `isNovel: true`).
     - Khắc phục lỗi `SyntaxError` trùng lặp biến trong `history.controller.js`.
+    - **Optimization**: Đã xác nhận cơ chế phục vụ file tĩnh thông qua IP máy chủ để thiết bị thật tải được ảnh/PDF.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

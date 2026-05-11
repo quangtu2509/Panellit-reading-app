@@ -22,17 +22,29 @@ class MangaApiService {
   Future<ApiMangaDetail> getNovelDetail(String slug) async {
     try {
       final response = await _dio.get('/api/novels/$slug');
-      // We map the novel JSON to the same ApiMangaDetail model for compatibility in UI
       final data = response.data as Map<String, dynamic>;
+      final rawCover = data['cover']?.toString() ?? '';
+      final fixedCover = rawCover.replaceFirst('http://localhost:3000', ApiClient.baseUrl);
+      
+      final rawPdf = data['pdfUrl']?.toString() ?? '';
+      final fixedPdf = rawPdf.replaceFirst('http://localhost:3000', ApiClient.baseUrl);
+
       return ApiMangaDetail(
         title:      data['title']?.toString() ?? '',
         slug:       data['slug']?.toString() ?? slug,
-        cover:      data['cover']?.toString() ?? '',
+        cover:      fixedCover,
         author:     data['author']?.toString() ?? 'Unknown',
         status:     'Light Novel',
         summary:    data['description']?.toString() ?? '',
         categories: ['Light Novel'],
-        chapters:   [], // Novels use PDF reader, no sub-chapters in API yet
+        pdfUrl:     fixedPdf,
+        chapters:   [
+          const ApiChapter(
+            chapterName: '1',
+            chapterTitle: 'Full Volume',
+            chapterApiData: '',
+          )
+        ], // Novels use PDF reader, provide one dummy chapter for the UI
       );
     } on DioException catch (e) {
       throw _handleError(e, 'getNovelDetail($slug)');

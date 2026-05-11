@@ -108,7 +108,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           relatedStories: const [],
           coverColor: _currentDetail.coverColor,
           coverUrl: api.cover.isNotEmpty ? api.cover : _currentDetail.coverUrl,
-          pdfUrl: _currentDetail.pdfUrl,
+          pdfUrl: api.pdfUrl?.isNotEmpty == true ? api.pdfUrl : _currentDetail.pdfUrl,
         );
       });
     } catch (e) {

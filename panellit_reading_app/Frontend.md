@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 16 — Backend & Frontend Sync (Light Novels & Bugs)
-- **Trạng thái**: Hoàn thành
-- **Tệp đang tác động chính**: `library_page.dart`
-- **Vấn đề đang gặp (Nếu có)**: Đã hoàn tất và fix xong lỗi `Null Check`.
+- **Task đang thực hiện**: Phase 17 — Network Connectivity & Null Safety Patches
+- **Trạng thái**: Hoàn thành dứt điểm các lỗi crash và kết nối.
+- **Tệp đang tác động chính**: `api_client.dart`, `manga_api_model.dart`, `novel_api_model.dart`
+- **Vấn đề đang gặp (Nếu có)**: Không còn lỗi blockers. App đã sẵn sàng chạy trên thiết bị thật.
 
 # Frontend Development Progress - Panellit Reading App
 
@@ -370,12 +370,20 @@
 4. **Synopsis Not Expandable** → Implemented real TextPainter overflow detection + toggle
 5. **Chapters Horizontal Instead of Vertical** → Changed scrollDirection & layout
 
-### Phase 17: Fix Network Connectivity (Real Device vs Emulator) ✅
+### Phase 17: Fix Network Connectivity & Null Safety Patches ✅
 
-- [x] **Xác định nguyên nhân**: App dùng `http://10.0.2.2:3000` (URL chỉ dành cho Android Emulator), không hoạt động khi test trên thiết bị thật (real device).
-- [x] **Sửa `api_client.dart`**: Đổi `baseUrl` sang `http://172.16.3.106:3000` (IP máy tính trên Wi-Fi).
-- [x] **Thêm comment hướng dẫn**: Cấu trúc rõ ràng 3 môi trường (Emulator / Real Device / Web).
-- [x] **Thêm debug logging**: Thay `catch (_) {}` bằng `debugPrint` trong `_fetchHomeFeed()` để lỗi mạng hiển thị trong Flutter console.
+- [x] **Xác định nguyên nhân kết nối**: App dùng `http://10.0.2.2:3000` (chỉ dành cho Emulator), gây lỗi `Connection Refused` trên thiết bị thật.
+- [x] **Sửa `api_client.dart`**: Đổi `baseUrl` sang IP cục bộ `http://172.16.3.106:3000` (Wi-Fi máy chủ backend).
+- [x] **Fix lỗi Crash Type Cast**: Khắc phục lỗi `type 'Null' is not a subtype of type 'String'` hàng loạt trong các models:
+    - [x] `home_feed_model.dart`: Thay `List<String>.from()` bằng pattern an toàn `.whereType<String>()`.
+    - [x] `manga_api_model.dart`: Sửa lỗi ép kiểu `as Map` và `List<String>.from()` trong `ApiMangaDetail` và `ApiChapter`.
+    - [x] `novel_api_model.dart`: Sửa lỗi `as String` cứng nhắc, thay bằng `?.toString() ?? ''` và fallback `id` sang `slug`.
+    - [x] `search_api_model.dart`: Áp dụng pattern safe list casting.
+- [x] **Cải thiện UI Light Novel**:
+    - [x] Thêm trường `pdfUrl` vào `ApiMangaDetail` để đồng bộ dữ liệu Novel khi chuyển trang.
+    - [x] Cập nhật `MangaApiService.getNovelDetail`: Tự động sửa URL `localhost` thành `ApiClient.baseUrl` cho cover và PDF.
+    - [x] Thêm dummy chapter "Full Volume" cho Novel để UI không hiển thị "0 Chapters".
+- [x] **Error Handling**: Thêm `try-catch` và safe casting vào `NovelApiService` và `HomeFeedService` để tránh 1 API lỗi làm hỏng toàn bộ màn hình Home.
 
 > ⚠️ **Lưu ý quan trọng**: Mỗi khi IP máy tính thay đổi (đổi mạng Wi-Fi), phải cập nhật `baseUrl` trong `api_client.dart`. IP hiện tại: `172.16.3.106`.
 
@@ -386,10 +394,11 @@
 - ✅ Navigation wiring verified across Home/Library/Search/Notifications/Detail
 - ✅ Guest state (isGuest flag) propagated through all navigation routes
 - ✅ Profile module integrated with bottom nav across all screens
-- ✅ **[2026-05-11]**: **Light Novel PDF Support**: 
+- ✅ **[2026-05-11]**: **Light Novel PDF Support & Safety Fixes**: 
     - Hoàn thành trình đọc PDF Premium (`PdfReadingPage`) với download progress.
-    - Tích hợp `NovelApiService` để fetch dữ liệu novel từ PostgreSQL.
-    - Cập nhật `TitleDetailPage` tự động chuyển chế độ đọc PDF/Manga dựa trên dữ liệu backend.
+    - Tích hợp `NovelApiService` và fix lỗi mapping `pdfUrl` từ API.
+    - **Vá lỗ hổng Null Safety**: Chặn đứng các lỗi crash khi API OTruyen trả về dữ liệu thiếu/null.
+    - Cập nhật `TitleDetailPage` tự động đồng bộ `pdfUrl` thật từ backend khi fetch detail.
 - ✅ LoginPage wiring: Guest mode & Login mode both navigate correctly
 - ✅ All bottom nav widgets accept and use onProfileTap callback
 
