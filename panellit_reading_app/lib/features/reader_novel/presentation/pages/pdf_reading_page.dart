@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/network/models/novel_api_model.dart';
@@ -31,6 +31,7 @@ class _PdfReadingPageState extends State<PdfReadingPage>
   double _downloadProgress = 0.0;
 
   // PDF viewer state
+  final PdfViewerController _pdfViewerController = PdfViewerController();
   int _currentPage = 0;
   int _totalPages = 0;
 
@@ -47,6 +48,7 @@ class _PdfReadingPageState extends State<PdfReadingPage>
   @override
   void dispose() {
     _topBarTimer?.cancel();
+    _pdfViewerController.dispose();
     super.dispose();
   }
 
@@ -91,7 +93,8 @@ class _PdfReadingPageState extends State<PdfReadingPage>
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Failed to download PDF.\nPlease check your connection.\n(${e.message})';
+        _errorMessage =
+            'Failed to download PDF.\nPlease check your connection.\n(${e.message})';
       });
     } catch (e) {
       if (!mounted) return;
@@ -246,8 +249,8 @@ class _PdfReadingPageState extends State<PdfReadingPage>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF8B5CF6),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
               ),
@@ -261,28 +264,24 @@ class _PdfReadingPageState extends State<PdfReadingPage>
   Widget _buildPdfViewer() {
     return GestureDetector(
       onTap: _toggleTopBar,
-      child: PDFView(
-        filePath: _localPath!,
-        enableSwipe: true,
-        swipeHorizontal: false,
-        autoSpacing: true,
-        pageFling: true,
-        fitPolicy: FitPolicy.WIDTH,
-        backgroundColor: const Color(0xFF1C1C1E),
-        onRender: (pages) {
-          if (mounted) setState(() => _totalPages = pages ?? 0);
-        },
-        onPageChanged: (page, total) {
+      child: SfPdfViewer.file(
+        File(_localPath!),
+        controller: _pdfViewerController,
+        canShowScrollHead: false,
+        canShowScrollStatus: false,
+        enableTextSelection: true,
+        pageLayoutMode: PdfPageLayoutMode.continuous,
+        onDocumentLoaded: (PdfDocumentLoadedDetails details) {
           if (mounted) {
             setState(() {
-              _currentPage = (page ?? 0) + 1;
-              _totalPages = total ?? 0;
+              _totalPages = details.document.pages.count;
+              _currentPage = 1;
             });
           }
         },
-        onError: (error) {
+        onPageChanged: (PdfPageChangedDetails details) {
           if (mounted) {
-            setState(() => _errorMessage = error.toString());
+            setState(() => _currentPage = details.newPageNumber);
           }
         },
       ),
@@ -366,8 +365,8 @@ class _PdfReadingPageState extends State<PdfReadingPage>
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: const Color(0xFF3A3A3C),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFF8B5CF6)),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
               minHeight: 3,
             ),
           ),
