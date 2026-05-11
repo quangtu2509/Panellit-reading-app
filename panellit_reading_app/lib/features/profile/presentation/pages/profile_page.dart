@@ -33,7 +33,7 @@ class ProfilePage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 8, 18, 96),
           children: [
-            const _ProfileTopBar(),
+            _ProfileTopBar(onBackTap: onHomeTap),
             const SizedBox(height: 16),
             if (isGuest)
               _GuestSection(
@@ -60,7 +60,8 @@ class ProfilePage extends StatelessWidget {
 // ── Top bar: ← back arrow + title ────────────────────────────────────────────
 
 class _ProfileTopBar extends StatelessWidget {
-  const _ProfileTopBar();
+  final VoidCallback onBackTap;
+  const _ProfileTopBar({required this.onBackTap});
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +69,8 @@ class _ProfileTopBar extends StatelessWidget {
       children: [
         // ← back arrow (replaces 3-line menu icon)
         IconButton(
-          onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 22),
+          onPressed: onBackTap,
+          icon: const Icon(Icons.arrow_back_rounded, size: 28),
           color: ProfileColors.primary,
         ),
         const SizedBox(width: 4),

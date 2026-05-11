@@ -39,7 +39,7 @@ class HomeBottomNav extends StatelessWidget {
             active: true,
           ),
           _BottomNavItem(
-            icon: Icons.library_books_rounded,
+            icon: Icons.library_books_outlined,
             label: 'LIBRARY',
             onTap: onLibraryTap,
           ),

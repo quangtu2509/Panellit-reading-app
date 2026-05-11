@@ -24,6 +24,7 @@ class HomeTopBar extends StatelessWidget {
   /// Order: format types first, then genres alphabetically.
   static const List<_Category> _categories = [
     _Category('Manga',        'manga'),
+    _Category('Light Novel',  'light-novel'),
     _Category('Manhwa',       'manhwa'),
     _Category('Manhua',       'manhua'),
     _Category('Webtoon',      'webtoon'),
@@ -140,6 +141,7 @@ class _GenreMenuButton extends StatelessWidget {
   IconData _iconForSlug(String slug) {
     switch (slug) {
       case 'manga':          return Icons.auto_stories_rounded;
+      case 'light-novel':    return Icons.menu_book_rounded;
       case 'manhwa':         return Icons.collections_bookmark_rounded;
       case 'manhua':         return Icons.library_books_rounded;
       case 'webtoon':        return Icons.view_day_rounded;
@@ -173,6 +175,7 @@ class _GenreMenuButton extends StatelessWidget {
     switch (slug) {
       // Format types — distinct colors
       case 'manga':    return const Color(0xFF0F6F9B);
+      case 'light-novel': return const Color(0xFFE53935);
       case 'manhwa':   return const Color(0xFF1A7A5A);
       case 'manhua':   return const Color(0xFFB36A00);
       case 'webtoon':  return const Color(0xFF6D28D9);
@@ -182,7 +185,7 @@ class _GenreMenuButton extends StatelessWidget {
   }
 
   bool _isFormatType(String slug) =>
-      slug == 'manga' || slug == 'manhwa' || slug == 'manhua' || slug == 'webtoon';
+      slug == 'manga' || slug == 'light-novel' || slug == 'manhwa' || slug == 'manhua' || slug == 'webtoon';
 
   @override
   Widget build(BuildContext context) {

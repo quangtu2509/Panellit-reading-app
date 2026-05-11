@@ -15,6 +15,7 @@ class HomePageContent extends StatelessWidget {
   final List<HomeRankItem> popularItems;
   final List<HomeNovelItem> novelItems;
   final ValueChanged<TitleDetailModel> onOpenDetail;
+  final VoidCallback? onSeeAllUpdates;
 
   const HomePageContent({
     super.key,
@@ -25,6 +26,7 @@ class HomePageContent extends StatelessWidget {
     required this.popularItems,
     required this.novelItems,
     required this.onOpenDetail,
+    this.onSeeAllUpdates,
   });
 
   @override
@@ -41,6 +43,7 @@ class HomePageContent extends StatelessWidget {
         HomeUpdatesSection(
           items: updateItems,
           onItemTap: (item) => onOpenDetail(item.detail),
+          onSeeAllTap: onSeeAllUpdates,
         ),
         const SizedBox(height: 24),
         HomePopularMangaSection(

@@ -6,12 +6,14 @@ class HomeSectionHeader extends StatelessWidget {
   final String title;
   final String subtitle;
   final String actionLabel;
+  final VoidCallback? onActionTap;
 
   const HomeSectionHeader({
     super.key,
     required this.title,
     required this.subtitle,
     required this.actionLabel,
+    this.onActionTap,
   });
 
   @override
@@ -42,12 +44,19 @@ class HomeSectionHeader extends StatelessWidget {
           ),
         ),
         if (actionLabel.isNotEmpty)
-          Text(
-            '$actionLabel ›',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: HomeColors.primary,
+          InkWell(
+            onTap: onActionTap,
+            borderRadius: BorderRadius.circular(4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Text(
+                '$actionLabel ›',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: HomeColors.primary,
+                ),
+              ),
             ),
           ),
       ],

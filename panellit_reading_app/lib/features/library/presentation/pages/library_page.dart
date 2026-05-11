@@ -163,7 +163,10 @@ class _LibraryPageState extends State<LibraryPage> {
         body: SafeArea(
           child: Column(
             children: [
-              LibraryTopBar(onNotificationTap: _openNotifications),
+              LibraryTopBar(
+                onNotificationTap: _openNotifications,
+                onBackTap: _openHome,
+              ),
               Container(
                 decoration: const BoxDecoration(
                   color: LibraryColors.surface,

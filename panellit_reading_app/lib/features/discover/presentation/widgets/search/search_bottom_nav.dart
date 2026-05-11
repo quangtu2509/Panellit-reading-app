@@ -33,22 +33,22 @@ class SearchBottomNav extends StatelessWidget {
         children: [
           _SearchNavItem(
             icon: Icons.home_outlined,
-            label: 'Home',
+            label: 'HOME',
             onTap: onHomeTap,
           ),
           _SearchNavItem(
-            icon: Icons.book_outlined,
-            label: 'Library',
+            icon: Icons.library_books_outlined,
+            label: 'LIBRARY',
             onTap: onLibraryTap,
           ),
           const _SearchNavItem(
             icon: Icons.search_rounded,
-            label: 'Search',
+            label: 'SEARCH',
             active: true,
           ),
           _SearchNavItem(
             icon: Icons.person_outline_rounded,
-            label: 'Profile',
+            label: 'PROFILE',
             onTap: onProfileTap,
           ),
         ],

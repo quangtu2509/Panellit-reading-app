@@ -4,8 +4,13 @@ import '../theme/library_colors.dart';
 
 class LibraryTopBar extends StatelessWidget {
   final VoidCallback onNotificationTap;
+  final VoidCallback onBackTap;
 
-  const LibraryTopBar({super.key, required this.onNotificationTap});
+  const LibraryTopBar({
+    super.key,
+    required this.onNotificationTap,
+    required this.onBackTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +19,8 @@ class LibraryTopBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu_rounded, size: 30),
+            onPressed: onBackTap,
+            icon: const Icon(Icons.arrow_back_rounded, size: 28),
             color: LibraryColors.primary,
           ),
           const SizedBox(width: 6),

@@ -201,7 +201,7 @@ class _SearchPageState extends State<SearchPage> {
       body: SafeArea(
         child: Column(
           children: [
-            SearchTopBar(onBackTap: () => Navigator.of(context).maybePop()),
+            SearchTopBar(onBackTap: widget.onHomeTap),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 96),

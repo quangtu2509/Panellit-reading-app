@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 17 — Network Connectivity & Null Safety Patches
-- **Trạng thái**: Hoàn thành dứt điểm các lỗi crash và kết nối.
-- **Tệp đang tác động chính**: `api_client.dart`, `manga_api_model.dart`, `novel_api_model.dart`
-- **Vấn đề đang gặp (Nếu có)**: Không còn lỗi blockers. App đã sẵn sàng chạy trên thiết bị thật.
+- **Task đang thực hiện**: Phase 18 — Navigation & UI Polish (Home, Dropdown, Bottom Nav)
+- **Trạng thái**: Hoàn thành.
+- **Tệp đang tác động chính**: `home_page.dart`, `category_results_page.dart`, `*_bottom_nav.dart`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Giao diện mượt mà.
 
 # Frontend Development Progress - Panellit Reading App
 
@@ -399,6 +399,11 @@
     - Tích hợp `NovelApiService` và fix lỗi mapping `pdfUrl` từ API.
     - **Vá lỗ hổng Null Safety**: Chặn đứng các lỗi crash khi API OTruyen trả về dữ liệu thiếu/null.
     - Cập nhật `TitleDetailPage` tự động đồng bộ `pdfUrl` thật từ backend khi fetch detail.
+- ✅ **[2026-05-11]**: **Phase 18 Navigation & UI Polish**:
+    - Đồng bộ hóa toàn bộ icon và nhãn (labels) trên Bottom Navigation ở mọi màn hình (`Home`, `Library`, `Search`, `Profile`).
+    - Cập nhật nút Back (mũi tên `<-`) trên thanh top bar của `My Library`, `Search`, và `Profile` để luôn điều hướng trực tiếp về `Home Screen`.
+    - Thêm tính năng **"See All"** tại khu vực `New Updates` của `Home Screen` (Trang `NewUpdatesPage` liệt kê danh sách toàn bộ truyện mới cập nhật từ API).
+    - Mở rộng menu lọc truyện (Dropdown) với mục **"Light Novel"**, cho phép điều hướng sang danh sách Light Novel (`CategoryResultsPage` lấy dữ liệu trực tiếp từ `NovelApiService`).
 - ✅ LoginPage wiring: Guest mode & Login mode both navigate correctly
 - ✅ All bottom nav widgets accept and use onProfileTap callback
 

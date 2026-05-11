@@ -80,6 +80,7 @@ panellit_backend/
     - Mở rộng chức năng tìm kiếm kết hợp trả về cả Manga từ OTruyen và Novel từ Database nội bộ (có cờ `isNovel: true`).
     - Khắc phục lỗi `SyntaxError` trùng lặp biến trong `history.controller.js`.
     - **Optimization**: Đã xác nhận cơ chế phục vụ file tĩnh thông qua IP máy chủ để thiết bị thật tải được ảnh/PDF.
+- **[2026-05-11]**: **Phase 18 UI/UX Polish**: Không có sự thay đổi về mặt Database hay API endpoints, nhưng Frontend đã hoàn tất việc kết nối UI đồng nhất để sử dụng các API hiện tại (kể cả Light Novel fetch).
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

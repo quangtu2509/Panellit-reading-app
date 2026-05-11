@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/smooth_page_route.dart';
 import '../../../../core/network/manga_repository.dart';
 import '../../../../core/network/models/manga_api_model.dart';
+import '../../../../core/network/services/novel_api_service.dart';
 import '../../../discover/data/models/title_detail_model.dart';
 import '../../../discover/presentation/pages/title_detail_page.dart';
 
@@ -53,6 +54,36 @@ class _CategoryResultsPageState extends State<CategoryResultsPage> {
       _hasError = false;
     });
 
+    if (widget.categorySlug == 'light-novel') {
+      try {
+        final novels = await NovelApiService().getNovels();
+        if (mounted) {
+          setState(() {
+            _items = novels
+                .map((n) => ApiCategoryItem(
+                      title: n.title,
+                      slug: n.slug,
+                      cover: n.cover ?? '',
+                      categories: const ['Light Novel'],
+                      latestChapterName: '1',
+                      status: 'Ongoing',
+                    ))
+                .toList();
+            _isLoading = false;
+            _hasError = _items.isEmpty;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _hasError = true;
+          });
+        }
+      }
+      return;
+    }
+
     final result = await _repo.getCategoryManga(widget.categorySlug);
 
     if (mounted) {
@@ -88,6 +119,7 @@ class _CategoryResultsPageState extends State<CategoryResultsPage> {
             relatedStories: const [],
             coverColor: const Color(0xFF1C2333),
             coverUrl: item.cover,
+            pdfUrl: widget.categorySlug == 'light-novel' ? 'placeholder' : null,
           ),
           isGuest: widget.isGuest,
           onHomeTap: widget.onHomeTap,

@@ -12,6 +12,7 @@ import '../../../discover/presentation/pages/title_detail_page.dart';
 import '../../../discover/presentation/pages/category_results_page.dart';
 import '../../../discover/data/models/title_detail_model.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
+import 'new_updates_page.dart';
 import '../../data/models/home_content_models.dart';
 import '../theme/home_colors.dart';
 import '../widgets/home_bottom_nav.dart';
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       // Map API items → HomeUpdateItem (for New Updates section)
-      final updates = feedItems.take(4).map((item) {
+      final updates = feedItems.map((item) {
         final detail = _buildDetailFromFeedItem(item);
         final latestChapter = item.chaptersLatest.isNotEmpty
             ? 'EP. ${item.chaptersLatest.first.chapterName}'
@@ -265,6 +266,7 @@ class _HomePageState extends State<HomePage> {
   /// Map from OTruyen slug → human-readable display name (mirrors home_top_bar.dart).
   static const Map<String, String> _slugToName = {
     'manga':         'Manga',
+    'light-novel':   'Light Novel',
     'manhwa':        'Manhwa',
     'manhua':        'Manhua',
     'webtoon':       'Webtoon',
@@ -324,6 +326,21 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _openUpdatesList(BuildContext context) {
+    Navigator.of(context).push(
+      buildSmoothPageRoute(
+        NewUpdatesPage(
+          updates: _updateItems,
+          isGuest: widget.isGuest,
+          onHomeTap: () => _openHome(context),
+          onLibraryTap: () => _openLibrary(context),
+          onSearchTap: () => _openSearch(context),
+          onProfileTap: () => _openProfile(context),
+        ),
+      ),
+    );
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
@@ -348,6 +365,7 @@ class _HomePageState extends State<HomePage> {
                 popularItems: _popularItems,
                 novelItems: _novelItems,
                 onOpenDetail: (detail) => _openDetail(context, detail),
+                onSeeAllUpdates: () => _openUpdatesList(context),
               ),
             ),
           ],

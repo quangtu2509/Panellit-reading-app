@@ -7,11 +7,13 @@ import 'home_update_card.dart';
 class HomeUpdatesSection extends StatelessWidget {
   final List<HomeUpdateItem> items;
   final ValueChanged<HomeUpdateItem> onItemTap;
+  final VoidCallback? onSeeAllTap;
 
   const HomeUpdatesSection({
     super.key,
     required this.items,
     required this.onItemTap,
+    this.onSeeAllTap,
   });
 
   @override
@@ -23,10 +25,11 @@ class HomeUpdatesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HomeSectionHeader(
+        HomeSectionHeader(
           title: 'New Updates',
           subtitle: 'Fresh chapters from your favorite artists',
           actionLabel: 'See All',
+          onActionTap: onSeeAllTap,
         ),
         const SizedBox(height: 16),
         GridView.builder(
