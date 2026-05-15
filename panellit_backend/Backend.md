@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 21 — Security (Helmet + Rate Limiting)
-- **Trạng thái**: Hoàn thành. Đã áp dụng Helmet chặn Cross-Site và Rate Limit chặn DDoS/Brute-force.
-- **Tệp đang tác động chính**: `src/app.js`, `src/routes/auth.routes.js`
-- **Vấn đề đang gặp (Nếu có)**: Không có lỗi.
+- **Task đang thực hiện**: Phase 22 — Refactor Code Controllers
+- **Trạng thái**: Hoàn thành. Đã áp dụng `catchAsync` cho toàn bộ các file Controller, loại bỏ hoàn toàn `try-catch` lặp lại.
+- **Tệp đang tác động chính**: `manga.controller.js`, `novel.controller.js`, `history.controller.js`, `bookmark.controller.js`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Mọi thứ đã sạch sẽ và thống nhất.
 
 # Panellit Backend Documentation
 
@@ -103,6 +103,10 @@ panellit_backend/
     - Cấu hình `helmet` trong `app.js` với `crossOriginResourcePolicy` để không cản trở App Flutter lấy ảnh.
     - Cấu hình `Global Rate Limiter` trong `app.js`: Giới hạn 150 req/15 phút.
     - Cấu hình `Auth Rate Limiter` trong `auth.routes.js`: Giới hạn nghiêm ngặt 10 req/15 phút cho `/login` và `/register` để chống dò mật khẩu.
+- **[2026-05-15]**: **Phase 22 — Refactor Code Controllers**:
+    - Viết lại `manga.controller.js`, `novel.controller.js`, `history.controller.js`, `bookmark.controller.js` bằng cách sử dụng `catchAsync`.
+    - Thay thế các khối `try-catch` dư thừa và các lệnh trả về lỗi thủ công (`res.status(400).json(...)`) bằng cách `throw new AppError(...)`.
+    - Code ngắn gọn hơn, sạch sẽ hơn và được chuẩn hóa đồng bộ với Global Error Middleware.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

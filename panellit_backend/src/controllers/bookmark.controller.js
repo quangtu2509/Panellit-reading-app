@@ -1,47 +1,37 @@
 const bookmarkService = require('../services/bookmark.service');
+const catchAsync = require('../utils/catch-async');
+const { BadRequestError } = require('../utils/app-error');
 
 class BookmarkController {
-  async toggleBookmark(req, res) {
-    try {
-      const userId = req.user.id;
-      const { mangaSlug, novelSlug } = req.body;
-      if (!mangaSlug && !novelSlug) {
-        return res.status(400).json({ error: 'mangaSlug or novelSlug is required' });
-      }
-
-      const result = await bookmarkService.toggleBookmark(userId, req.body);
-
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  toggleBookmark = catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const { mangaSlug, novelSlug } = req.body;
+    if (!mangaSlug && !novelSlug) {
+      throw new BadRequestError('mangaSlug or novelSlug is required');
     }
-  }
 
-  async getMyBookmarks(req, res) {
-    try {
-      const userId = req.user.id;
-      const bookmarks = await bookmarkService.getUserBookmarks(userId);
-      res.json(bookmarks);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    const result = await bookmarkService.toggleBookmark(userId, req.body);
+
+    res.json(result);
+  });
+
+  getMyBookmarks = catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const bookmarks = await bookmarkService.getUserBookmarks(userId);
+    res.json(bookmarks);
+  });
+
+  deleteBookmark = catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const { mangaSlug } = req.params;
+    
+    if (!mangaSlug) {
+      throw new BadRequestError('mangaSlug is required');
     }
-  }
 
-  async deleteBookmark(req, res) {
-    try {
-      const userId = req.user.id;
-      const { mangaSlug } = req.params;
-      
-      if (!mangaSlug) {
-        return res.status(400).json({ error: 'mangaSlug is required' });
-      }
-
-      await bookmarkService.deleteBookmark(userId, mangaSlug);
-      res.json({ message: 'Bookmark deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
+    await bookmarkService.deleteBookmark(userId, mangaSlug);
+    res.json({ message: 'Bookmark deleted successfully' });
+  });
 }
 
 module.exports = new BookmarkController();
