@@ -1,6 +1,8 @@
 const express = require('express');
 const historyController = require('../controllers/history.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { validate } = require('../middlewares/validate.middleware');
+const { syncHistorySchema } = require('../validators/history.validator');
 const router = express.Router();
 
 // All history routes require authentication
@@ -34,7 +36,7 @@ router.use(authMiddleware);
  *       200:
  *         description: Progress synced successfully
  */
-router.post('/sync', (req, res) => historyController.sync(req, res));
+router.post('/sync', validate(syncHistorySchema), (req, res) => historyController.sync(req, res));
 
 /**
  * @swagger

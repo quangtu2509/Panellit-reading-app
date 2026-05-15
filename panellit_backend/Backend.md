@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Tối ưu hóa Backend cho Real Device Testing.
-- **Trạng thái**: Hoàn thành đồng bộ hóa IP và fix lỗi mapping.
-- **Tệp đang tác động chính**: `manga.controller.js`, `novel.controller.js`
-- **Vấn đề đang gặp (Nếu có)**: Đã đảm bảo Backend có thể truy cập được từ thiết bị trong cùng mạng Wi-Fi.
+- **Task đang thực hiện**: Phase 19 — Input Validation với Zod
+- **Trạng thái**: Hoàn thành. Zod validation đã được tích hợp vào các Route Auth, History, Bookmark.
+- **Tệp đang tác động chính**: `src/middlewares/validate.middleware.js`, `src/validators/*.js`, `src/routes/*.js`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Server khởi động OK.
 
 # Panellit Backend Documentation
 
@@ -16,10 +16,11 @@ panellit_backend/
 ├── src/
 │   ├── config/            # Cấu hình DB (Prisma Client)
 │   ├── controllers/       # Xử lý Request/Response (Tầng Controller)
-│   ├── middlewares/       # Các Middleware xử lý trung gian (Auth)
+│   ├── middlewares/       # Các Middleware xử lý trung gian (Auth, Validate)
 │   ├── routes/            # Định nghĩa các luồng API (Tầng Route)
 │   ├── services/          # Xử lý logic nghiệp vụ và gọi API ngoài (Tầng Service)
 │   ├── utils/             # Các công cụ tiện ích (Axios client, backoff logic)
+│   ├── validators/        # Zod Schemas cho từng module (Auth, History, Bookmark)
 │   ├── app.js             # Khởi tạo Express app và đăng ký middleware/route
 │   ├── server.js          # Entry point khởi động server
 ├── public/                # Thư mục lưu trữ file tĩnh (Local Storage)
@@ -80,7 +81,14 @@ panellit_backend/
     - Mở rộng chức năng tìm kiếm kết hợp trả về cả Manga từ OTruyen và Novel từ Database nội bộ (có cờ `isNovel: true`).
     - Khắc phục lỗi `SyntaxError` trùng lặp biến trong `history.controller.js`.
     - **Optimization**: Đã xác nhận cơ chế phục vụ file tĩnh thông qua IP máy chủ để thiết bị thật tải được ảnh/PDF.
-- **[2026-05-11]**: **Phase 18 UI/UX Polish**: Không có sự thay đổi về mặt Database hay API endpoints, nhưng Frontend đã hoàn tất việc kết nối UI đồng nhất để sử dụng các API hiện tại (kể cả Light Novel fetch).
+- **[2026-05-15]**: **Phase 19 — Input Validation (Zod)**:
+    - Cài đặt thư viện `zod` vào `dependencies`.
+    - Tạo `src/middlewares/validate.middleware.js`: hàm `validate(schema)` wrapper dùng chung cho mọi route.
+    - Tạo `src/validators/auth.validator.js`: schema cho `register`, `login`, `updateName`, `updatePassword` (gồm kiểm tra định dạng email, min-length password, trim whitespace).
+    - Tạo `src/validators/history.validator.js`: schema cho `syncHistory` với `.refine()` để kiểm tra điều kiện phụ thuộc lẫn nhau (ít nhất 1 trong `mangaSlug`/`novelSlug`).
+    - Tạo `src/validators/bookmark.validator.js`: schema cho `toggleBookmark` với `.refine()` tương tự.
+    - Cập nhật `auth.routes.js`, `history.routes.js`, `bookmark.routes.js` để gắn middleware `validate()` vào đúng vị trí (sau Auth middleware, trước Controller).
+    - Kiểm tra `node -e "require('./src/app.js')"` → OK, không lỗi syntax.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

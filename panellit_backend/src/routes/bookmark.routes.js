@@ -1,6 +1,8 @@
 const express = require('express');
 const bookmarkController = require('../controllers/bookmark.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { validate } = require('../middlewares/validate.middleware');
+const { toggleBookmarkSchema } = require('../validators/bookmark.validator');
 const router = express.Router();
 
 // All bookmark routes require authentication
@@ -35,7 +37,7 @@ router.use(authMiddleware);
  *       200:
  *         description: Bookmark toggled successfully
  */
-router.post('/toggle', (req, res) => bookmarkController.toggleBookmark(req, res));
+router.post('/toggle', validate(toggleBookmarkSchema), (req, res) => bookmarkController.toggleBookmark(req, res));
 
 /**
  * @swagger

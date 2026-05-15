@@ -1,6 +1,13 @@
 const express = require('express');
 const authController = require('../controllers/auth.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { validate } = require('../middlewares/validate.middleware');
+const {
+  registerSchema,
+  loginSchema,
+  updateNameSchema,
+  updatePasswordSchema,
+} = require('../validators/auth.validator');
 const router = express.Router();
 
 /**
@@ -29,7 +36,7 @@ const router = express.Router();
  *       400:
  *         description: Error registering user
  */
-router.post('/register', (req, res) => authController.register(req, res));
+router.post('/register', validate(registerSchema), (req, res) => authController.register(req, res));
 
 /**
  * @swagger
@@ -57,7 +64,7 @@ router.post('/register', (req, res) => authController.register(req, res));
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', (req, res) => authController.login(req, res));
+router.post('/login', validate(loginSchema), (req, res) => authController.login(req, res));
 
 /**
  * @swagger
@@ -86,7 +93,7 @@ router.post('/login', (req, res) => authController.login(req, res));
  *       401:
  *         description: Unauthorized
  */
-router.put('/update-name', authMiddleware, (req, res) => authController.updateName(req, res));
+router.put('/update-name', authMiddleware, validate(updateNameSchema), (req, res) => authController.updateName(req, res));
 
 /**
  * @swagger
@@ -118,6 +125,6 @@ router.put('/update-name', authMiddleware, (req, res) => authController.updateNa
  *       401:
  *         description: Unauthorized
  */
-router.put('/update-password', authMiddleware, (req, res) => authController.updatePassword(req, res));
+router.put('/update-password', authMiddleware, validate(updatePasswordSchema), (req, res) => authController.updatePassword(req, res));
 
 module.exports = router;
