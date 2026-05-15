@@ -21,7 +21,7 @@ function validate(schema) {
           field: issue.path.join('.') || 'body',
           message: issue.message,
         }));
-        return res.status(400).json({ errors });
+        return res.status(422).json({ status: 'fail', errors });
       }
       // Unexpected error – pass to global error handler
       next(error);

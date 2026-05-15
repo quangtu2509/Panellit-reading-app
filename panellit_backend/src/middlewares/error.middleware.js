@@ -15,13 +15,13 @@ module.exports = (err, req, res, next) => {
     logger.warn(`${err.message}`, { url: req.originalUrl, method: req.method });
   }
 
-  // Development vs Production response
+  // Development response (với đầy đủ stack trace)
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else {
-    // Handle specific DB or Validation errors for clean production messages
-    let error = { ...err };
-    error.message = err.message;
+    // Handle specific DB or Validation errors for clean messages
+    // QUAN TRỌNG: Không dùng spread để copy err vì mất prototype properties (isOperational)
+    let error = err;
 
     if (err.name === 'ZodError') error = handleZodError(err);
     if (err.code === 'P2002') error = handlePrismaUniqueError(err);

@@ -19,7 +19,7 @@ const router = express.Router();
  *         description: Home feed fetched successfully
  */
 // ⚠️ IMPORTANT: Specific routes MUST be registered before dynamic /:slug
-router.get('/home', (req, res) => mangaController.getHomeFeed(req, res));
+router.get('/home', (req, res, next) => mangaController.getHomeFeed(req, res, next));
 
 /**
  * @swagger
@@ -43,7 +43,7 @@ router.get('/home', (req, res) => mangaController.getHomeFeed(req, res));
  *       200:
  *         description: Search results
  */
-router.get('/search', (req, res) => mangaController.searchManga(req, res));
+router.get('/search', (req, res, next) => mangaController.searchManga(req, res, next));
 
 /**
  * @swagger
@@ -67,7 +67,7 @@ router.get('/search', (req, res) => mangaController.searchManga(req, res));
  *               type: string
  *               format: binary
  */
-router.get('/image-proxy', (req, res) => mangaController.proxyImage(req, res));
+router.get('/image-proxy', (req, res, next) => mangaController.proxyImage(req, res, next));
 
 /**
  * @swagger
@@ -91,7 +91,7 @@ router.get('/image-proxy', (req, res) => mangaController.proxyImage(req, res));
  *       200:
  *         description: Category manga list fetched successfully
  */
-router.get('/category/:slug', (req, res) => mangaController.getCategoryManga(req, res));
+router.get('/category/:slug', (req, res, next) => mangaController.getCategoryManga(req, res, next));
 
 /**
  * @swagger
@@ -110,7 +110,7 @@ router.get('/category/:slug', (req, res) => mangaController.getCategoryManga(req
  *       200:
  *         description: Chapter images fetched successfully
  */
-router.get('/chapter/:chapterId', (req, res) => mangaController.getChapter(req, res));
+router.get('/chapter/:chapterId', (req, res, next) => mangaController.getChapter(req, res, next));
 
 /**
  * @swagger
@@ -129,6 +129,6 @@ router.get('/chapter/:chapterId', (req, res) => mangaController.getChapter(req, 
  *       200:
  *         description: Manga details fetched successfully
  */
-router.get('/:slug', (req, res) => mangaController.getDetails(req, res));
+router.get('/:slug', (req, res, next) => mangaController.getDetails(req, res, next));
 
 module.exports = router;

@@ -13,9 +13,10 @@ const router = express.Router();
 
 // Strict Rate Limiter cho thao tác Đăng nhập/Đăng ký
 const authLimiter = rateLimit({
-  max: 10, // Giới hạn 10 requests / 15 phút
+  max: 10,
   windowMs: 15 * 60 * 1000,
-  message: { status: 'fail', message: 'Bạn thao tác quá nhiều lần. Vui lòng thử lại sau 15 phút!' }
+  message: { status: 'fail', message: 'Bạn thao tác quá nhiều lần. Vui lòng thử lại sau 15 phút!' },
+  skip: () => process.env.NODE_ENV === 'test', // Tắt khi chạy test
 });
 
 /**
@@ -44,7 +45,7 @@ const authLimiter = rateLimit({
  *       400:
  *         description: Error registering user
  */
-router.post('/register', authLimiter, validate(registerSchema), (req, res) => authController.register(req, res));
+router.post('/register', authLimiter, validate(registerSchema), (req, res, next) => authController.register(req, res, next));
 
 /**
  * @swagger
@@ -72,7 +73,7 @@ router.post('/register', authLimiter, validate(registerSchema), (req, res) => au
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authLimiter, validate(loginSchema), (req, res) => authController.login(req, res));
+router.post('/login', authLimiter, validate(loginSchema), (req, res, next) => authController.login(req, res, next));
 
 /**
  * @swagger
@@ -101,7 +102,7 @@ router.post('/login', authLimiter, validate(loginSchema), (req, res) => authCont
  *       401:
  *         description: Unauthorized
  */
-router.put('/update-name', authMiddleware, validate(updateNameSchema), (req, res) => authController.updateName(req, res));
+router.put('/update-name', authMiddleware, validate(updateNameSchema), (req, res, next) => authController.updateName(req, res, next));
 
 /**
  * @swagger
@@ -133,6 +134,9 @@ router.put('/update-name', authMiddleware, validate(updateNameSchema), (req, res
  *       401:
  *         description: Unauthorized
  */
-router.put('/update-password', authMiddleware, validate(updatePasswordSchema), (req, res) => authController.updatePassword(req, res));
+router.put('/update-password', authMiddleware, validate(updatePasswordSchema), (req, res, next) => authController.updatePassword(req, res, next));
+
+// GET /api/auth/me - Lấy thông tin user đang đăng nhập
+router.get('/me', authMiddleware, (req, res, next) => authController.getMe(req, res, next));
 
 module.exports = router;

@@ -28,6 +28,11 @@ class AuthController {
     const result = await authService.updatePassword(userId, currentPassword, newPassword);
     res.json(result);
   });
+
+  getMe = catchAsync(async (req, res) => {
+    // req.user đã được gắn vào bởi auth.middleware.js
+    res.json(req.user);
+  });
 }
 
 module.exports = new AuthController();

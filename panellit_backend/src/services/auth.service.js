@@ -1,11 +1,12 @@
 const prisma = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { BadRequestError, UnauthorizedError, NotFoundError } = require('../utils/app-error');
 
 class AuthService {
   async register(email, password) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) throw new Error('User already exists');
+    if (existingUser) throw new BadRequestError('Email này đã được đăng ký');
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
@@ -20,10 +21,11 @@ class AuthService {
 
   async login(email, password) {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) throw new Error('Invalid credentials');
+    // Dùng cùng một message để tránh lộ thông tin (email nào đã đăng ký)
+    if (!user) throw new UnauthorizedError('Email hoặc mật khẩu không chính xác');
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new Error('Invalid credentials');
+    if (!isMatch) throw new UnauthorizedError('Email hoặc mật khẩu không chính xác');
 
     return this.generateToken(user);
   }
@@ -38,10 +40,10 @@ class AuthService {
 
   async updatePassword(userId, currentPassword, newPassword) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new Error('User not found');
+    if (!user) throw new NotFoundError('User not found');
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) throw new Error('Incorrect current password');
+    if (!isMatch) throw new UnauthorizedError('Mật khẩu hiện tại không đúng');
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await prisma.user.update({

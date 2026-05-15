@@ -37,7 +37,7 @@ router.use(authMiddleware);
  *       200:
  *         description: Bookmark toggled successfully
  */
-router.post('/toggle', validate(toggleBookmarkSchema), (req, res) => bookmarkController.toggleBookmark(req, res));
+router.post('/toggle', validate(toggleBookmarkSchema), (req, res, next) => bookmarkController.toggleBookmark(req, res, next));
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ router.post('/toggle', validate(toggleBookmarkSchema), (req, res) => bookmarkCon
  *       200:
  *         description: User bookmarks fetched successfully
  */
-router.get('/me', (req, res) => bookmarkController.getMyBookmarks(req, res));
+router.get('/me', (req, res, next) => bookmarkController.getMyBookmarks(req, res, next));
 
 /**
  * @swagger
@@ -71,6 +71,6 @@ router.get('/me', (req, res) => bookmarkController.getMyBookmarks(req, res));
  *       200:
  *         description: Bookmark deleted successfully
  */
-router.delete('/:mangaSlug', (req, res) => bookmarkController.deleteBookmark(req, res));
+router.delete('/:mangaSlug', (req, res, next) => bookmarkController.deleteBookmark(req, res, next));
 
 module.exports = router;

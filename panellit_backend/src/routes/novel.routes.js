@@ -63,7 +63,7 @@ router.post(
   '/upload',
   authMiddleware, // require login
   upload.fields([{ name: 'pdf', maxCount: 1 }, { name: 'cover', maxCount: 1 }]),
-  (req, res) => novelController.uploadNovel(req, res)
+  (req, res, next) => novelController.uploadNovel(req, res, next)
 );
 
 /**
@@ -76,7 +76,7 @@ router.post(
  *       200:
  *         description: List of novels
  */
-router.get('/', (req, res) => novelController.getNovels(req, res));
+router.get('/', (req, res, next) => novelController.getNovels(req, res, next));
 
 /**
  * @swagger
@@ -94,6 +94,6 @@ router.get('/', (req, res) => novelController.getNovels(req, res));
  *       200:
  *         description: Novel details
  */
-router.get('/:slug', (req, res) => novelController.getNovelBySlug(req, res));
+router.get('/:slug', (req, res, next) => novelController.getNovelBySlug(req, res, next));
 
 module.exports = router;

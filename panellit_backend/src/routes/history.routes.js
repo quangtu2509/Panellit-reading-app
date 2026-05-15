@@ -36,7 +36,7 @@ router.use(authMiddleware);
  *       200:
  *         description: Progress synced successfully
  */
-router.post('/sync', validate(syncHistorySchema), (req, res) => historyController.sync(req, res));
+router.post('/sync', validate(syncHistorySchema), (req, res, next) => historyController.sync(req, res, next));
 
 /**
  * @swagger
@@ -50,7 +50,7 @@ router.post('/sync', validate(syncHistorySchema), (req, res) => historyControlle
  *       200:
  *         description: User history fetched successfully
  */
-router.get('/me', (req, res) => historyController.getMyHistory(req, res));
+router.get('/me', (req, res, next) => historyController.getMyHistory(req, res, next));
 
 /**
  * @swagger
@@ -70,6 +70,6 @@ router.get('/me', (req, res) => historyController.getMyHistory(req, res));
  *       200:
  *         description: History deleted successfully
  */
-router.delete('/:mangaSlug', (req, res) => historyController.deleteHistory(req, res));
+router.delete('/:mangaSlug', (req, res, next) => historyController.deleteHistory(req, res, next));
 
 module.exports = router;
