@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const logger = require('./utils/logger');
+const errorMiddleware = require('./middlewares/error.middleware');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth.routes');
@@ -15,6 +17,12 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Simple request logger middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.originalUrl}`);
+  next();
+});
 
 // Serve static files (PDFs, Images)
 app.use('/static', express.static(path.join(__dirname, '../public')));
@@ -68,10 +76,13 @@ app.get('/', (req, res) => {
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
+// 404 handler for undefined routes
+app.use((req, res, next) => {
+  const { NotFoundError } = require('./utils/app-error');
+  next(new NotFoundError(`Can't find ${req.originalUrl} on this server!`));
 });
+
+// Global error handler
+app.use(errorMiddleware);
 
 module.exports = app;

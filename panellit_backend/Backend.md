@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 19 — Input Validation với Zod
-- **Trạng thái**: Hoàn thành. Zod validation đã được tích hợp vào các Route Auth, History, Bookmark.
-- **Tệp đang tác động chính**: `src/middlewares/validate.middleware.js`, `src/validators/*.js`, `src/routes/*.js`
-- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Server khởi động OK.
+- **Task đang thực hiện**: Phase 20 — Centralized Error Handling & Winston Logging
+- **Trạng thái**: Hoàn thành. Hệ thống log ra file/console và middleware xử lý lỗi tập trung đã sẵn sàng.
+- **Tệp đang tác động chính**: `src/middlewares/error.middleware.js`, `src/utils/logger.js`, `src/utils/app-error.js`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Code controller đã được tối ưu hóa bằng `catchAsync`.
 
 # Panellit Backend Documentation
 
@@ -27,6 +27,7 @@ panellit_backend/
 │   └── uploads/
 │       ├── novels/        # Lưu trữ file PDF Light Novel
 │       └── covers/        # Lưu trữ ảnh bìa novel
+├── logs/              # ✅ MỚI: Lưu trữ log hệ thống (error.log, combined.log)
 ├── .env                   # Chứa các biến môi trường (Database URL, JWT Secret)
 └── README.md              # Hướng dẫn cài đặt và vận hành
 ```
@@ -89,6 +90,14 @@ panellit_backend/
     - Tạo `src/validators/bookmark.validator.js`: schema cho `toggleBookmark` với `.refine()` tương tự.
     - Cập nhật `auth.routes.js`, `history.routes.js`, `bookmark.routes.js` để gắn middleware `validate()` vào đúng vị trí (sau Auth middleware, trước Controller).
     - Kiểm tra `node -e "require('./src/app.js')"` → OK, không lỗi syntax.
+- **[2026-05-15]**: **Phase 20 — Centralized Error Handling & Logging (Winston)**:
+    - Cài đặt `winston` để quản lý log chuyên nghiệp.
+    - Tạo `src/utils/logger.js`: Cấu hình log ra console (màu sắc) và file (`logs/error.log`).
+    - Tạo `src/utils/app-error.js`: Hệ thống các Class lỗi (`BadRequest`, `Unauthorized`, `NotFound`, v.v.).
+    - Tạo `src/utils/catch-async.js`: Wrapper loại bỏ `try-catch` dư thừa trong Controller.
+    - Tạo `src/middlewares/error.middleware.js`: Xử lý tập trung các lỗi Zod, Prisma và Custom Error.
+    - Cập nhật `server.js`: Thêm `uncaughtException` và `unhandledRejection` để bảo vệ server.
+    - Refactor `auth.controller.js`: Áp dụng `catchAsync` làm sạch code.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

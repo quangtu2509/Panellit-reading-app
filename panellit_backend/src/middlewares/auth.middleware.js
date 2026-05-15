@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+const { UnauthorizedError } = require('../utils/app-error');
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return next(new UnauthorizedError('You are not logged in. Please log in to get access.'));
   }
 
   const token = authHeader.split(' ')[1];
@@ -13,7 +14,7 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+    return next(new UnauthorizedError('Invalid or expired token. Please log in again.'));
   }
 };
 
