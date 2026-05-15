@@ -1,5 +1,6 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry').default;
+const logger = require('./logger');
 
 const axiosClient = axios.create({
   timeout: 10000,
@@ -9,7 +10,8 @@ const axiosClient = axios.create({
 axiosRetry(axiosClient, {
   retries: 3,
   retryDelay: (retryCount) => {
-    console.log(`Retry attempt: ${retryCount}`);
+    // Điểm 2: Dùng logger thay vì console.log thô
+    logger.warn(`[OTruyen] Request thất bại, thử lại lần ${retryCount}...`);
     return axiosRetry.exponentialDelay(retryCount);
   },
   retryCondition: (error) => {

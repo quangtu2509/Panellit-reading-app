@@ -15,6 +15,8 @@ const novelRoutes = require('./routes/novel.routes');
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const { NotFoundError } = require('./utils/app-error'); // Điểm 3: require ở top-level
 
 const app = express();
 
@@ -33,6 +35,9 @@ app.use('/api', limiter);
 
 app.use(cors());
 app.use(express.json());
+
+// 3. Compress all responses (Điểm 4)
+app.use(compression());
 
 // Simple request logger middleware (Disabled to keep console clean)
 /*
@@ -96,7 +101,7 @@ app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {
-  const { NotFoundError } = require('./utils/app-error');
+  // Điểm 3: Không require() bên trong callback — đã import ở top-level
   next(new NotFoundError(`Can't find ${req.originalUrl} on this server!`));
 });
 

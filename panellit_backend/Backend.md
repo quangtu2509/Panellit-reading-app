@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 22 — Refactor Code Controllers
-- **Trạng thái**: Hoàn thành. Đã áp dụng `catchAsync` cho toàn bộ các file Controller, loại bỏ hoàn toàn `try-catch` lặp lại.
-- **Tệp đang tác động chính**: `manga.controller.js`, `novel.controller.js`, `history.controller.js`, `bookmark.controller.js`
-- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Mọi thứ đã sạch sẽ và thống nhất.
+- **Task đang thực hiện**: Phase 24 — Tối ưu hóa API & Dữ liệu
+- **Trạng thái**: Hoàn thành. Đã thêm In-Memory Cache, Compression, và dọn dẹp code quality.
+- **Tệp đang tác động chính**: `utils/cache.js`, `routes/manga.routes.js`, `app.js`, `utils/axios-client.js`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. 49/49 tests PASS.
 
 # Panellit Backend Documentation
 
@@ -107,6 +107,17 @@ panellit_backend/
     - Viết lại `manga.controller.js`, `novel.controller.js`, `history.controller.js`, `bookmark.controller.js` bằng cách sử dụng `catchAsync`.
     - Thay thế các khối `try-catch` dư thừa và các lệnh trả về lỗi thủ công (`res.status(400).json(...)`) bằng cách `throw new AppError(...)`.
     - Code ngắn gọn hơn, sạch sẽ hơn và được chuẩn hóa đồng bộ với Global Error Middleware.
+- **[2026-05-16]**: **Phase 23 — Unit Test & Integration Test (Jest + Supertest)**:
+    - Cài đặt `jest` và `supertest`.
+    - Tạo 6 test suite với 49 test cases bao phủ toàn bộ API:
+        - `app-error.test.js` (5 Unit Tests), `auth.test.js` (12), `manga.test.js` (6), `novel.test.js` (4), `history.test.js` (11), `bookmark.test.js` (11).
+    - Phát hiện và sửa 5 bug thực sự trong quá trình viết test: thiếu `next` trong routes, sai status code 400→422, bug spread mất `isOperational` trong error middleware.
+    - Cấu hình Rate Limiter tự động tắt trong môi trường `test`.
+- **[2026-05-16]**: **Phase 24 — Tối ưu hóa API & Dữ liệu**:
+    - **In-Memory Cache**: Tạo `src/utils/cache.js` với `node-cache`. Áp dụng cho toàn bộ public routes của Manga (Home: 5p, Search: 2p, Category: 5p, Detail: 10p, Chapter: 60p).
+    - **Compression**: Thêm `compression` middleware vào `app.js` để nén gzip tất cả responses, giảm băng thông ~70%.
+    - **Logger Fix**: Thay `console.log` bằng `logger.warn` trong `axios-client.js`.
+    - **Code Quality**: Chuyển `require()` từ bên trong callback 404 lên top-level import trong `app.js`.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

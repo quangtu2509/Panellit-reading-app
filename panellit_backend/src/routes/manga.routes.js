@@ -1,6 +1,8 @@
 const express = require('express');
 const mangaController = require('../controllers/manga.controller');
+const { cacheMiddleware, TTL } = require('../utils/cache');
 const router = express.Router();
+
 
 /**
  * @swagger
@@ -19,7 +21,7 @@ const router = express.Router();
  *         description: Home feed fetched successfully
  */
 // ⚠️ IMPORTANT: Specific routes MUST be registered before dynamic /:slug
-router.get('/home', (req, res, next) => mangaController.getHomeFeed(req, res, next));
+router.get('/home', cacheMiddleware(TTL.HOME), (req, res, next) => mangaController.getHomeFeed(req, res, next));
 
 /**
  * @swagger
@@ -43,7 +45,7 @@ router.get('/home', (req, res, next) => mangaController.getHomeFeed(req, res, ne
  *       200:
  *         description: Search results
  */
-router.get('/search', (req, res, next) => mangaController.searchManga(req, res, next));
+router.get('/search', cacheMiddleware(TTL.SEARCH), (req, res, next) => mangaController.searchManga(req, res, next));
 
 /**
  * @swagger
@@ -91,7 +93,7 @@ router.get('/image-proxy', (req, res, next) => mangaController.proxyImage(req, r
  *       200:
  *         description: Category manga list fetched successfully
  */
-router.get('/category/:slug', (req, res, next) => mangaController.getCategoryManga(req, res, next));
+router.get('/category/:slug', cacheMiddleware(TTL.CATEGORY), (req, res, next) => mangaController.getCategoryManga(req, res, next));
 
 /**
  * @swagger
@@ -110,7 +112,7 @@ router.get('/category/:slug', (req, res, next) => mangaController.getCategoryMan
  *       200:
  *         description: Chapter images fetched successfully
  */
-router.get('/chapter/:chapterId', (req, res, next) => mangaController.getChapter(req, res, next));
+router.get('/chapter/:chapterId', cacheMiddleware(TTL.CHAPTER), (req, res, next) => mangaController.getChapter(req, res, next));
 
 /**
  * @swagger
@@ -129,6 +131,6 @@ router.get('/chapter/:chapterId', (req, res, next) => mangaController.getChapter
  *       200:
  *         description: Manga details fetched successfully
  */
-router.get('/:slug', (req, res, next) => mangaController.getDetails(req, res, next));
+router.get('/:slug', cacheMiddleware(TTL.MANGA_DETAIL), (req, res, next) => mangaController.getDetails(req, res, next));
 
 module.exports = router;
