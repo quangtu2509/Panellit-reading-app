@@ -13,16 +13,33 @@ const historyRoutes = require('./routes/history.routes');
 const bookmarkRoutes = require('./routes/bookmark.routes');
 const novelRoutes = require('./routes/novel.routes');
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
+
+// 1. Set security HTTP headers
+// Cho phép tải resource từ cross-origin để App Flutter có thể load ảnh bìa tĩnh
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+
+// 2. Limit requests from same API
+const limiter = rateLimit({
+  max: 150, // Limit each IP to 150 requests per windowMs
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  message: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau 15 phút!'
+});
+app.use('/api', limiter);
 
 app.use(cors());
 app.use(express.json());
 
-// Simple request logger middleware
+// Simple request logger middleware (Disabled to keep console clean)
+/*
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.originalUrl}`);
   next();
 });
+*/
 
 // Serve static files (PDFs, Images)
 app.use('/static', express.static(path.join(__dirname, '../public')));

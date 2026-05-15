@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 20 — Centralized Error Handling & Winston Logging
-- **Trạng thái**: Hoàn thành. Hệ thống log ra file/console và middleware xử lý lỗi tập trung đã sẵn sàng.
-- **Tệp đang tác động chính**: `src/middlewares/error.middleware.js`, `src/utils/logger.js`, `src/utils/app-error.js`
-- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Code controller đã được tối ưu hóa bằng `catchAsync`.
+- **Task đang thực hiện**: Phase 21 — Security (Helmet + Rate Limiting)
+- **Trạng thái**: Hoàn thành. Đã áp dụng Helmet chặn Cross-Site và Rate Limit chặn DDoS/Brute-force.
+- **Tệp đang tác động chính**: `src/app.js`, `src/routes/auth.routes.js`
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi.
 
 # Panellit Backend Documentation
 
@@ -98,6 +98,11 @@ panellit_backend/
     - Tạo `src/middlewares/error.middleware.js`: Xử lý tập trung các lỗi Zod, Prisma và Custom Error.
     - Cập nhật `server.js`: Thêm `uncaughtException` và `unhandledRejection` để bảo vệ server.
     - Refactor `auth.controller.js`: Áp dụng `catchAsync` làm sạch code.
+- **[2026-05-15]**: **Phase 21 — Security (Helmet + Rate Limiting)**:
+    - Cài đặt `helmet` và `express-rate-limit`.
+    - Cấu hình `helmet` trong `app.js` với `crossOriginResourcePolicy` để không cản trở App Flutter lấy ảnh.
+    - Cấu hình `Global Rate Limiter` trong `app.js`: Giới hạn 150 req/15 phút.
+    - Cấu hình `Auth Rate Limiter` trong `auth.routes.js`: Giới hạn nghiêm ngặt 10 req/15 phút cho `/login` và `/register` để chống dò mật khẩu.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*

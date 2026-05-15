@@ -11,7 +11,7 @@ import '../storage/token_storage.dart';
 ///   - Web / Desktop    : 'http://localhost:3000'
 class ApiClient {
   // ─── ⚠️  Đổi URL tùy môi trường test ────────────────────────────────────
-  static const String baseUrl = 'http://10.11.7.226:3000'; // Real Device (Updated IP)
+  static const String baseUrl = 'http://10.0.2.2:3000'; // Android Emulator Bất tử
   // static const String baseUrl = 'http://10.0.2.2:3000';   // Android Emulator
 
   static final ApiClient _instance = ApiClient._internal();

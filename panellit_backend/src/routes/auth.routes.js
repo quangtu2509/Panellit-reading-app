@@ -8,7 +8,15 @@ const {
   updateNameSchema,
   updatePasswordSchema,
 } = require('../validators/auth.validator');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
+
+// Strict Rate Limiter cho thao tác Đăng nhập/Đăng ký
+const authLimiter = rateLimit({
+  max: 10, // Giới hạn 10 requests / 15 phút
+  windowMs: 15 * 60 * 1000,
+  message: { status: 'fail', message: 'Bạn thao tác quá nhiều lần. Vui lòng thử lại sau 15 phút!' }
+});
 
 /**
  * @swagger
@@ -36,7 +44,7 @@ const router = express.Router();
  *       400:
  *         description: Error registering user
  */
-router.post('/register', validate(registerSchema), (req, res) => authController.register(req, res));
+router.post('/register', authLimiter, validate(registerSchema), (req, res) => authController.register(req, res));
 
 /**
  * @swagger
@@ -64,7 +72,7 @@ router.post('/register', validate(registerSchema), (req, res) => authController.
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', validate(loginSchema), (req, res) => authController.login(req, res));
+router.post('/login', authLimiter, validate(loginSchema), (req, res) => authController.login(req, res));
 
 /**
  * @swagger

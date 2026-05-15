@@ -1,6 +1,0 @@
-{"level":"info","message":"🚀 Panellit Backend running on http://localhost:3000","service":"panellit-backend","timestamp":"2026-05-15 20:40:24"}
-{"level":"info","message":"GET /api/duong-dan-nao-do-khong-co-that","service":"panellit-backend","timestamp":"2026-05-15 20:40:27"}
-{"level":"warn","message":"Can't find /api/duong-dan-nao-do-khong-co-that on this server!","method":"GET","service":"panellit-backend","timestamp":"2026-05-15 20:40:27","url":"/api/duong-dan-nao-do-khong-co-that"}
-{"level":"info","message":"POST /api/auth/register","service":"panellit-backend","timestamp":"2026-05-15 20:40:51"}
-{"level":"info","message":"GET /api/history/me","service":"panellit-backend","timestamp":"2026-05-15 20:41:11"}
-{"level":"info","message":"🚀 Panellit Backend running on http://localhost:3000","service":"panellit-backend","timestamp":"2026-05-15 20:42:53"}
