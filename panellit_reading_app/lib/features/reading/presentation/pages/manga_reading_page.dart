@@ -160,8 +160,8 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     });
   }
 
-  bool get _canGoPrev => _chapterIndex < widget.allChapters.length - 1;
-  bool get _canGoNext => _chapterIndex > 0;
+  bool get _canGoPrev => _chapterIndex > 0;
+  bool get _canGoNext => _chapterIndex < widget.allChapters.length - 1;
 
   void _scrollToTop() {
     _scrollController.animateTo(
@@ -208,16 +208,16 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     if (!_canGoNext) {
       return;
     }
-    // In OTruyen, next chapter (higher number) is a smaller index
-    _updateChapterIndex(_chapterIndex - 1);
+    // In OTruyen (Ascending), next chapter (higher number) is a larger index
+    _updateChapterIndex(_chapterIndex + 1);
   }
 
   void _goToPreviousChapter() {
     if (!_canGoPrev) {
       return;
     }
-    // In OTruyen, previous chapter (lower number) is a larger index
-    _updateChapterIndex(_chapterIndex + 1);
+    // In OTruyen (Ascending), previous chapter (lower number) is a smaller index
+    _updateChapterIndex(_chapterIndex - 1);
   }
 
   void _openChapterPicker() {
