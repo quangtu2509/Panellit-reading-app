@@ -5,7 +5,6 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
 import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
-import '../../../reader_novel/presentation/pages/pdf_reading_page.dart';
 import '../../../reader_novel/data/models/novel_reading_model.dart';
 import '../../../../core/network/models/novel_api_model.dart';
 import '../../../../core/network/models/manga_api_model.dart';
@@ -212,42 +211,24 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   }
 
   void _openReading(int chapterNumber) {
-    // ── 1. PDF Novel ────────────────────────────────────────────────────────
-    if (_detail.pdfUrl != null && _detail.pdfUrl!.isNotEmpty) {
+    // ── 1. Novel (PDF or Text) ──────────────────────────────────────────────
+    if ((_detail.pdfUrl != null && _detail.pdfUrl!.isNotEmpty) ||
+        _detail.genres.contains('Novel') ||
+        _detail.genres.contains('NOVEL')) {
       Navigator.of(context).push(
         buildSmoothPageRoute(
-          PdfReadingPage(
+          NovelReadingPage(
             novel: ApiNovelModel(
-              id:        _detail.id,
-              slug:      _detail.id,
-              title:     _detail.title,
-              author:    _detail.author,
-              cover:     _detail.coverUrl,
-              pdfUrl:    _detail.pdfUrl!,
+              id: _detail.id,
+              slug: _detail.id,
+              title: _detail.title,
+              author: _detail.author,
+              cover: _detail.coverUrl,
+              pdfUrl: _detail.pdfUrl ?? '', // Default to empty if not PDF
               description: _detail.synopsis,
               createdAt: DateTime.now(),
             ),
             isGuest: widget.isGuest,
-          ),
-        ),
-      );
-      return;
-    }
-
-    // ── 2. Text Novel (legacy) ───────────────────────────────────────────────
-    if (_detail.genres.contains('Novel') || _detail.genres.contains('NOVEL')) {
-      Navigator.of(context).push(
-        buildSmoothPageRoute(
-          NovelReadingPage(
-            novel: NovelReadingModel(
-              title: _detail.title,
-              author: _detail.author,
-              chapters: const [],
-            ),
-            initialChapterIndex: chapterNumber > 0 ? chapterNumber - 1 : 0,
-            isGuest: widget.isGuest,
-            isSaved: _savedChapterNumber == chapterNumber,
-            onSaveChapter: _saveChapter,
           ),
         ),
       );

@@ -31,7 +31,9 @@ class NovelSmartSidebar extends StatefulWidget {
 
 class _NovelSmartSidebarState extends State<NovelSmartSidebar> {
   // Panel width as a fraction of screen width.
-  static const double _panelWidthFraction = 0.72;
+  static const double _panelWidthFraction = 0.55;
+  static const double _handleHeight = 140.0; // Slightly taller
+  static const double _handleWidth = 14.0; // Wider for easier touch
 
   // Minimum horizontal drag distance to trigger open.
   static const double _dragThreshold = 18.0;
@@ -64,6 +66,8 @@ class _NovelSmartSidebarState extends State<NovelSmartSidebar> {
     final screenWidth = MediaQuery.of(context).size.width;
     final panelWidth = screenWidth * _panelWidthFraction;
 
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Stack(
       children: [
         // ── Scrim / backdrop ──────────────────────────────────────────────
@@ -87,13 +91,20 @@ class _NovelSmartSidebarState extends State<NovelSmartSidebar> {
         AnimatedBuilder(
           animation: widget.animation,
           builder: (context, child) {
+            // Sliding and scaling effect
             final offsetX = panelWidth * (widget.animation.value - 1.0);
+            final scale = 0.95 + (0.05 * widget.animation.value);
+            
             return Positioned(
               left: offsetX,
-              top: 0,
-              bottom: 0,
+              top: screenHeight * 0.1, // Not full height
+              bottom: screenHeight * 0.1,
               width: panelWidth,
-              child: child!,
+              child: Transform.scale(
+                scale: scale,
+                alignment: Alignment.centerRight,
+                child: child!,
+              ),
             );
           },
           child: _SidebarPanel(panelWidth: panelWidth, onClose: widget.onClose),
@@ -103,8 +114,8 @@ class _NovelSmartSidebarState extends State<NovelSmartSidebar> {
         if (!widget.isOpen)
           Positioned(
             left: 0,
-            top: 0,
-            bottom: 0,
+            top: (screenHeight - _handleHeight) / 2,
+            height: _handleHeight,
             child: GestureDetector(
               onLongPress: widget.onOpen,
               onHorizontalDragStart: _onDragStart,
@@ -126,25 +137,26 @@ class _SidebarHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 18,
-      decoration: const BoxDecoration(
-        color: NovelReadingColors.sidebarHandle,
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(10)),
+      width: 14,
+      decoration: BoxDecoration(
+        // Use a more vibrant color (Violet) to make it visible
+        color: const Color(0xFF8B5CF6).withValues(alpha: 0.9),
+        borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Color(0x18000000),
-            blurRadius: 8,
-            offset: Offset(2, 0),
+            color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+            blurRadius: 12,
+            offset: const Offset(2, 0),
           ),
         ],
       ),
-      child: const Center(
-        child: RotatedBox(
-          quarterTurns: 1,
-          child: Icon(
-            Icons.drag_handle_rounded,
-            size: 16,
-            color: NovelReadingColors.sidebarHandleIcon,
+      child: Center(
+        child: Container(
+          width: 3,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.7),
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
       ),
@@ -164,19 +176,18 @@ class _SidebarPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: panelWidth,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: NovelReadingColors.sidebarPanel,
-        border: Border(
-          right: BorderSide(
-            color: NovelReadingColors.sidebarPanelBorder,
-            width: 1,
-          ),
+        borderRadius: const BorderRadius.horizontal(right: Radius.circular(24)),
+        border: Border.all(
+          color: NovelReadingColors.sidebarPanelBorder,
+          width: 1,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: NovelReadingColors.sidebarPanelShadow,
-            blurRadius: 24,
-            offset: Offset(8, 0),
+            blurRadius: 32,
+            offset: Offset(4, 0),
           ),
         ],
       ),
