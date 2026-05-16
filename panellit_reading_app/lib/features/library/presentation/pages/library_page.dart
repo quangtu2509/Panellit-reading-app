@@ -194,7 +194,7 @@ class _LibraryPageState extends State<LibraryPage> {
                   ),
                   tabs: [
                     Tab(text: 'Bookmarks'),
-                    Tab(text: 'Continue'),
+                    Tab(text: 'Recent'),
                     Tab(text: 'Completed'),
                   ],
                 ),
@@ -831,7 +831,7 @@ class _HistoryCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            isNovel ? 'Novel Progress' : 'Chapter ${item.chapterId}',
+                            isNovel ? 'Light Novel' : 'Manga',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -842,16 +842,6 @@ class _HistoryCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: const LinearProgressIndicator(
-                        value: 0.5, // Mock value until backend provides total chapters
-                        backgroundColor: Color(0xFFE9EDF1),
-                        valueColor: AlwaysStoppedAnimation<Color>(LibraryColors.primary),
-                        minHeight: 4,
-                      ),
                     ),
                   ],
                 ),
