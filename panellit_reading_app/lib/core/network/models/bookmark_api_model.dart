@@ -21,7 +21,7 @@ class ApiBookmarkItem {
     return ApiBookmarkItem(
       mangaSlug: json['mangaSlug']?.toString(),
       novelSlug: json['novelSlug']?.toString(),
-      chapterId: (json['chapterId'] as num?)?.toInt(),
+      chapterId: int.tryParse(json['chapterId']?.toString() ?? ''),
       updatedAt: DateTime.tryParse(json['updatedAt']?.toString() ?? '') ?? DateTime.now(),
       manga: json['manga'] != null ? ApiMangaRef.fromJson(json['manga'] as Map<String, dynamic>) : null,
       novel: json['novel'] != null ? ApiMangaRef.fromJson(json['novel'] as Map<String, dynamic>) : null,

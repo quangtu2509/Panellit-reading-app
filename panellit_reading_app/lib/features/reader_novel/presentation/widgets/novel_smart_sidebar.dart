@@ -33,7 +33,6 @@ class _NovelSmartSidebarState extends State<NovelSmartSidebar> {
   // Panel width as a fraction of screen width.
   static const double _panelWidthFraction = 0.55;
   static const double _handleHeight = 140.0; // Slightly taller
-  static const double _handleWidth = 14.0; // Wider for easier touch
 
   // Minimum horizontal drag distance to trigger open.
   static const double _dragThreshold = 18.0;

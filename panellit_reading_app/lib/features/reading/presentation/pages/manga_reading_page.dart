@@ -18,8 +18,10 @@ class MangaReadingPage extends StatefulWidget {
   final bool isGuest;
   final ValueChanged<int?>? onSaveChapter;
   final int? savedChapterNumber;
+
   /// OTruyen slug — used to sync reading progress to the backend.
   final String mangaSlug;
+
   /// Absolute cover image URL — stored alongside history for Library display.
   final String coverUrl;
 
@@ -34,7 +36,7 @@ class MangaReadingPage extends StatefulWidget {
     this.onSaveChapter,
     this.savedChapterNumber,
     this.mangaSlug = '',
-    this.coverUrl  = '',
+    this.coverUrl = '',
   });
 
   @override
@@ -49,7 +51,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   int? _localSavedChapterNumber;
   bool _showGuestHintVisible = false;
   Timer? _guestHintTimer;
-  
+
   // Track current chapter state dynamically for navigation
   late String _currentChapterLabel;
   late int _currentChapterNumber;
@@ -57,15 +59,16 @@ class _MangaReadingPageState extends State<MangaReadingPage>
   late int _chapterIndex;
 
   final ScrollController _scrollController = ScrollController();
-  
+
   List<String> _imageUrls = [];
   bool _isLoadingImages = false;
-
 
   @override
   void initState() {
     super.initState();
-    _localSavedChapterNumber = widget.isGuest ? null : widget.savedChapterNumber;
+    _localSavedChapterNumber = widget.isGuest
+        ? null
+        : widget.savedChapterNumber;
 
     _currentChapterLabel = widget.chapterLabel;
     _currentChapterNumber = widget.chapterNumber;
@@ -102,11 +105,11 @@ class _MangaReadingPageState extends State<MangaReadingPage>
       });
       return;
     }
-    
+
     setState(() => _isLoadingImages = true);
     final repo = MangaRepository();
     final images = await repo.getChapterImages(_currentChapterApiData!);
-    
+
     if (mounted) {
       setState(() {
         _imageUrls = images;
@@ -190,13 +193,12 @@ class _MangaReadingPageState extends State<MangaReadingPage>
     final isLoggedIn = await AuthService.instance.isLoggedIn();
     if (!isLoggedIn) return;
     await HistoryApiService().syncProgress(
-      mangaSlug:  widget.mangaSlug,
-      chapterId:  chapter.chapterApiData ?? '',
+      mangaSlug: widget.mangaSlug,
+      chapterId: chapter.chapterNumber.toString(), // Use the human-readable number
       mangaTitle: widget.title,
-      coverUrl:   widget.coverUrl,
+      coverUrl: widget.coverUrl,
     );
   }
-
 
   void _goToNextChapter() {
     if (!_canGoNext) {
@@ -351,7 +353,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
         ),
       );
     }
-    
+
     if (_imageUrls.isNotEmpty) {
       return ListView.builder(
         controller: _scrollController,
@@ -370,11 +372,18 @@ class _MangaReadingPageState extends State<MangaReadingPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.broken_image, color: Colors.white54, size: 48),
+                    const Icon(
+                      Icons.broken_image,
+                      color: Colors.white54,
+                      size: 48,
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'Page ${index + 1} failed to load',
-                      style: const TextStyle(color: Colors.white54, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -399,7 +408,10 @@ class _MangaReadingPageState extends State<MangaReadingPage>
                       const SizedBox(height: 8),
                       Text(
                         'Page ${index + 1}',
-                        style: const TextStyle(color: Colors.white38, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -416,7 +428,11 @@ class _MangaReadingPageState extends State<MangaReadingPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.image_not_supported_outlined, color: Colors.grey[400], size: 64),
+          Icon(
+            Icons.image_not_supported_outlined,
+            color: Colors.grey[400],
+            size: 64,
+          ),
           const SizedBox(height: 16),
           Text(
             'No pages available for this chapter',
@@ -541,7 +557,6 @@ class _ReaderTopBar extends StatelessWidget {
     );
   }
 }
-
 
 class _ReaderControlBar extends StatelessWidget {
   final String chapterLabel;
@@ -835,4 +850,3 @@ class _MagicFab extends StatelessWidget {
     );
   }
 }
-

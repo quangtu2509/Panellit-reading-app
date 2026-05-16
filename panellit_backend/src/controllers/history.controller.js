@@ -1,41 +1,51 @@
 const historyService = require('../services/history.service');
-const catchAsync = require('../utils/catch-async');
-const { BadRequestError } = require('../utils/app-error');
 
 class HistoryController {
-  sync = catchAsync(async (req, res) => {
-    const userId = req.user.id;
-    const { mangaSlug, novelSlug, chapterId } = req.body;
+  async sync(req, res) {
+    try {
+      const userId = req.user.id;
+      const { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl } = req.body;
 
-    if (!mangaSlug && !novelSlug) {
-      throw new BadRequestError('mangaSlug or novelSlug is required');
+      if (!mangaSlug && !novelSlug) {
+        return res.status(400).json({ error: 'mangaSlug or novelSlug is required' });
+      }
+      if (mangaSlug && !chapterId) {
+        return res.status(400).json({ error: 'chapterId is required for manga' });
+      }
+
+      const history = await historyService.syncProgress(userId, req.body);
+
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    if (mangaSlug && !chapterId) {
-      throw new BadRequestError('chapterId is required for manga');
+  }
+
+  async getMyHistory(req, res) {
+    try {
+      const userId = req.user.id;
+      const history = await historyService.getUserHistory(userId);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
+  }
 
-    const history = await historyService.syncProgress(userId, req.body);
+  async deleteHistory(req, res) {
+    try {
+      const userId = req.user.id;
+      const { mangaSlug } = req.params;
+      
+      if (!mangaSlug) {
+        return res.status(400).json({ error: 'mangaSlug is required' });
+      }
 
-    res.json(history);
-  });
-
-  getMyHistory = catchAsync(async (req, res) => {
-    const userId = req.user.id;
-    const history = await historyService.getUserHistory(userId);
-    res.json(history);
-  });
-
-  deleteHistory = catchAsync(async (req, res) => {
-    const userId = req.user.id;
-    const { mangaSlug } = req.params;
-    
-    if (!mangaSlug) {
-      throw new BadRequestError('mangaSlug is required');
+      await historyService.deleteHistory(userId, mangaSlug);
+      res.json({ message: 'History deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-
-    await historyService.deleteHistory(userId, mangaSlug);
-    res.json({ message: 'History deleted successfully' });
-  });
+  }
 }
 
 module.exports = new HistoryController();

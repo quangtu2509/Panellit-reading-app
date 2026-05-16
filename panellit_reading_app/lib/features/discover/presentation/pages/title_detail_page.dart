@@ -5,7 +5,6 @@ import '../../../../app/router/smooth_page_route.dart';
 import '../../data/models/title_detail_model.dart';
 import '../../../reading/presentation/pages/manga_reading_page.dart';
 import '../../../reader_novel/presentation/pages/novel_reading_page.dart';
-import '../../../reader_novel/data/models/novel_reading_model.dart';
 import '../../../../core/network/models/novel_api_model.dart';
 import '../../../../core/network/models/manga_api_model.dart';
 import '../theme/title_detail_colors.dart';
@@ -66,7 +65,8 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
   Future<void> _fetchApiData() async {
     final repo = MangaRepository();
     final slug = _currentDetail.id;
-    final isNovel = _currentDetail.pdfUrl != null && _currentDetail.pdfUrl!.isNotEmpty;
+    final isNovel =
+        _currentDetail.pdfUrl != null && _currentDetail.pdfUrl!.isNotEmpty;
 
     try {
       final ApiMangaDetail api;
@@ -75,13 +75,15 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
       } else {
         api = await repo.getMangaDetail(slug: slug);
       }
-      
+
       if (!mounted) return;
 
       // Map API chapters
       final mappedChapters = api.chapters.asMap().entries.map((entry) {
         final c = entry.value;
-        final displayName = c.chapterName.isNotEmpty ? c.chapterName : c.chapterTitle;
+        final displayName = c.chapterName.isNotEmpty
+            ? c.chapterName
+            : c.chapterTitle;
         return ChapterUpdateModel(
           chapterNumber: entry.key + 1,
           title: displayName,
@@ -99,15 +101,21 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           rating: _currentDetail.rating,
           chapters: api.chapters.length,
           readsLabel: _currentDetail.readsLabel,
-          synopsis: api.summary.isNotEmpty ? api.summary : _currentDetail.synopsis,
-          genres: api.categories.isNotEmpty ? api.categories : _currentDetail.genres,
+          synopsis: api.summary.isNotEmpty
+              ? api.summary
+              : _currentDetail.synopsis,
+          genres: api.categories.isNotEmpty
+              ? api.categories
+              : _currentDetail.genres,
           chapterUpdates: mappedChapters,
           reviewSummary: _currentDetail.reviewSummary,
           reviews: const [],
           relatedStories: const [],
           coverColor: _currentDetail.coverColor,
           coverUrl: api.cover.isNotEmpty ? api.cover : _currentDetail.coverUrl,
-          pdfUrl: api.pdfUrl?.isNotEmpty == true ? api.pdfUrl : _currentDetail.pdfUrl,
+          pdfUrl: api.pdfUrl?.isNotEmpty == true
+              ? api.pdfUrl
+              : _currentDetail.pdfUrl,
         );
       });
     } catch (e) {
@@ -119,15 +127,16 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
     try {
       final bookmarks = await BookmarkApiService().getMyBookmarks();
       final bookmark = bookmarks.cast<ApiBookmarkItem?>().firstWhere(
-            (b) => b?.mangaSlug == _detail.id,
-            orElse: () => null,
-          );
-      
+        (b) => b?.mangaSlug == _detail.id,
+        orElse: () => null,
+      );
+
       if (!mounted) return;
-      
+
       if (bookmark != null) {
         setState(() {
-          _savedChapterNumber = bookmark.chapterId ?? 1; // Default to 1 if just bookmarked manga
+          _savedChapterNumber =
+              bookmark.chapterId ?? 1; // Default to 1 if just bookmarked manga
         });
         _scheduleResumePrompt();
       } else {
@@ -184,7 +193,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
     if (widget.isGuest) {
       return;
     }
-    
+
     // Optimistic UI update
     setState(() {
       _savedChapterNumber = chapterNumber;
@@ -224,7 +233,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
               title: _detail.title,
               author: _detail.author,
               cover: _detail.coverUrl,
-              pdfUrl: _detail.pdfUrl ?? '', // Default to empty if not PDF
+              pdfUrl: _detail.pdfUrl ?? '',
               description: _detail.synopsis,
               createdAt: DateTime.now(),
             ),
@@ -257,7 +266,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           savedChapterNumber: _savedChapterNumber,
           onSaveChapter: _saveChapter,
           mangaSlug: _detail.id,
-          coverUrl:  _detail.coverUrl ?? '',
+          coverUrl: _detail.coverUrl ?? '',
         ),
       ),
     );
