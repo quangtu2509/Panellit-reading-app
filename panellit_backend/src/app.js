@@ -26,10 +26,10 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 // 2. Limit requests from same API
 const limiter = rateLimit({
-  max: 150,
+  max: 5000, // Tăng lên 5000 để thoải mái debug
   windowMs: 15 * 60 * 1000,
   message: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau 15 phút!',
-  skip: () => process.env.NODE_ENV === 'test', // Tắt khi chạy test
+  skip: () => process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development', // Tắt khi chạy test hoặc đang dev
 });
 app.use('/api', limiter);
 
