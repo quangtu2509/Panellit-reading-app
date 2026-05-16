@@ -1,18 +1,20 @@
 const prisma = require('../config/database');
 
 class BookmarkService {
-  async toggleBookmark(userId, { mangaSlug, novelSlug, mangaTitle, novelTitle, coverUrl, chapterId }) {
+  async toggleBookmark(userId, { mangaSlug, novelSlug, mangaTitle, novelTitle, coverUrl, chapterId, genres }) {
     if (mangaSlug) {
       await prisma.manga.upsert({
         where: { slug: mangaSlug },
         update: {
           ...(mangaTitle && { title: mangaTitle }),
           ...(coverUrl && { cover: coverUrl }),
+          ...(genres && { genres }),
         },
         create: {
           slug: mangaSlug,
           title: mangaTitle || mangaSlug,
           cover: coverUrl || null,
+          genres: genres || [],
         },
       });
 
@@ -41,8 +43,23 @@ class BookmarkService {
         return { isSaved: false };
       }
     } else if (novelSlug) {
-      // Novel metadata is already in our DB usually, but let's ensure it's there
-      // (Novel is local, Manga is remote-synced)
+      // Upsert novel metadata to ensure genres are up to date
+      await prisma.novel.upsert({
+        where: { slug: novelSlug },
+        update: {
+          ...(novelTitle && { title: novelTitle }),
+          ...(coverUrl && { cover: coverUrl }),
+          ...(genres && { genres }),
+        },
+        create: {
+          slug: novelSlug,
+          title: novelTitle || novelSlug,
+          pdfUrl: '',
+          cover: coverUrl || null,
+          genres: genres || [],
+        },
+      });
+
       const existingBookmark = await prisma.bookmark.findUnique({
         where: { userId_novelSlug: { userId, novelSlug } },
       });

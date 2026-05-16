@@ -1,18 +1,20 @@
 const prisma = require('../config/database');
 
 class HistoryService {
-  async syncProgress(userId, { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl }) {
+  async syncProgress(userId, { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl, genres }) {
     if (mangaSlug) {
       await prisma.manga.upsert({
         where: { slug: mangaSlug },
         update: {
           ...(mangaTitle && { title: mangaTitle }),
           ...(coverUrl && { cover: coverUrl }),
+          ...(genres && { genres }),
         },
         create: {
           slug: mangaSlug,
           title: mangaTitle || mangaSlug,
           cover: coverUrl || null,
+          genres: genres || [],
         },
       });
 
@@ -22,6 +24,23 @@ class HistoryService {
         create: { userId, mangaSlug, chapterId, lastPageIndex },
       });
     } else if (novelSlug) {
+      // Upsert Novel to ensure genres and basic info exist
+      await prisma.novel.upsert({
+        where: { slug: novelSlug },
+        update: {
+          ...(mangaTitle && { title: mangaTitle }),
+          ...(coverUrl && { cover: coverUrl }),
+          ...(genres && { genres }),
+        },
+        create: {
+          slug: novelSlug,
+          title: mangaTitle || novelSlug,
+          pdfUrl: '',
+          cover: coverUrl || null,
+          genres: genres || [],
+        },
+      });
+
       return await prisma.history.upsert({
         where: { userId_novelSlug: { userId, novelSlug } },
         update: { lastPageIndex },

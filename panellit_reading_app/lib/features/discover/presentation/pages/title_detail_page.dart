@@ -238,6 +238,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
               createdAt: DateTime.now(),
             ),
             isGuest: widget.isGuest,
+            genres: _detail.genres,
           ),
         ),
       );
@@ -267,6 +268,7 @@ class _TitleDetailPageState extends State<TitleDetailPage> {
           onSaveChapter: _saveChapter,
           mangaSlug: _detail.id,
           coverUrl: _detail.coverUrl ?? '',
+          genres: _detail.genres,
         ),
       ),
     );

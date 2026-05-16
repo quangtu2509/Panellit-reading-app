@@ -5,7 +5,7 @@ const { BadRequestError } = require('../utils/app-error');
 class BookmarkController {
   toggleBookmark = catchAsync(async (req, res) => {
     const userId = req.user.id;
-    const { mangaSlug, novelSlug } = req.body;
+    const { mangaSlug, novelSlug, mangaTitle, novelTitle, coverUrl, chapterId, genres } = req.body;
     if (!mangaSlug && !novelSlug) {
       throw new BadRequestError('mangaSlug or novelSlug is required');
     }

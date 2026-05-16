@@ -5,11 +5,13 @@ class ApiMangaRef {
   final String slug;
   final String title;
   final String cover;
+  final List<String> genres;
 
   const ApiMangaRef({
     required this.slug,
     required this.title,
     required this.cover,
+    this.genres = const [],
   });
 
   factory ApiMangaRef.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class ApiMangaRef {
       slug:  json['slug']?.toString()  ?? '',
       title: json['title']?.toString() ?? '',
       cover: json['cover']?.toString() ?? '',
+      genres: (json['genres'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }

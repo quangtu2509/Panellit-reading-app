@@ -14,11 +14,13 @@ import '../widgets/novel_smart_sidebar.dart';
 class NovelReadingPage extends StatefulWidget {
   final ApiNovelModel novel;
   final bool isGuest;
+  final List<String> genres;
 
   const NovelReadingPage({
     super.key,
     required this.novel,
     required this.isGuest,
+    this.genres = const [],
   });
 
   @override
@@ -162,6 +164,9 @@ class _NovelReadingPageState extends State<NovelReadingPage>
         await HistoryApiService().syncProgress(
           novelSlug: widget.novel.slug,
           lastPageIndex: page,
+          novelTitle: widget.novel.title,
+          coverUrl: widget.novel.cover,
+          genres: widget.genres,
         );
       } catch (e) {
         debugPrint('Failed to sync progress: $e');

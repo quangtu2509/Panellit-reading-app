@@ -25,6 +25,7 @@ model Manga {
   slug      String     @id
   title     String
   cover     String?
+  genres    String[]   @default([])
   histories History[]
   bookmarks Bookmark[]
   createdAt DateTime   @default(now())
@@ -69,6 +70,7 @@ model Novel {
   cover       String?
   pdfUrl      String
   description String?
+  genres      String[]   @default([])
   histories   History[]
   bookmarks   Bookmark[]
   createdAt   DateTime   @default(now())

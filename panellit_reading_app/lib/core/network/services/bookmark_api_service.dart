@@ -12,6 +12,7 @@ class BookmarkApiService {
     String? mangaTitle,
     String? novelTitle,
     String? coverUrl,
+    List<String>? genres,
   }) async {
     try {
       final data = <String, dynamic>{
@@ -22,6 +23,7 @@ class BookmarkApiService {
       if (novelSlug != null) data['novelSlug'] = novelSlug;
       if (mangaTitle != null) data['mangaTitle'] = mangaTitle;
       if (novelTitle != null) data['novelTitle'] = novelTitle;
+      if (genres != null) data['genres'] = genres;
 
       final response = await _dio.post('/api/bookmarks/toggle', data: data);
       return response.data as Map<String, dynamic>;

@@ -25,6 +25,7 @@ class HistoryApiService {
     String? mangaTitle,
     String? novelTitle,
     String? coverUrl,
+    List<String>? genres,
     int lastPageIndex = 0,
   }) async {
     try {
@@ -37,6 +38,7 @@ class HistoryApiService {
       if (chapterId != null) data['chapterId'] = chapterId;
       if (mangaTitle != null) data['mangaTitle'] = mangaTitle;
       if (novelTitle != null) data['novelTitle'] = novelTitle;
+      if (genres != null) data['genres'] = genres;
 
       await _dio.post('/api/history/sync', data: data);
     } catch (_) {

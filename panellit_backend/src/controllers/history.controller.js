@@ -4,7 +4,7 @@ class HistoryController {
   async sync(req, res) {
     try {
       const userId = req.user.id;
-      const { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl } = req.body;
+      const { mangaSlug, novelSlug, chapterId, lastPageIndex, mangaTitle, coverUrl, genres } = req.body;
 
       if (!mangaSlug && !novelSlug) {
         return res.status(400).json({ error: 'mangaSlug or novelSlug is required' });

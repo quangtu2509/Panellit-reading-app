@@ -25,6 +25,8 @@ class MangaReadingPage extends StatefulWidget {
   /// Absolute cover image URL — stored alongside history for Library display.
   final String coverUrl;
 
+  final List<String> genres;
+
   const MangaReadingPage({
     super.key,
     required this.title,
@@ -37,6 +39,7 @@ class MangaReadingPage extends StatefulWidget {
     this.savedChapterNumber,
     this.mangaSlug = '',
     this.coverUrl = '',
+    this.genres = const [],
   });
 
   @override
@@ -197,6 +200,7 @@ class _MangaReadingPageState extends State<MangaReadingPage>
       chapterId: chapter.chapterNumber.toString(), // Use the human-readable number
       mangaTitle: widget.title,
       coverUrl: widget.coverUrl,
+      genres: widget.genres,
     );
   }
 

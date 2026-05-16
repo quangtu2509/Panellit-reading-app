@@ -771,6 +771,10 @@ class _HistoryCard extends StatelessWidget {
     final title = item.manga?.title ?? item.novel?.title ?? (item.mangaSlug ?? item.novelSlug ?? '');
     final cover = item.manga?.cover ?? item.novel?.cover ?? '';
     final isNovel = item.novelSlug != null;
+    final genres = [
+      isNovel ? 'Light Novel' : 'Manga',
+      ...(item.manga?.genres ?? item.novel?.genres ?? []),
+    ];
 
     return GestureDetector(
       onTap: onTap,
@@ -824,20 +828,28 @@ class _HistoryCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F4F8), // matching TitleDetailColors.chipBackground roughly
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: const Color(0xFFDCE2EA)),
-                      ),
-                      child: Text(
-                        isNovel ? 'Light Novel' : 'Manga',
-                        style: const TextStyle(
-                          color: Color(0xFF5A6B87), // matching TitleDetailColors.chipText
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: genres.map((g) => Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F4F8),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: const Color(0xFFDCE2EA)),
+                            ),
+                            child: Text(
+                              g,
+                              style: const TextStyle(
+                                color: Color(0xFF5A6B87),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )).toList(),
                       ),
                     ),
                   ],
