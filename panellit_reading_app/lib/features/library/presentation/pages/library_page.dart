@@ -824,24 +824,21 @@ class _HistoryCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.bookmark_rounded,
-                            size: 14, color: Color(0xFF0F6F9B)),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            isNovel ? 'Light Novel' : 'Manga',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF0F6F9B),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F4F8), // matching TitleDetailColors.chipBackground roughly
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: const Color(0xFFDCE2EA)),
+                      ),
+                      child: Text(
+                        isNovel ? 'Light Novel' : 'Manga',
+                        style: const TextStyle(
+                          color: Color(0xFF5A6B87), // matching TitleDetailColors.chipText
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
