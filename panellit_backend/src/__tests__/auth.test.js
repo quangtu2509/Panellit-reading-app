@@ -109,6 +109,64 @@ describe('POST /api/auth/login', () => {
   });
 });
 
+// ─── UPDATE NAME ─────────────────────────────────────────────────────────────
+describe('PUT /api/auth/update-name', () => {
+  it('✅ Cập nhật tên thành công', async () => {
+    const res = await request(app)
+      .put('/api/auth/update-name')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ name: 'New Awesome Name' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('name', 'New Awesome Name');
+  });
+
+  it('❌ Báo lỗi 422 nếu tên rỗng (Zod Validation)', async () => {
+    const res = await request(app)
+      .put('/api/auth/update-name')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ name: '' });
+
+    expect(res.statusCode).toBe(422);
+  });
+});
+
+// ─── UPDATE PASSWORD ─────────────────────────────────────────────────────────
+describe('PUT /api/auth/update-password', () => {
+  it('❌ Báo lỗi 401 nếu mật khẩu hiện tại sai', async () => {
+    const res = await request(app)
+      .put('/api/auth/update-password')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        currentPassword: 'WrongPassword!',
+        newPassword: 'NewPassword123'
+      });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('✅ Cập nhật mật khẩu thành công', async () => {
+    const res = await request(app)
+      .put('/api/auth/update-password')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        currentPassword: testUser.password, // Mật khẩu lúc đăng ký
+        newPassword: 'NewPassword123'
+      });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('success', true);
+  });
+
+  it('✅ Đăng nhập lại với mật khẩu mới thành công', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: testUser.email, password: 'NewPassword123' });
+
+    expect(res.statusCode).toBe(200);
+  });
+});
+
 // ─── ME (Lấy thông tin user hiện tại) ───────────────────────────────────────
 describe('GET /api/auth/me', () => {
   it('✅ Lấy thông tin thành công khi có token hợp lệ', async () => {

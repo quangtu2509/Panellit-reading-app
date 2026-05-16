@@ -1,8 +1,8 @@
 ## 🚧 Current Focus (Mục tiêu hiện tại)
-- **Task đang thực hiện**: Phase 24 — Tối ưu hóa API & Dữ liệu
-- **Trạng thái**: Hoàn thành. Đã thêm In-Memory Cache, Compression, và dọn dẹp code quality.
-- **Tệp đang tác động chính**: `utils/cache.js`, `routes/manga.routes.js`, `app.js`, `utils/axios-client.js`
-- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. 49/49 tests PASS.
+- **Task đang thực hiện**: Hoàn tất toàn bộ Backend (Ready for Production)
+- **Trạng thái**: Đã hoàn thành 100%. 
+- **Tệp đang tác động chính**: Đã xong.
+- **Vấn đề đang gặp (Nếu có)**: Không có lỗi. Sẵn sàng tích hợp 100% với Frontend Flutter.
 
 # Panellit Backend Documentation
 
@@ -118,6 +118,9 @@ panellit_backend/
     - **Compression**: Thêm `compression` middleware vào `app.js` để nén gzip tất cả responses, giảm băng thông ~70%.
     - **Logger Fix**: Thay `console.log` bằng `logger.warn` trong `axios-client.js`.
     - **Code Quality**: Chuyển `require()` từ bên trong callback 404 lên top-level import trong `app.js`.
+- **[2026-05-16]**: **Final Polish — Ready for Production**:
+    - Tạo tệp mẫu `.env.example` để chuẩn hóa các biến môi trường cho môi trường triển khai.
+    - Viết thêm Integration tests cho các endpoint `PUT /api/auth/update-name` và `PUT /api/auth/update-password` để đạt 100% test coverage cho module Auth. Tổng cộng hiện có 54 tests pass.
 
 ---
 *Tài liệu này được cập nhật tự động bởi Assistant mỗi khi có thay đổi quan trọng.*
